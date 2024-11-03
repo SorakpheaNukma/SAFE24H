@@ -1,0 +1,58 @@
+.quantity-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* Adjust space between elements */
+}
+
+.quantity-container h7 {
+    margin: 0;
+}
+
+@media (min-width: 850px) and (max-width: 1200px) {
+    .quantity-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (min-width: 1200px) {
+    .quantity-container {
+        width: 80%;
+        justify-content: space-between;
+    }
+}
+
+/* CSS to truncate the title text after 2 lines */
+.d-flex.flex-column p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#IdImgGrid {
+    justify-content: center;
+    display: flex;
+    object-fit: cover;
+    background-color: #E4EEF9;
+}
+
+
+/*=====================================================================*/
+/*style for product image show the same size*/
+.my-image-container {
+    max-height: 300px;
+    overflow: hidden;
+}
+
+.carousel-item {
+    height: 300px;
+}
+
+.my-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

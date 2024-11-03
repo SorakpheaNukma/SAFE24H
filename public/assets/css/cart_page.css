@@ -1,0 +1,139 @@
+.quantity-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    /* Adjust space between elements */
+}
+
+.quantity-container h7 {
+    margin: 0;
+}
+
+.d-flex.flex-column p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#IdImgGrid {
+    justify-content: center;
+    display: flex;
+    object-fit: cover;
+    background-color: #E4EEF9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+
+    /* Adjust font size and padding for smaller screens */
+    .container .fs-4 {
+        font-size: 1.25rem;
+    }
+
+    .quantity-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .quantity-container h7,
+    .quantity-container .btn,
+    .quantity-container input {
+        font-size: 0.875rem;
+    }
+
+    .product-description h5 {
+        font-size: 1rem;
+    }
+
+    .product-description p {
+        font-size: 0.875rem;
+    }
+
+    .col-9 {
+        padding-left: 0;
+    }
+
+    .col-9 .product-description,
+    .col-9 .text-success {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .quantity-container {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .product-description h5 {
+        font-size: 1.125rem;
+    }
+
+    .product-description p {
+        font-size: 1rem;
+    }
+
+    .col-9 {
+        padding-left: 1rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .quantity-container {
+        width: 80%;
+    }
+
+    .product-description h5 {
+        font-size: 1.25rem;
+    }
+
+    .product-description p {
+        font-size: 1.125rem;
+    }
+}
+
+/*style for cart page*/
+.quantity-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    /* Adjust space between elements */
+}
+
+.quantity-container h7 {
+    margin: 0;
+}
+
+.product-description {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 10px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+@media (max-width: 768px) {
+    .quantity-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    #idInfoProdcut {
+        margin-left: -60px;
+    }
+}

@@ -1,0 +1,17 @@
+.dashboard-box {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.my-hidden {
+    display: none;
+}
+
+@media (max-width: 350px) {
+    .dashboard-box {
+        width: 110%;
+    }
+}

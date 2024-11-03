@@ -1,0 +1,17 @@
+.styleBtn {
+    width: 80%;
+    color: white;
+}
+
+/* image height for larger screens */
+#welcomeImage {
+    height: 100vh;
+}
+
+/* image height for smaller screens */
+@media (max-width: 767px) {
+    #welcomeImage {
+        height: 70vh;
+        object-fit: cover;
+    }
+}

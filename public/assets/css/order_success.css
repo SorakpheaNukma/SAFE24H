@@ -1,0 +1,42 @@
+body {
+    background-color: #f8f9fa;
+}
+
+
+.order-success-card {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.order-success-card .icon {
+    font-size: 80px;
+    color: #28a745;
+}
+
+.order-success-card h1 {
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.order-success-card .order-details {
+    margin-top: 20px;
+}
+
+.order-success-card .order-details h5 {
+    margin-bottom: 5px;
+    color: #6c757d;
+}
+
+.btn-custom {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #218838;
+}

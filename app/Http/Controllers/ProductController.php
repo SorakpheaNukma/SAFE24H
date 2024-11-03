@@ -1,0 +1,289 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\ProductImages;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+
+use Illuminate\Support\Str;
+
+class ProductController extends Controller
+{
+    public function getAll()
+    {
+        try {
+            $products = Product::with(['category', 'product_image'])
+                ->orderBy('created_at', 'desc') // Sorting by 'created_at' in descending order
+                ->get();
+
+            $proDetail = $products->map(function ($p) {
+                $descriptions = [];
+                for ($i = 1; $i <= 11; $i++) {
+                    $descriptionField = "des_$i";
+                    if (!empty($p->$descriptionField)) {
+                        $descriptions[$descriptionField] = $p->$descriptionField;
+                    }
+                }
+                return [
+                    'product_id' => $p->product_id,
+                    'product_name' => $p->product_name,
+                    'quantity' => $p->quantity ?? 0,
+                    'category_name' => $p->category->category_name,
+                    'category_id' => $p->category->category_id,
+                    'product_price' => number_format($p->product_price, 2),
+                    'descriptions' => $descriptions,
+                    'images' => $p->product_image->pluck('image_path')->toArray(),
+                ];
+            });
+
+            return response()->json([
+                'status' => 200,
+                'data' => $proDetail
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getById($id)
+    {
+        try {
+            $product = Product::find($id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+
+            $product->images = ProductImages::where('product_id', $id)->get();
+            return response()->json($product, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function addProduct(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_name' => 'required|string|max:255',
+            'product_price' => 'required|numeric',
+            'category_id' => 'required|exists:categories,category_id',
+            'quantity' => 'required|Integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        try {
+            $product = new Product();
+            $product->product_name = $request->product_name;
+            $product->product_price = number_format($request->product_price, 2);
+            $product->category_id = $request->category_id;
+            $product->quantity = $request->quantity;
+
+            for ($i = 1; $i <= 11; $i++) {
+                $descriptionField = "des_$i";
+                $product->$descriptionField = $request->$descriptionField;
+            }
+
+            $product->save();
+            return response()->json([
+                'status' => 200,
+                'data' => $product
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function addImageProduct(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,product_id',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        try {
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $productImg = new ProductImages();
+                    $productImg->product_id = $request->product_id;
+
+                    $uniqueName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
+                    $destinationPath = public_path('/uploads/products');
+
+                    $image->move($destinationPath, $uniqueName);
+
+                    $productImg->image_path = $uniqueName;
+
+                    $productImg->save();
+                }
+            }
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product added successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateProduct(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,product_id',
+            'product_price' => 'required|numeric',
+            'product_name' => 'required|string',
+            'category_id' => 'required|exists:categories,category_id',
+            'quantity' => 'required|Integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        try {
+            $product = Product::find($request->product_id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+
+            $product->product_name = $request->product_name;
+            $product->category_id = $request->category_id;
+            $product->product_price = number_format($request->product_price, 2);
+            $product->quantity = $request->quantity;
+
+            for ($i = 1; $i <= 11; $i++) {
+                $descriptionField = "des_$i";
+
+                if ($request->has($descriptionField)) {
+                    $product->$descriptionField = $request->$descriptionField;
+                }
+            }
+
+            $product->save();
+
+            return response()->json([
+                'status' => 200,
+                'data' => $product,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateImgProduct(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,product_id',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        try {
+            if ($request->hasFile('images')) {
+                $productImg = ProductImages::find($request->product_id);
+
+                if (!$productImg) {
+                    foreach ($request->file('images') as $image) {
+                        $productImg = new ProductImages();
+                        $productImg->product_id = $request->product_id;
+
+                        $uniqueName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
+                        $destinationPath = public_path('/uploads/products');
+
+                        $image->move($destinationPath, $uniqueName);
+                        $productImg->image_path = $uniqueName;
+                        $productImg->save();
+                    }
+                }
+
+                if ($productImg->image_path) {
+                    $oldImagePath = public_path($productImg->image_path);
+
+                    if (file_exists($oldImagePath)) {
+                        @unlink($oldImagePath);
+                    }
+                }
+
+                foreach ($request->file('images') as $image) {
+                    $productImg = new ProductImages();
+                    $productImg->product_id = $request->product_id;
+
+                    $uniqueName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
+                    $destinationPath = public_path('/uploads/products');
+
+                    $image->move($destinationPath, $uniqueName);
+                    $productImg->image_path = $uniqueName;
+                    $productImg->save();
+                }
+            }
+            return response()->json([
+                'status' => 200,
+                'message' => 'Product updated successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteProduct(Request $request)
+    {
+        try {
+            $product = Product::find($request->product_id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+
+            $product->delete();
+            return response()->json([
+                'status' => 200,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteProductImg(Request $request)
+    {
+        try {
+            $productImg = ProductImages::find($request->product_id);
+
+            if (!$productImg) {
+                return response()->json([
+                    'status' => 200,
+                ], 200);
+            }
+
+            if ($productImg->image_path) {
+                $imagePath = public_path($productImg->image_path);
+                if (file_exists($imagePath)) {
+                    @unlink($imagePath);
+                }
+            }
+            $productImg->delete();
+
+            return response()->json([
+                'status' => 200,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+}
