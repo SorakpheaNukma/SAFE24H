@@ -122,8 +122,9 @@ $(document).ready(function () {
             method: 'GET',
             success: function (res) {
                 if (res.status == 200) {
-                    if (res.data !== null || res.data.length > 0) {
+                    if (res.data !== null) {
                         badgeNumberGL = res.data.length;
+
                         updateBadgeNumber(badgeNumberGL);
                     }
                 } else {

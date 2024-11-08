@@ -40,6 +40,18 @@ class CartController extends Controller
                 return response()->json($validator->errors(), 422);
             }
 
+            // Check if the product is already in the cart for the same user
+            $existingCartItem = Cart::where('user_id', $request->user_id)
+                ->where('product_id', $request->product_id)
+                ->first();
+
+            if ($existingCartItem) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'This item already have in cart !!'
+                ], 200);
+            }
+
             $cartItem = Cart::create([
                 'user_id' => $request->user_id,
                 'product_id' => $request->product_id,
@@ -48,7 +60,7 @@ class CartController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Item added to cart successfully.',
+                'message' => 'Item added to cart successfully 🎉',
                 'cart_item' => $cartItem
             ], 201);
         } catch (\Exception $e) {
@@ -102,6 +114,26 @@ class CartController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while processing your request.'], 500);
+        }
+    }
+
+    public function deleteMultiple(Request $request)
+    {
+        try {
+            // Validate that 'ids' is an array and contains at least one ID
+            $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer|exists:carts,id',
+            ]);
+
+            $deletedCount = Cart::whereIn('id', $request->ids)->delete();
+
+            return response()->json([
+                'status' => 200,
+                'message' => "$deletedCount cart item(s) removed successfully."
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurre:' . $e->getMessage()], 500);
         }
     }
 }

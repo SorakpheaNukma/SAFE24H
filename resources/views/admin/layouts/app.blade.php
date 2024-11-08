@@ -39,7 +39,9 @@
     <script src="{{ asset('assets/lib/toastr.min.js') }}"></script>
 
     <script src="{{ asset('assets/toasts/toast.js') }}"></script>
+
     <script src="{{ asset('assets/js/home_dashboard.js') }}"></script>
+    <script src="{{ asset('assets/js/home_dashboard_push_notify.js') }}"></script>
 
     <!--here for pusher-->
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>

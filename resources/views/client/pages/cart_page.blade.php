@@ -53,6 +53,7 @@
 
 <link rel="stylesheet" href="{{ asset('assets/css/cart_page.css') }}">
 
-<script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
 <script src="{{ asset('assets/js/cart_page.js') }}"></script>
+<script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
+
 @endsection

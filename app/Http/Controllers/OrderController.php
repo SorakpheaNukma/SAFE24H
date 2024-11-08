@@ -16,7 +16,7 @@ class OrderController extends Controller
     {
         try {
             // Fetch all orders with related data
-            $orders = Order::with(['users', 'payment', 'orderItems'])->get();
+            $orders = Order::with(['users', 'payment', 'orderItems.product.product_image'])->get();
 
             return response()->json([
                 'status' => 200,
@@ -88,7 +88,8 @@ class OrderController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'Order created successfully',
-                'data' => $order
+                'users' => $user,
+                'data' => $order,
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create order' . $e->getMessage()], 500);
@@ -112,9 +113,8 @@ class OrderController extends Controller
     public function updateOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'total_amount' => 'nullable|numeric',
             'status' => 'nullable|string',
-            'id' => 'required',
+            'order_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -122,9 +122,10 @@ class OrderController extends Controller
         }
 
         try {
-            $order = Order::findOrFail($request->id);
+            $order = Order::findOrFail($request->order_id);
             $order->total_amount = $request->total_amount ?? $order->total_amount;
             $order->status = $request->status ?? $order->status;
+            $order->order_date = $request->order_date ?? $order->order_date;
             $order->save();
 
             return response()->json([
@@ -142,14 +143,14 @@ class OrderController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required',
+                'order_id' => 'required',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $order = Order::findOrFail($request->id);
+            $order = Order::findOrFail($request->order_id);
             $order->delete();
 
             return response()->json([

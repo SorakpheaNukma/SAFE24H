@@ -4,33 +4,6 @@ $(document).ready(function () {
         return false;
     });
 
-    // function getOrderItems() {
-    //     $.ajax({
-    //         url: '/getall-order-items',
-    //         method: 'GET',
-    //         headers: {
-    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //         },
-    //         success: function (res) {
-    //             if (res.status === 200) {
-    //                 console.log('data getOrderItems is:' + JSON.stringify(res.data));
-    //             } else {
-    //                 alert('Failed ');
-    //             }
-    //         },
-    //         error: function (res) {
-    //             if (res.status === 422) {
-    //                 let error = res.responseJSON.error;
-    //                 let firstError = Object.values(error)[0][0];
-    //                 showError(firstError);
-    //             } else if (res.status === 500) {
-    //                 showError('An error occurred. Please try again later.');
-    //             } else {
-    //                 showError('Something went wrong!');
-    //             }
-    //         }
-    //     });
-    // }
 
     // here pusher
 
@@ -56,7 +29,7 @@ $(document).ready(function () {
         console.log('Real-time notification users js1: ' + JSON.stringify(data.message.users));
 
         if (data.message.order.status === 'processing') {
-            getOrders();
+            getAllOrders();
         }
 
     });
@@ -71,6 +44,7 @@ $(document).ready(function () {
 
     let categoriesLsGL = [];
     let productsLsGL = [];
+    let OrdersLsGL = [];
 
     const dashboardContent = document.getElementById("dashboard-content");
     const productContent = document.getElementById("product-content");
@@ -556,10 +530,9 @@ $(document).ready(function () {
         proImageContent.style.display = "none";
         proDescription1.style.display = "none";
         proDescription2.style.display = "none";
-        displayContentOrders();
     }
 
-    function getOrders() {
+    function getAllOrders() {
         $.ajax({
             url: '/getall-order',
             method: 'GET',
@@ -569,10 +542,10 @@ $(document).ready(function () {
             success: function (res) {
                 if (res.status === 200) {
                     LsOrdersForCountBadgeNumber = [];
+                    OrdersLsGL = [];
 
                     res.data.forEach(item => {
-                        //console.log('orders on getorders 1: ' + JSON.stringify(item.users));
-                        //console.log('orders on getorders 2: ' + JSON.stringify(item));
+                        OrdersLsGL.push(item);
 
                         if (item.status === 'processing') {
                             LsOrdersForCountBadgeNumber.push(item);
@@ -580,6 +553,8 @@ $(document).ready(function () {
                     });
 
                     $('#id-badge-order').text(LsOrdersForCountBadgeNumber.length).removeClass('d-none');
+
+                    displayContentOrders();
                 } else {
                     alert('Failed');
                 }
@@ -598,23 +573,40 @@ $(document).ready(function () {
         });
     }
 
-    getOrders();
+    getAllOrders();
+
+    // formate date
+    function formatDate(inputDate) {
+        const date = new Date(inputDate);
+
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getUTCFullYear();
+
+        let hours = date.getUTCHours();
+        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+        // Determine AM or PM and convert hours to 12-hour format
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? String(hours).padStart(2, '0') : '12'; // the hour '0' should be '12'
+
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+    }
 
     //Content Orders
     function displayContentOrders() {
-        var dvContentOrder = document.getElementById("id-content-order");
-        dvContentOrder.innerHTML = "";
+        const dvContentOrder = document.getElementById("id-content-order");
 
-        var orderCt = `
+        dvContentOrder.innerHTML = `
             <div class="container mt-3">
                 <h2 class="mb-2">Orders Management</h2>
-    
-                <!-- Orders Table -->
                 <div class="table-responsive">
-                    <table class="table table-bordered">
+                <table class="table" id="ordersTable">
                         <thead class="table-dark">
                             <tr>
-                                <th>Order ID</th>
+                                <th>Nº</th>
                                 <th>Customer</th>
                                 <th>Total Amount</th>
                                 <th>Status</th>
@@ -622,41 +614,286 @@ $(document).ready(function () {
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- Example row, replace with backend-generated rows -->
-                            <tr>
-                                <td>1234</td>
-                                <td>John Doe</td>
-                                <td>$250.00</td>
-                                <td><span class="badge bg-warning">Processing</span></td>
-                                <td>2024-10-25</td>
-                                <td>
-                                    <a href="#" class="btn btn-info btn-sm">View</a>
-                                    <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirm('Are you sure you want to delete this order?')">Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1235</td>
-                                <td>Jane Smith</td>
-                                <td>$150.00</td>
-                                <td><span class="badge bg-primary">Shipped</span></td>
-                                <td>2024-10-24</td>
-                                <td>
-                                    <a href="#" class="btn btn-info btn-sm">View</a>
-                                    <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirm('Are you sure you want to delete this order?')">Delete</button>
-                                </td>
-                            </tr>
-                            <!-- Additional rows can be added dynamically here -->
-                        </tbody>
+                        <tbody id="ordersTableBody"></tbody>
                     </table>
                 </div>
-    
             </div>
         `;
 
-        dvContentOrder.innerHTML += orderCt;
+        const ordersTableBody = document.getElementById("ordersTableBody");
+        let numberCount = 0;
+
+        OrdersLsGL.forEach(order => {
+            numberCount++;
+            const formattedDateTime = formatDate(order.order_date);
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${numberCount}</td>
+                <td>${order.users.username}</td>
+                <td>$${order.total_amount}</td>
+                <td><span class="badge ${order.status === 'processing' ? 'bg-warning' : 'bg-success'}">${order.status}</span></td>
+                <td>${formattedDateTime}</td>
+                <td>
+                    <button class="btn btn-info btn-sm btn-view-order" data-order-id="${order.order_id}">View</button>
+                    <button class="btn btn-warning btn-sm btn-edit-order" data-order-id="${order.order_id}" data-order-status="${order.status}">Edit</button>
+                    <button class="btn btn-danger btn-sm btn-delete-order" data-order-id="${order.order_id}">Delete</button>
+                    
+                    <input type="hidden" class="order-data" value='${JSON.stringify(order)}' />
+                </td>
+            `;
+            ordersTableBody.appendChild(row);
+        });
+
+        MyDataTable('#ordersTable', 15);
+
+        $(".btn-edit-order").on('click', function (e) {
+            e.stopPropagation();
+            var order_id = $(this).data("order-id");
+            var order_status = $(this).data("order-status");
+
+            editOrderDialog(order_id, order_status);
+        });
+
+        $(".btn-delete-order").on('click', function (e) {
+            e.stopPropagation();
+            var orderData = $(this).closest("td").find(".order-data").val();
+            orderData = JSON.parse(orderData);
+
+            deleteOrderDialog(orderData);
+        });
+
+        $('.btn-view-order').on('click', function (e) {
+            e.stopPropagation();
+            var orderData = $(this).closest("td").find(".order-data").val();
+
+            console.log("orderData: " + orderData);
+            orderData = JSON.parse(orderData);
+
+            viewOrderDialog(orderData);
+        });
+    }
+
+    function viewOrderDialog(orderData) {
+        const dmain = window.location.origin;
+
+        const orderItemsHTML = orderData.order_items.map(item => `
+            <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
+                <img src="${dmain}/uploads/products/${item.product.product_image[0]?.image_path}" 
+                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                <div>
+                    <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center;">
+                        🛒 ${item.product.product_name}
+                    </h5>
+                    <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
+                    <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                </div>
+            </div>
+        `).join('');
+
+        MyJConfirmDialog({
+            title: `<strong>👁️ View Order</strong>`,
+            content: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
+                    <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
+                    <p><strong>🔄 Status:</strong> ${orderData.status}</p>
+                    <p><strong>💰 Total Amount:</strong> $${orderData.total_amount}</p>
+                    <p><strong>📅 Order Date:</strong> ${formatDate(orderData.order_date)}</p>
+                    
+                    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+                    
+                    <h4 style="color: #333; margin-bottom: 10px;">👤 User Info</h4>
+                    <p><strong>📛 Name:</strong> ${orderData.users.username}</p>
+                    <p><strong>✉️ Email:</strong> ${orderData.users.email}</p>
+                    <p><strong>📞 Phone:</strong> ${orderData.users.phone_number}</p>
+                    <p><strong>🏠 Address:</strong> ${orderData.users.address}</p>
+                    
+                    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+                    
+                    <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        ${orderItemsHTML}
+                    </div>
+                </div>`,
+            columnClass: 'm',
+            type: 'blue',
+            cancelText: 'Close',
+            onCancel: function () {
+                console.log('Dialog cancelled');
+            },
+            confirmBtnClass: 'btn-warning',
+            confirmText: 'Save To Excel',
+            onConfirm: function () {
+            }
+        });
+    }
+
+
+    function editOrderDialog(orderId, status) {
+        MyJConfirmDialog({
+            title: '<strong><i class="fas fa-sync-alt" style="color: orange; margin-right: 5px;"></i> Update Order</strong>',
+            confirmText: 'Update',
+            content: `
+                <div style="margin-top: 10px;">
+                    <label for="orderStatus" style="font-weight: bold;">Order Status:</label>
+                    <select id="orderStatus" class="form-control mt-2">
+                        <option value="processing" >Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+            `,
+            confirmBtnClass: 'btn-warning',
+            columnClass: 'm',
+            type: 'orange',
+            onConfirm: function () {
+                const selectedStatus = document.getElementById("orderStatus").value;
+
+                updateOrder(orderId, selectedStatus);
+            },
+            cancelText: 'Cancel',
+            onCancel: function () {
+
+            },
+            onOpenBefore: function () {
+
+            },
+        });
+    }
+
+    function updateOrder(order_id, status) {
+        $.ajax({
+            url: '/edit-order',
+            method: 'PUT',
+            data: {
+                "order_id": order_id,
+                "status": status,
+            },
+            success: function (res) {
+                if (res.status === 200) {
+                    getAllOrders();
+
+                    showSuccess("Order updated successfully🎉");
+                } else {
+                    $.alert('Failed to update order');
+                }
+            },
+            error: function (res) {
+                let errorMessage = 'An error occurred. Please try again later.';
+                if (res.status === 422) {
+                    let error = res.responseJSON.error;
+                    errorMessage = Object.values(error)[0][0];
+                } else if (res.status === 500) {
+                    errorMessage = 'A server error occurred.';
+                }
+
+                showError(errorMessage);
+            }
+        });
+    }
+
+    function deleteOrderDialog(orderData) {
+        const { order_id, total_amount, status, order_date, order_items, users } = orderData;
+        const { username, email, phone_number, address, country } = users;
+
+        // Create HTML for order items (products with their images, names, and quantities)
+        const orderItemsHTML = order_items.map(item => `
+            <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0;">
+                <img src="${window.location.origin}/uploads/products/${item.product.product_image[0]?.image_path}" 
+                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                <div>
+                    <h5 style="margin: 0; font-weight: bold;">🛒 ${item.product.product_name}</h5>
+                    <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                </div>
+            </div>
+        `).join('');
+
+        // Confirm Dialog for Deleting Order
+        MyJConfirmDialog({
+            title: '<strong><i class="fas fa-trash-alt" style="color: red; margin-right: 5px;"></i> Delete Order</strong>',
+            confirmText: 'Delete Order',
+            content: `
+                <div style="text-align: center; padding: 10px;">
+                    <p style="font-size: 16px; color: #555;">
+                        Are you sure you want to delete this order for customer: <strong>${username}</strong>?
+                    </p>
+                    <div style="margin: 10px 0; font-size: 14px; color: #333;">
+                        <strong>Order ID:</strong> ${order_id}<br>
+                        <strong>Status:</strong> ${status}<br>
+                        <strong>Total Amount:</strong> $${total_amount}<br>
+                        <strong>Order Date:</strong> ${formatDate(order_date)}
+                    </div>
+                    <hr style="margin: 15px 0;">
+                    
+                    <h4 style="font-size: 16px; color: #333; margin-bottom: 10px;">Order Items</h4>
+                    <div style="max-height: 200px; overflow-y: auto; font-size: 14px; color: #555;">
+                        ${orderItemsHTML}
+                    </div>
+                    
+                    <hr style="margin: 15px 0;">
+                    
+                    <div style="font-size: 14px; color: #555;">
+                        <p><i class="fas fa-user-circle" style="color: #007bff; margin-right: 5px;"></i> <strong>Customer:</strong> ${username}</p>
+                        <p><i class="fas fa-envelope" style="color: #007bff; margin-right: 5px;"></i> <strong>Email:</strong> ${email}</p>
+                        <p><i class="fas fa-phone" style="color: #007bff; margin-right: 5px;"></i> <strong>Phone:</strong> ${phone_number}</p>
+                        <p><i class="fas fa-map-marker-alt" style="color: #007bff; margin-right: 5px;"></i> <strong>Address:</strong> ${address ? address : 'N/A'}, ${country}</p>
+                    </div>
+                    
+                    <hr style="margin: 15px 0;">
+                    <p style="font-size: 14px; color: #888;">
+                        This action cannot be undone. Please confirm if you want to proceed.
+                    </p>
+                    <i class="fas fa-exclamation-triangle" style="color: orange; font-size: 40px; margin-top: 15px;"></i>
+                </div>
+            `,
+            confirmText: 'Delete Order',
+            confirmBtnClass: 'btn-danger',
+            cancelBtnClass: 'btn-secondary',
+            autoClose: 'Cancel|50000',
+            columnClass: 'm',
+            type: 'red',
+            onConfirm: function () {
+                deleteOrder(order_id);  // Function to delete the order
+            },
+            cancelText: 'Cancel',
+            onCancel: function () {
+                // Handle cancel action
+            },
+            onOpenBefore: function () {
+                // Optional: Action to take before the dialog opens
+            },
+        });
+    }
+
+    function deleteOrder(order_id) {
+        $.ajax({
+            url: '/delete-order',
+            method: 'DELETE',
+            data: {
+                "order_id": order_id
+            },
+            success: function (res) {
+                if (res.status === 200) {
+                    getAllOrders();
+
+                    showSuccess("Order deleted successfully🎉");
+                } else {
+                    $.alert('Failed to delete order');
+                }
+            },
+            error: function (res) {
+                let errorMessage = 'An error occurred. Please try again later.';
+                if (res.status === 422) {
+                    let error = res.responseJSON.error;
+                    errorMessage = Object.values(error)[0][0];
+                } else if (res.status === 500) {
+                    errorMessage = 'A server error occurred.';
+                }
+
+                showError(errorMessage);
+            }
+        });
     }
 
 
@@ -1096,7 +1333,7 @@ $(document).ready(function () {
                 typeAnimated: true,
                 type: 'blue',
                 content: `
-                <form action = "" class="formName" > 
+                <form  class="formName"> 
                     <div class="form-group">
                         <label>Product Name</label>
                         <input type="text" id="productName" placeholder="Enter product name" class="form-control" required />
@@ -1231,8 +1468,15 @@ $(document).ready(function () {
                             this.value = 0;
                         }
                     });
+
+                    const contentArea = this.$content;
+                    contentArea.css({
+                        'max-height': '70vh', // Make the content scrollable if it's too long
+                        'overflow-y': 'auto',  // Add vertical scroll
+                    });
                 }
             });
+            // end of confirm dialog
         });
     }
 
@@ -1447,54 +1691,71 @@ $(document).ready(function () {
             draggable: true,
             typeAnimated: true,
             type: options.type || 'blue',
-            buttons: {
-                Confirm: {
-                    text: options.confirmText || 'Confirm',
-                    btnClass: options.confirmBtnClass || 'btn-blue',
-                    action: options.onConfirm || function () { }
-                },
-                Cancel: {
-                    text: options.cancelText || 'Cancel',
-                    action: options.onCancel || function () { }
-                }
-            },
-            onOpenBefore: function () {
-                if (options.onOpenBefore) {
-                    options.onOpenBefore();
-                }
-            },
-            onContentReady: function () {
-                if (options.onContentReady) {
-                    options.onContentReady();
-                }
+            buttons: {}
+        };
+
+        // Add Confirm button if confirmText is not null
+        if (options.confirmText != null) {
+            config.buttons.Confirm = {
+                text: options.confirmText || 'Confirm',
+                btnClass: options.confirmBtnClass || 'btn-blue',
+                action: options.onConfirm || function () { }
+            };
+        }
+
+        // Always add Cancel button
+        config.buttons.Cancel = {
+            text: options.cancelText || 'Cancel',
+            action: options.onCancel || function () { }
+        };
+
+        config.onOpenBefore = function () {
+            if (options.onOpenBefore) {
+                options.onOpenBefore();
             }
         };
 
+        config.onContentReady = function () {
+            if (options.onContentReady) {
+                options.onContentReady();
+            }
+
+            const contentArea = this.$content;
+            contentArea.css({
+                'max-height': '70vh', // Make the content scrollable if it's too long
+                'overflow-y': 'auto',  // Add vertical scroll
+            });
+        };
+
+        // Auto-close option
         if (options.autoClose != null) {
             config.autoClose = options.autoClose;
         }
 
+        // Show the confirm dialog
         $.confirm(config);
     }
 
-    function MyDataTable(tableId) {
+
+
+    function MyDataTable(tableId, pageLength = 10) {
         if ($.fn.dataTable.isDataTable(tableId)) {
             $(tableId).DataTable().destroy();
         }
 
         $(tableId).DataTable({
-            "info": false,
-            "lengthChange": false,
-            "pageLength": 10,
-            "paging": true,
-            "searching": true,
-            "ordering": true,
+            "info": false,                  // Disable table information display
+            "lengthChange": false,           // Allow users to change the number of rows per page
+            "pageLength": pageLength,       // Set the initial page length (default 10)
+            "paging": true,                 // Enable pagination
+            "searching": true,              // Enable search functionality
+            "ordering": true,               // Enable sorting functionality
             "language": {
                 "paginate": {
-                    "previous": "<i class='fas fa-arrow-left'></i>",
-                    "next": "<i class='fas fa-arrow-right'></i>"
+                    "previous": "<i class='fas fa-arrow-left'></i>",  // Previous button icon
+                    "next": "<i class='fas fa-arrow-right'></i>"      // Next button icon
                 }
-            }
+            },
         });
     }
 

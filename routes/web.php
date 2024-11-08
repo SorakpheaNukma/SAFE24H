@@ -42,8 +42,8 @@ Route::middleware('MyMiddlewareNavigation')->group(function () {
     })->name('commons.welcome');
 });
 
-Route::middleware('MyMiddleware')->group(function () {
-    Route::get('/home-dashboard', [Home_dashBoard::class, 'index'])->name('admin.home_dashboard');
+//can be use all of this if already logged in (auth)
+Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);
     Route::post('/add-category', [CategoryController::class, 'createCategory']);
     Route::put('/edit-category', [CategoryController::class, 'updateCategory']);
@@ -57,28 +57,16 @@ Route::middleware('MyMiddleware')->group(function () {
     Route::post('/edit-product-img', [ProductController::class, 'updateImgProduct']);
     Route::delete('/delete-product-img', [ProductController::class, 'deleteProductImg']);
     Route::get('/logout', [LoginController::class, 'logout']);
-    //
-    Route::get('/home-page', function () {
-        return view('client.pages.home_page');
-    })->name('client.home_page');
 
-    Route::get('/cart-page', [CartController::class, 'index']);
+    //
     Route::get('/get-all-cart-items', [CartController::class, 'getAllCartItems']);
     Route::post('/add-to-cart', [CartController::class, 'store']);
     Route::put('/update-cart', [CartController::class, 'update']);
     Route::delete('/remove-from-cart', [CartController::class, 'destroy']);
+    Route::delete('/delete-multiple-from-cart', [CartController::class, 'deleteMultiple']);
 
-    Route::get('/buy-now-page', function () {
-        return view('client.pages.buy_now_page');
-    });
-    Route::get('/profile-page', function () {
-        return view('client.pages.profile_page');
-    });
 
-    Route::get('/order-success', function () {
-        return view('client.pages.order_sucess');
-    });
-
+    //
     Route::get('/getall-order', [OrderController::class, 'getAllOrders']);
     Route::get('/get-order-current-login', [OrderController::class, 'getOrdersCurrentLogin']);
     Route::post('/save-order', [OrderController::class, 'createOrders']);
@@ -90,23 +78,56 @@ Route::middleware('MyMiddleware')->group(function () {
     Route::put('/edit-order-items', [OrderItemController::class, 'updateOrderItem']);
     Route::delete('/delete-order-items', [OrderItemController::class, 'deleteOrderItem']);
 
-    Route::get('/order-history-page', function () {
-        return view('client.pages.order_history_page');
-    });
-
     Route::get('/address-page', action: [MapController::class, 'index']);
     Route::put('/update-address', action: [LoginController::class, 'updateUserAdress']);
-    Route::get('/details-page', function () {
-        return view('client.pages.detail_page');
-    });
-
     Route::get('/me-info', [LoginController::class, 'me']);
-
 
     // push notifications 
     Route::post('/save-push-notification-sub', [PushNotificationBrowserController::class, 'saveSubscription']);
     Route::post('/send-push-notification', [PushNotificationBrowserController::class, 'sendNotification']);
 });
+
+
+// admin
+Route::middleware('MyAdminMiddleware')->group(function () {
+    Route::get('/home-dashboard', [Home_dashBoard::class, 'index'])->name('admin.home_dashboard');
+});
+
+// user
+Route::middleware('MyUserMiddleWare')->group(function () {
+    Route::get('/home-page', function () {
+        return view('client.pages.home_page');
+    })->name('client.home_page');
+
+    Route::get('/cart-page', [CartController::class, 'index']);
+
+    //
+    Route::get('/buy-now-page', function () {
+        return view('client.pages.buy_now_page');
+    });
+
+    //
+    Route::get('/profile-page', function () {
+        return view('client.pages.profile_page');
+    });
+
+    //
+    Route::get('/order-success', function () {
+        return view('client.pages.order_sucess');
+    });
+
+
+    //
+    Route::get('/order-history-page', function () {
+        return view('client.pages.order_history_page');
+    });
+
+    Route::get('/details-page', function () {
+        return view('client.pages.detail_page');
+    });
+});
+
+
 
 
 

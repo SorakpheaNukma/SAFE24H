@@ -224,29 +224,4 @@ $(document).ready(function () {
         populateGrid();
     });
 
-
-    function sendNotification() {
-        $.ajax({
-            url: '/send-push-notification',
-            type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: {
-                title: 'Hello, world Test Notification',
-                body: 'Hello, world Test Notification',
-                url: 'http://127.0.0.1:8000/home-dashboard',
-            },
-            success: function (response) {
-                console.log(response);
-                alert('Notification sent successfully');
-            },
-            error: function (error) {
-                console.log(error);
-                alert('Failed to send notification');
-            }
-        });
-    }
-
-    sendNotification();
 });

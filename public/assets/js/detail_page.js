@@ -280,7 +280,8 @@ $(document).ready(function () {
             success: function (res) {
                 if (res.status == 200) {
                     getAllCartItems();
-                    showSuccess('Added to Cart successfully.🎉');
+
+                    showSuccess(res.message);
                 } else {
                     showError('Fails to add to Cart.');
                 }

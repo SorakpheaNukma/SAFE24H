@@ -2,7 +2,7 @@ $(document).ready(function () {
     var cartsItemsGL = [];
 
     // Function to get all cart items
-    function getAllCartItems() {
+    function getAllCartItemsInThisJS() {
         showSpinner();
         $.ajax({
             url: '/get-all-cart-items',
@@ -11,8 +11,11 @@ $(document).ready(function () {
                 hideSpinner();
                 if (res.status === 200 && res.data && res.data.length > 0) {
                     cartsItemsGL = res.data;
-                    console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
-                    renderCartItems(cartsItemsGL); // Render items if available
+
+                    // console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
+
+                    // Render items if available
+                    renderCartItems(cartsItemsGL);
                 } else {
                     console.log('No items in cart');
                 }
@@ -24,7 +27,7 @@ $(document).ready(function () {
         });
     }
 
-    getAllCartItems();
+    getAllCartItemsInThisJS();
 
     function showSpinner() {
         const spinner = document.getElementById('spinner');
@@ -155,7 +158,9 @@ $(document).ready(function () {
     // Function to delete a single cart item
     function deleteSingleItem(e) {
         const index = e.currentTarget.dataset.index;
-        const itemId = cartsItemsGL[index].id; // Assuming each cart item has an ID
+
+        // Assuming each cart item has an ID
+        const itemId = cartsItemsGL[index].id;
 
         $.ajax({
             url: `/remove-from-cart`,
@@ -163,10 +168,19 @@ $(document).ready(function () {
             data: {
                 'id': itemId
             },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             success: function (res) {
                 if (res.status === 200) {
+                    showSuccess('deleted cart successfully🎉');
+
+                    // call from other js
+                    getAllCartItems();
+
                     // Remove the item from the global array and re-render the cart
                     cartsItemsGL.splice(index, 1);
+
                     renderCartItems(cartsItemsGL);
                     updateTotalPrice();
                 } else {
@@ -179,22 +193,35 @@ $(document).ready(function () {
         });
     }
 
+
     // Function to delete selected items (bulk delete)
     document.getElementById('deleteSelectedAllItems').addEventListener('click', function () {
         const selectedItems = cartsItemsGL.filter((item, index) => document.getElementById(`item${index}`).checked);
-        const selectedItemIds = selectedItems.map(item => item.id); // Assuming each cart item has an ID
+        const selectedItemIds = selectedItems.map(item => item.id);
 
         if (selectedItemIds.length > 0) {
             $.ajax({
-                url: '/remove-from-cart',
+                url: '/delete-multiple-from-cart',
                 method: 'DELETE',
-                data: { ids: selectedItemIds },
+                data: {
+                    'ids': selectedItemIds,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 success: function (res) {
                     if (res.status === 200) {
-                        // Remove selected items from the global array and re-render the cart
-                        cartsItemsGL = cartsItemsGL.filter((item, index) => !document.getElementById(`item${index}`).checked);
+                        // Remove selected items from the global array based on selected IDs
+                        cartsItemsGL = cartsItemsGL.filter(item => !selectedItemIds.includes(item.id));
+
+                        // Re-render the cart and update the total price
                         renderCartItems(cartsItemsGL);
                         updateTotalPrice();
+
+                        // call from other js
+                        getAllCartItems();
+
+                        showSuccess('deleted cart successfully🎉');
                     } else {
                         showError('Failed to delete selected items.');
                     }
@@ -205,6 +232,7 @@ $(document).ready(function () {
             });
         }
     });
+
 
     function btnCheckOut() {
         $('#id-btn-checkout').on('click', function () {

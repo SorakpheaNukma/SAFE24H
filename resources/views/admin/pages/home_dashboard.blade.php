@@ -1,4 +1,9 @@
 @extends('admin.layouts.app')
+
+<meta name="csrf_token" content="{{ csrf_token() }}">
+<meta name="service-worker-file-js" content="{{ URL::asset('service-worker.js') }}">
+<meta name="public-key-push-notification" content="{{ env('PUSH_NOTIFICATION_PUBLIC_KEY') }}">
+
 @section('content')
 
 <div class="container-fluid position-relative d-flex p-0">
@@ -74,11 +79,10 @@
             </a>
             <div class="navbar-nav align-items-center ms-auto">
                 <!-- Button to Enable Notifications on Browser -->
-                <button
-                    class="btn btn-primary btn-sm d-none d-lg-inline-flex shadow-sm px-3 py-2 rounded-pill d-flex align-items-center"
-                    onclick="askForPermission()">
-                    <i class="fa fa-bell me-2"></i>
-                    Enable Notifications
+                <button id="btn-enable-notification"
+                    class="btn btn-primary shadow-sm rounded-pill d-flex align-items-center px-2 py-1 px-lg-3 py-lg-2">
+                    <i class="fa fa-bell me-0 me-md-2 me-lg-2"></i>
+                    <span class="d-none d-md-inline">Enable Notifications</span>
                 </button>
 
 
@@ -196,66 +200,4 @@
 
 </div>
 
-<script>
-    navigator.serviceWorker.register("{{ URL::asset('service-worker.js') }}");
-
-    function askForPermission() {
-        Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-                // get service worker
-                navigator.serviceWorker.ready.then((sw) => {
-                    // subscribe
-                    sw.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: "{{ env('PUSH_NOTIFICATION_PUBLIC_KEY') }}"
-                    }).then((subscription) => {
-                        console.log("sub ok:"+JSON.stringify(subscription));
-                      
-                        // save subscription 
-                        saveSub(JSON.stringify(subscription));
-                    }).catch((error) => {
-                        console.error("Subscription failed: ", error);
-                    });
-                });
-            }
-        });
-    }
-
-    function saveSub(sub) {
-            $.ajax({
-                type: 'post',
-                url: '{{ URL('save-push-notification-sub') }}',
-                data: {
-                    '_token': "{{ csrf_token() }}",
-                    'sub': sub
-                },
-                success: function(data) {
-                    console.log('Subscription saved:', data);
-                },
-                error: function(error) {
-                    console.error('Failed to save subscription:', error);
-                }
-            });
-    }
-
-    // function sendNotification() {
-    //         $.ajax({
-    //             type: 'post',
-    //             url: '{{ URL('send-push-notification') }}',
-    //             data: {
-    //                 '_token': "{{ csrf_token() }}",
-    //                 'title': $("#title").val(),
-    //                 'body': $("#body").val(),
-    //                 'idOfProduct': $("#idOfProduct").val(),
-    //             },
-    //         success: function(data) {
-    //                 alert('Notification sent successfully');
-    //                 console.log(data);
-    //             },
-    //             error: function(error) {
-    //                 console.error('Failed to send notification:', error);
-    //             }
-    //         });
-    // }
-</script>
 @endsection

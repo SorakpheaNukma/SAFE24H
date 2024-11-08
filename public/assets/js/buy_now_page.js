@@ -6,6 +6,9 @@ $(document).ready(function () {
 
     const user_idGL = document.querySelector('meta[name="user_id"]').content;
 
+    var UserDataGL = [];
+    var ProductNameDataGL = [];
+
     $('#id-change-address').on('click', function () {
         window.location.href = '/address-page';
     });
@@ -211,6 +214,8 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.status === 200) {
+                    UserDataGL.push(res.users);
+
                     callback(res.data.order_id);
                 } else {
                     alert('Failed to place the order.');
@@ -226,6 +231,29 @@ $(document).ready(function () {
                 } else {
                     showError('Something went wrong!');
                 }
+            }
+        });
+    }
+
+    // send notification to browser that already has subscription 
+    function sendNotification(title, body, url) {
+        $.ajax({
+            url: '/send-push-notification',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                title: title,
+                body: body,
+                url: url,
+            },
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (error) {
+                console.log("Error send Notification:" + error);
+                showError("Error send Notification: " + error);
             }
         });
     }
@@ -260,6 +288,25 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.status === 200) {
+                    const dmain = window.location.origin;
+
+                    var title = "🛒 New Order Received!";
+                    var url = `${dmain}/home-dashboard`;
+                    var body = `👤 Client: `;
+
+                    UserDataGL.forEach(u => {
+                        body += `${u.username}\n`;
+                    });
+
+                    body += "🛍️ Ordered Items:\n";
+
+                    res.data.forEach(item => {
+                        // console.log('item: ' + JSON.stringify(item.order_item.quantity));
+                        body += `• ${item.product_name} -- Quantity:${item.order_item.quantity}\n`;
+                    });
+
+                    sendNotification(title, body, url);
+
                     window.location.href = `/order-success?Total_Price=${totalPrice.toFixed(2)}&Order_Id=${orderId}`;
                 } else {
                     alert('Failed to place the order items.');

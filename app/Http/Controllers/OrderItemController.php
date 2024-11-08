@@ -43,6 +43,7 @@ class OrderItemController extends Controller
     public function addOrderItem(Request $request)
     {
         $items = $request->input('items');
+        $createdItems = [];
 
         foreach ($items as $item) {
             $validatedData = Validator::make($item, [
@@ -52,14 +53,25 @@ class OrderItemController extends Controller
                 'price' => 'required',
             ])->validate();
 
-            OrderItem::create($validatedData);
+            $createdItem = OrderItem::create($validatedData);
+
+            // Load the product relation and only get the product name
+            $createdItem->load('product');
+            $productName = $createdItem->product->product_name;
+
+            $createdItems[] = [
+                'order_item' => $createdItem,
+                'product_name' => $productName,
+            ];
         }
 
         return response()->json([
             'status' => 200,
-            'message' => 'Order items successfully added'
+            'message' => 'Order items successfully added',
+            'data' => $createdItems,
         ]);
     }
+
 
     // Update quantity or price of an order item
     public function updateOrderItem(Request $request)

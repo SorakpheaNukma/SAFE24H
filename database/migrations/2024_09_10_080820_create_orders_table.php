@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->unsignedInteger('user_id');
             $table->float('total_amount');
             $table->string('status'); // (processing, shipped, delivered)
-            $table->timestamp('order_date');
+            $table->dateTime('order_date'); // Change from timestamp to dateTime
             $table->timestamps();
 
             //Cascade on Delete: The onDelete('cascade') rule only applies to deletions 

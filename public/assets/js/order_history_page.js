@@ -18,37 +18,61 @@ $(document).ready(function () {
         $('#badge-shipped').text(toShipCount).removeClass('d-none');
     }
 
+    // Group order items by order_id
+    const ordersGroupedByOrderId = {};
+    objOrderItems.forEach(item => {
+        if (!ordersGroupedByOrderId[item.order.order_id]) {
+            ordersGroupedByOrderId[item.order.order_id] = {
+                order: item.order,
+                items: []
+            };
+        }
+        ordersGroupedByOrderId[item.order.order_id].items.push(item);
+    });
+
     // Function to append order items to the appropriate tab
     function appendOrderItems() {
-        objOrderItems.forEach(item => {
-            // console.log('item: ', item.product.product_image[0].image_path);
+        Object.values(ordersGroupedByOrderId).forEach(orderGroup => {
+            const order = orderGroup.order;
+            const items = orderGroup.items;
 
             const dmain = window.location.origin;
-            const imagePath = item.product.product_image[0].image_path;
+            let itemListHTML = '';
+
+            items.forEach(item => {
+                const imagePath = item.product.product_image[0].image_path;
+                itemListHTML += `
+                    <div class="order-item d-flex align-items-center mb-2">
+                        <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
+                        <div>
+                            <p class="mb-1 fw-bold">${item.product.product_name}</p>
+                            <p class="text-muted mb-0">Quantity: ${item.quantity}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
             const orderCard = `
-                <div class="card mb-3">
+                <div class="card shadow-sm mb-4 border-0">
                     <div class="card-body">
-                        <div class="order-details">
-                            <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image">
-                            <div>
-                                <h5 class="card-title">Order #${item.order.order_id}</h5>
-                                <p class="card-text">Product: ${item.product.product_name}</p>
-                                <p class="card-text">Quantity: ${item.quantity}</p>
-                                <p class="card-text">Total Amount: $${item.order.total_amount}</p>
-                                <p class="card-text">Order Date: ${item.order.order_date}</p>
-                                <span class="badge ${item.order.status === 'processing' ? 'badge-warning' : 'badge-primary'}">${item.order.status}</span>
-                            </div>
+                        <h5 class="card-title fw-bold">Order #${order.order_id}</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <p class="mb-0 text-muted">Total Amount: <span class="fw-bold">$${order.total_amount}</span></p>
+                            <p class="mb-0 text-muted">Order Date: ${order.order_date.split('T')[0]}</p>
+                        </div>
+                        <span class="badge ${order.status === 'processing' ? 'bg-warning text-dark' : 'bg-primary'}">${order.status}</span>
+                        <div class="order-items mt-3">
+                            ${itemListHTML}
                         </div>
                     </div>
                 </div>`;
 
             // Append to the correct tab based on the order status
-            if (item.order.status === 'processing') {
+            if (order.status === 'processing') {
                 $('#processing-orders').append(orderCard);
-            } else if (item.order.status === 'Shipped') {
+            } else if (order.status === 'Shipped') {
                 $('#shipped-orders').append(orderCard);
             } else {
-                // Handle completed orders if needed
                 $('#received-orders').append(orderCard);
             }
         });

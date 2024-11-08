@@ -55,10 +55,17 @@ class PushNotificationBrowserController extends Controller
 
     public function saveSubscription(Request $request)
     {
+        $existingSubscription = PushNotificationBrowser::where('subscriptions', $request->sub)->first();
+
+        if ($existingSubscription) {
+            return response()->json(['message' => 'Subscription already exists'], 200);
+        }
+
+        // If the subscription does not exist, save it to the database
         $items = new PushNotificationBrowser();
         $items->subscriptions = $request->sub; // Store raw JSON
         $items->save();
 
-        return response()->json(['message' => 'added successfully'], 200);
+        return response()->json(['message' => 'Subscription added successfully'], 200);
     }
 }
