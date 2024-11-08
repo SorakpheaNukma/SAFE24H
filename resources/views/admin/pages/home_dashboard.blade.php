@@ -6,6 +6,7 @@
 
 @section('content')
 
+
 <div class="container-fluid position-relative d-flex p-0">
     <!--spinner-->
     <div id="IDSpinner" class="my-hidden">
@@ -94,7 +95,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
                         <a id="" class="dropdown-item">My Profile</a>
-                        <a class="dropdown-item">Settings</a>
+                        {{-- <a class="dropdown-item">Settings</a> --}}
                         <a id="id-logout" class="dropdown-item">Log Out</a>
                     </div>
                 </div>
@@ -105,62 +106,7 @@
 
         <div class="container-fluid" id="different-content">
             <div id="dashboard-content" style="display: block;">
-                <div>
-                    <div class="row">
-                        <!-- 1 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="dashboard-box p-3">
-                                <div class="d-flex align-items-center justify-content-around">
-                                    <i class="fa fa-shopping-cart fa-3x me-3" aria-hidden="true"></i>
-                                    <div class="text-end">
-                                        <h6>Today Sale</h6>
-                                        <h5>$12555.00</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="dashboard-box p-3">
-                                <div class="d-flex align-items-center justify-content-around">
-                                    <i class="fa fa-line-chart fa-3x me-3" aria-hidden="true"></i>
-                                    <div class="text-end">
-                                        <h6>Total Sale</h6>
-                                        <h4>$1224.00</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="dashboard-box p-3">
-                                <div class="d-flex align-items-center justify-content-around">
-                                    <i class="fa fa-dollar fa-3x me-3" aria-hidden="true"></i>
-
-                                    <div class="text-end">
-                                        <h6>Today Revenue</h6>
-                                        <h4>$1234.00</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 4 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
-                            <div class="dashboard-box p-3">
-                                <div class="d-flex align-items-center justify-content-around">
-                                    <i class="fa fa-dollar fa-3x me-3" aria-hidden="true"></i>
-                                    <div class="text-end">
-                                        <h6>Total Revenue</h6>
-                                        <h4>$1288.00</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div id="id-conent-dashboard"></div>
             </div>
 
 

@@ -514,6 +514,9 @@ $(document).ready(function () {
         showDashboard();
     });
 
+    // Trigger click on dashboardActionLink to load the dashboard on page load
+    dashboardActionLink.click();
+
 
     OrderActionLink.addEventListener("click", function (e) {
         e.preventDefault();
@@ -531,6 +534,7 @@ $(document).ready(function () {
         proDescription1.style.display = "none";
         proDescription2.style.display = "none";
     }
+
 
     function getAllOrders() {
         $.ajax({
@@ -911,6 +915,9 @@ $(document).ready(function () {
         proImageContent.style.display = "none";
         proDescription1.style.display = "none";
         proDescription2.style.display = "none";
+
+        // call from other js (dashboard_content.js)
+        displayContentDashboard();
     }
 
     function prodcut_Content() {
