@@ -514,9 +514,6 @@ $(document).ready(function () {
         showDashboard();
     });
 
-    // Trigger click on dashboardActionLink to load the dashboard on page load
-    dashboardActionLink.click();
-
 
     OrderActionLink.addEventListener("click", function (e) {
         e.preventDefault();
@@ -536,7 +533,8 @@ $(document).ready(function () {
     }
 
 
-    function getAllOrders() {
+    // fun getAllOrders
+    function getAllOrders(callback = null) {
         $.ajax({
             url: '/getall-order',
             method: 'GET',
@@ -556,9 +554,14 @@ $(document).ready(function () {
                         }
                     });
 
+
                     $('#id-badge-order').text(LsOrdersForCountBadgeNumber.length).removeClass('d-none');
 
                     displayContentOrders();
+
+                    if (callback && typeof callback === 'function') {
+                        callback(res.data);
+                    }
                 } else {
                     alert('Failed');
                 }
@@ -577,7 +580,12 @@ $(document).ready(function () {
         });
     }
 
-    getAllOrders();
+    getAllOrders(function (data) {
+        if (data) {
+            // Trigger click on dashboardActionLink to load the dashboard on page load
+            dashboardActionLink.click();
+        }
+    });
 
     // formate date
     function formatDate(inputDate) {
@@ -916,9 +924,9 @@ $(document).ready(function () {
         proDescription1.style.display = "none";
         proDescription2.style.display = "none";
 
-        // call from other js (dashboard_content.js)
         displayContentDashboard();
     }
+
 
     function prodcut_Content() {
         displayTbProducts();
@@ -1766,7 +1774,6 @@ $(document).ready(function () {
         });
     }
 
-
     function clearAndRemove() {
         localStorage.removeItem('username');
         sessionStorage.removeItem("token");
@@ -1799,4 +1806,219 @@ $(document).ready(function () {
         });
     }
     logout();
+
+
+
+    // all about in content dashboard
+    //////////////////////////////////////////////////////
+    function displayContentDashboard() {
+        const dvContentDashboard = document.getElementById('id-conent-dashboard');
+
+        dvContentDashboard.innerHTML = `
+            <div class="row">
+                <!-- First Row with Cards -->
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-4 slide-in-top">
+                    <div class="dashboard-box p-4 bg-primary text-white rounded">
+                        <div class="d-flex align-items-center justify-content-around">
+                            <i class="fa fa-shopping-cart fa-3x me-3" aria-hidden="true"></i>
+                            <div class="text-end">
+                                <h6>Today's Sales</h6>
+                                <h5>$12,555.00</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-4 slide-in-top">
+                    <div class="dashboard-box p-4 bg-success text-white rounded">
+                        <div class="d-flex align-items-center justify-content-around">
+                            <i class="fa fa-line-chart fa-3x me-3" aria-hidden="true"></i>
+                            <div class="text-end">
+                                <h6>Total Sales</h6>
+                                <h4>$122,400.00</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Additional Stat Cards -->
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-4 slide-in-right">
+                    <div class="dashboard-box p-4 bg-warning text-white rounded">
+                        <div class="d-flex align-items-center justify-content-around">
+                            <i class="fa fa-users fa-3x me-3" aria-hidden="true"></i>
+                            <div class="text-end">
+                                <h6>Users</h6>
+                                <h4>1,500</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-4 slide-in-right">
+                    <div class="dashboard-box p-4 bg-danger text-white rounded">
+                        <div class="d-flex align-items-center justify-content-around">
+                            <i class="fa fa-cart-arrow-down fa-3x me-3" aria-hidden="true"></i>
+                            <div class="text-end">
+                                <h6>Orders</h6>
+                                <h4>${OrdersLsGL.length}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-4 slide-in-right">
+                    <div class="dashboard-box p-4 bg-info text-white rounded">
+                        <div class="d-flex align-items-center justify-content-around">
+                            <i class="fa fa-cube fa-3x me-3" aria-hidden="true"></i>
+                            <div class="text-end">
+                                <h6>Products</h6>
+                                <h4>${productsLsGL.length}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Second Row with Charts -->
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 slide-in-left">
+                    <div class="chart-box p-3">
+                        <h5 class="text-center">Top 3 Product Categories</h5>
+                        <canvas id="pieChart" style="width: 100%; height: 300px;"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-4 slide-in-right">
+                    <div class="chart-box p-3">
+                        <h5 class="text-center">Monthly Sales Report</h5>
+                        <canvas id="columnChart" style="width: 100%; height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Summary Table -->
+            <div class="row">
+                <div class="col-12 slide-in-left">
+                    <div class="table-responsive mt-4">
+                    <!--order summary and export -->
+                       <div class="container my-4">
+                            <div class="row align-items-center">
+                                <!-- Orders Summary Header -->
+                                <div class="col-12 col-md-8 text-center text-md-start">
+                                    <h4 class="fw-bold mb-3">Orders Summary</h4>
+                                </div>
+                                <!-- Export to Excel Button -->
+                                <div class="col-12 col-md-4 text-center text-md-end">
+                                    <button id="export-excel-btn" class="btn btn-success">
+                                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export to Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table" id="table-show-order-dashboard">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Order Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <!-- Order rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>    
+        `;
+
+        // Populate Orders Table with "View Details" button and attach event listener
+        const ordersTableBody = document.getElementById("orders-table-body");
+        OrdersLsGL.forEach((order, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${order.order_id}</td>
+                <td>${order.users.username}</td>
+                <td>$${order.total_amount.toFixed(2)}</td>
+                <td><span class="badge ${order.status === 'processing' ? 'bg-warning' : 'bg-success'}">${order.status}</span></td>
+                <td>${formatDate(order.order_date)}</td>
+                <td>
+                    <button class="btn btn-sm btn-info view-details-btn" data-index="${index}">View Details</button>
+                </td>
+            `;
+            ordersTableBody.appendChild(row);
+        });
+
+        MyDataTable('#table-show-order-dashboard');
+
+        // Attach event listeners to each "View Details" button
+        document.querySelectorAll(".view-details-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const orderIndex = this.getAttribute("data-index");
+                const order = OrdersLsGL[orderIndex];
+
+                // Use jConfirm or a similar modal to display order details
+                MyJConfirmDialog({
+                    title: `Order #${order.order_id} Details`,
+                    content: `
+                        <p><strong>Customer:</strong> ${order.users.username}</p>
+                        <p><strong>Total Amount:</strong> $${order.total_amount.toFixed(2)}</p>
+                        <p><strong>Status:</strong> ${order.status}</p>
+                        <p><strong>Order Date:</strong> ${formatDate(order.order_date)}</p>
+                    `,
+                    confirmText: "Close",
+                    confirmBtnClass: "btn-info",
+                    type: "blue",
+                    onConfirm: function () { /* Close dialog */ }
+                });
+            });
+        });
+
+        // Initialize Pie Chart for Top 3 Product Categories
+        const pieChartCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieChartCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Electronics', 'Apparel', 'Groceries'], // Example top categories
+                datasets: [{
+                    label: 'Product Categories',
+                    data: [35, 30, 20], // Example data for top categories
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                    hoverOffset: 4
+                }]
+            }
+        });
+
+        // Initialize Column Chart
+        const columnChartCtx = document.getElementById('columnChart').getContext('2d');
+        new Chart(columnChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: [12, 19, 10, 17, 25, 30, 23, 20, 18, 24, 22, 28],
+                    backgroundColor: '#36A2EB',
+                    borderColor: '#36A2EB',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Helper function to format dates
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+
+
+    //////////////////////////////////////////////////////
+    // end all about in content dashboard
 });
