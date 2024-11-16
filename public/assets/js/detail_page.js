@@ -6,7 +6,7 @@ const user_idGL = document.querySelector('meta[name="user_id"]').content;
 
 function loadItemsRecommend(items) {
     const itemsGrid = document.getElementById('recommend-items-grid');
-    itemsGrid.innerHTML = '';
+    itemsGrid.innerHTML = ''; // Clear existing content
 
     if (!items || items.length === 0) {
         itemsGrid.innerHTML = `<p>No recommendations available at the moment.</p>`;
@@ -18,7 +18,7 @@ function loadItemsRecommend(items) {
 
     itemsToLoad.forEach((item, i) => {
         const image = `
-            <a href="/product/${item.product_id}">
+            <a href="javascript:void(0);" class="product-link" data-product-index="${i}">
                 <img src="${dmain}/uploads/products/${item.images[0] || 'default-image.jpg'}" alt="${item.product_name}">
             </a>
         `;
@@ -27,7 +27,7 @@ function loadItemsRecommend(items) {
             <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom p-2">
                 <div class="grid-item" data-product-index="${i}">
                     <div class="image-container">
-                        ${image} 
+                        ${image}
                     </div>
                     <div class="product-title">${item.product_name}</div>
                     <div class="product-description">${item.descriptions.des_1 || ''}</div>
@@ -35,7 +35,7 @@ function loadItemsRecommend(items) {
                         <div class="product-price">\$${item.product_price}</div>
                         <div class="product-rating d-flex align-items-center">
                             <img src="assets/images/Star.png" alt="Star" style="margin-right: 5px;">
-                            <span style="color: black; font-weight: bold;">4.5</span> 
+                            <span style="color: black; font-weight: bold;">4.5</span>
                         </div>
                     </div>
                 </div>
@@ -47,14 +47,26 @@ function loadItemsRecommend(items) {
 
     currentIndex += itemsPerPage;
 
-    // Toggle the "View More" button
+    // Handle "View More" button visibility
     const viewMoreContainer = document.getElementById('view-more-container');
     if (currentIndex >= items.length) {
         viewMoreContainer.style.display = 'none';
     } else {
         viewMoreContainer.style.display = 'block';
     }
+
+    // Add click event listener to each product link
+    document.querySelectorAll('.product-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const index = link.getAttribute('data-product-index');
+            const item = items[index];
+
+            const productDetailUrl = `/details-page?item=${JSON.stringify(item)}&img=${item.images.join(',')}`;
+            window.location.href = productDetailUrl;
+        });
+    });
 }
+
 
 
 function getProductRecommend(productId) {
@@ -92,7 +104,7 @@ function getProductRecommend(productId) {
 }
 
 function goBackHome() {
-    window.history.back();
+    window.location.href = '/home-page';
 }
 
 function addMoreItems() {
@@ -273,6 +285,8 @@ function displayProductImages(ProductsImages) {
 $(document).ready(function () {
 
     var { productData, images } = getItemDataFromUrl();
+
+    $('#id-sold').text(productData.sold + " Sold");
 
     getProductRecommend(productData.product_id);
 

@@ -66,9 +66,10 @@ class OrderItemController extends Controller
                 'product_name' => $productName,
             ];
 
-            // MinusStockProduct for the first product only
+            // MinusStockProduct and add sold for the first product only
             if ($index == 0) {
                 $this->MinusStockProduct($createdItem->product_id);
+                $this->addSoldProduct($createdItem->product_id);
             }
         }
 
@@ -98,6 +99,26 @@ class OrderItemController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update stock' . $e->getMessage()], 500);
+        }
+    }
+
+    public function addSoldProduct($product_id)
+    {
+        try {
+            $product = Product::find($product_id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+            $product->sold = $product->sold + 1;
+            $product->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'sold updated successfully',
+                'data' => $product
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update sold product:' . $e->getMessage()], 500);
         }
     }
 

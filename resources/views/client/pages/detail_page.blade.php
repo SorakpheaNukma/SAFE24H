@@ -72,7 +72,7 @@
                     <span class="text">Free return</span>
                 </div>
 
-                <p>0 Sold</p>
+                <p id="id-sold"></p>
 
                 <div class="d-flex w-100 justify-content-start gap-4">
                     <!-- Buttons -->

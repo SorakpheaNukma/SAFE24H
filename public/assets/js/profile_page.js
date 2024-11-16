@@ -146,11 +146,7 @@ $(document).ready(function () {
                     goToViewOrderHistoryPage();
 
                 } else {
-                    $('#id-link-to-order-history').on('click', function (e) {
-                        e.preventDefault();
-
-                        alert('we don\'t have Items, please order some items');
-                    });
+                    NotifyWhenClick();
                 }
             });
         }
@@ -162,6 +158,14 @@ $(document).ready(function () {
             e.preventDefault();
 
             window.location.href = '/order-history-page';
+        });
+    }
+
+    function NotifyWhenClick() {
+        $('#id-link-to-order-history-toShip, #id-link-to-order-history-completed, #id-link-to-order-history-processing').on('click', function (e) {
+            e.preventDefault();
+
+            alert('we don\'t have Items, please order some items');
         });
     }
 

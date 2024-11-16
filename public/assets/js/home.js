@@ -19,6 +19,7 @@ $(document).ready(function () {
 
     function getAllProducts(callback) {
         showSpinner();
+
         $.ajax({
             url: '/getAllProducts',
             method: 'GET',
@@ -31,6 +32,7 @@ $(document).ready(function () {
                             product_id: p.product_id,
                             product_name: p.product_name,
                             product_price: p.product_price,
+                            sold: p.sold,
                             category_id: p.category_id,
                             category_name: p.category_name,
                             quantity: p.quantity,

@@ -36,11 +36,11 @@
     <script src="{{ asset('assets/lib/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/lib/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/lib/jquery-confirm.min.js') }}"></script>
-    <script src="{{ asset('assets/lib/toastr.min.js') }}"></script>
 
+    <script src="{{ asset('assets/lib/toastr.min.js') }}"></script>
+    <!--custom toast-->
     <script src="{{ asset('assets/toasts/toast.js') }}"></script>
 
-    {{-- <script src="{{ asset('assets/js/dashboard_content.js') }}"></script> --}}
     <script src="{{ asset('assets/js/home_dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/home_dashboard_push_notify.js') }}"></script>
     {{-- <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script> --}}

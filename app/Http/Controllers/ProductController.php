@@ -44,6 +44,7 @@ class ProductController extends Controller
                     'product_id' => $p->product_id,
                     'product_name' => $p->product_name,
                     'quantity' => $p->quantity ?? 0,
+                    'sold' => $p->sold ?? 0,
                     'category_name' => $p->category->category_name,
                     'category_id' => $p->category->category_id,
                     'product_price' => number_format($p->product_price, 2),
@@ -81,10 +82,12 @@ class ProductController extends Controller
                         $descriptions[$descriptionField] = $p->$descriptionField;
                     }
                 }
+
                 return [
                     'product_id' => $p->product_id,
                     'product_name' => $p->product_name,
                     'quantity' => $p->quantity ?? 0,
+                    'sold' => $p->sold ?? 0,
                     'category_name' => $p->category->category_name,
                     'category_id' => $p->category->category_id,
                     'product_price' => number_format($p->product_price, 2),
