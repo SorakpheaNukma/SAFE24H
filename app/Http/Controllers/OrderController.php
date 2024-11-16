@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -37,7 +36,7 @@ class OrderController extends Controller
             }
 
             // Fetch all orders related to the authenticated user
-            $orders = Order::with(['payment', 'orderItems'])
+            $orders = Order::with(['payment', 'orderItems.product.product_image'])
                 ->where('user_id', $user->user_id)
                 ->get();
 

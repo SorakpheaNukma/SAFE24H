@@ -1,83 +1,122 @@
 $(document).ready(function () {
-    // Function to get query parameter values
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
-
-    const processingCount = getQueryParam('processCount');
-    const toShipCount = getQueryParam('toShipCount');
-    const orderItems = getQueryParam('orderItems');
-
-    const objOrderItems = JSON.parse(orderItems || '[]');
-
-    if (processingCount > 0) {
-        $('#badge-processing').text(processingCount).removeClass('d-none');
-    }
-    if (toShipCount > 0) {
-        $('#badge-shipped').text(toShipCount).removeClass('d-none');
-    }
-
-    // Group order items by order_id
-    const ordersGroupedByOrderId = {};
-    objOrderItems.forEach(item => {
-        if (!ordersGroupedByOrderId[item.order.order_id]) {
-            ordersGroupedByOrderId[item.order.order_id] = {
-                order: item.order,
-                items: []
-            };
+    // Show/hide loading spinner
+    function showLoading(show) {
+        if (show) {
+            $('#loading-spinner').removeClass('d-none');
+        } else {
+            $('#loading-spinner').addClass('d-none');
         }
-        ordersGroupedByOrderId[item.order.order_id].items.push(item);
-    });
+    }
 
-    // Function to append order items to the appropriate tab
-    function appendOrderItems() {
-        Object.values(ordersGroupedByOrderId).forEach(orderGroup => {
-            const order = orderGroup.order;
-            const items = orderGroup.items;
+    // Display message for empty sections
+    function displayEmptyMessage(sectionId, message) {
+        $(`#${sectionId}`).html(`<p class="text-muted text-center">${message}</p>`);
+    }
 
-            const dmain = window.location.origin;
-            let itemListHTML = '';
+    // Build order card HTML
+    function buildOrderCard(order) {
+        const dmain = window.location.origin;
+        let itemListHTML = '';
 
-            items.forEach(item => {
-                const imagePath = item.product.product_image[0].image_path;
-                itemListHTML += `
-                    <div class="order-item d-flex align-items-center mb-2">
-                        <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
-                        <div>
-                            <p class="mb-1 fw-bold">${item.product.product_name}</p>
-                            <p class="text-muted mb-0">Quantity: ${item.quantity}</p>
-                        </div>
+        order.order_items.forEach(item => {
+            const imagePath = item.product.product_image[0]?.image_path || 'default.jpg';
+            itemListHTML += `
+                <div class="order-item d-flex align-items-center mb-2">
+                    <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
+                    <div>
+                        <p class="mb-1 fw-bold">${item.product.product_name}</p>
+                        <p class="text-muted mb-0">Quantity: ${item.quantity}</p>
                     </div>
-                `;
-            });
+                </div>
+            `;
+        });
 
-            const orderCard = `
-                <div class="card shadow-sm mb-4 border-0">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">Order #${order.order_id}</h5>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <p class="mb-0 text-muted">Total Amount: <span class="fw-bold">$${order.total_amount}</span></p>
-                            <p class="mb-0 text-muted">Order Date: ${order.order_date.split('T')[0]}</p>
-                        </div>
-                        <span class="badge ${order.status === 'processing' ? 'bg-warning text-dark' : 'bg-primary'}">${order.status}</span>
-                        <div class="order-items mt-3">
-                            ${itemListHTML}
-                        </div>
+        // Build the order card
+        return `
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Order #${order.order_id}</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="mb-0 text-muted">Total Amount: <span class="fw-bold">$${order.total_amount}</span></p>
+                        <p class="mb-0 text-muted">Order Date: ${order.order_date.split('T')[0]}</p>
                     </div>
-                </div>`;
+                    <span class="badge ${order.status === 'processing' ? 'bg-warning text-dark' : 'bg-primary'}">${order.status}</span>
+                    <div class="order-items mt-3">
+                        ${itemListHTML}
+                    </div>
+                </div>
+            </div>`;
+    }
 
-            // Append to the correct tab based on the order status
-            if (order.status === 'processing') {
-                $('#processing-orders').append(orderCard);
-            } else if (order.status === 'Shipped') {
-                $('#shipped-orders').append(orderCard);
-            } else {
-                $('#received-orders').append(orderCard);
+    // Fetch completed orders and append them
+    function getCompletedOrders() {
+        showLoading(true);
+
+        $('#processing-orders, #shipped-orders, #received-orders').html('<p class="text-center text-muted">Loading orders...</p>');
+
+        $.ajax({
+            url: '/get-order-current-login',
+            method: 'GET',
+            success: function (res) {
+                showLoading(false);
+
+                $('#processing-orders, #shipped-orders, #received-orders').empty();
+
+                if (res.status === 200 && res.data.length > 0) {
+                    // Process and append orders to the correct sections
+                    let hasProcessing = false, hasShipped = false, hasDelivered = false;
+
+                    processingCount = 0;
+                    toShipCount = 0;
+
+                    res.data.forEach(order => {
+                        const orderCard = buildOrderCard(order);
+
+                        if (order.status === 'processing') {
+                            processingCount++;
+                            hasProcessing = true;
+                            $('#processing-orders').append(orderCard);
+                        } else if (order.status === 'shipped') {
+                            toShipCount++;
+
+                            hasShipped = true;
+                            $('#shipped-orders').append(orderCard);
+                        } else if (order.status === 'delivered') {
+                            hasDelivered = true;
+                            $('#received-orders').append(orderCard);
+                        }
+
+                        // Update badges for processing and shipped counts
+                        if (processingCount > 0) {
+                            $('#badge-processing').text(processingCount).removeClass('d-none');
+                        }
+                        if (toShipCount > 0) {
+                            $('#badge-shipped').text(toShipCount).removeClass('d-none');
+                        }
+                    });
+
+                    // Display messages for empty sections
+                    if (!hasProcessing) displayEmptyMessage('processing-orders', 'No processing orders.');
+                    if (!hasShipped) displayEmptyMessage('shipped-orders', 'No shipped orders.');
+                    if (!hasDelivered) displayEmptyMessage('received-orders', 'No delivered orders.');
+                } else {
+                    // Handle empty data case
+                    displayEmptyMessage('processing-orders', 'No processing orders.');
+                    displayEmptyMessage('shipped-orders', 'No shipped orders.');
+                    displayEmptyMessage('received-orders', 'No delivered orders.');
+                }
+            },
+            error: function (res) {
+                showLoading(false);
+                $('#processing-orders, #shipped-orders, #received-orders').empty();
+                displayEmptyMessage('processing-orders', 'Error loading processing orders.');
+                displayEmptyMessage('shipped-orders', 'Error loading shipped orders.');
+                displayEmptyMessage('received-orders', 'Error loading delivered orders.');
             }
         });
     }
 
-    // Call the function to append order items
-    appendOrderItems();
+    // Initialize spinner and fetch orders
+    $('#loading-spinner').addClass('d-none');
+    getCompletedOrders();
 });

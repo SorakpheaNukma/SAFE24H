@@ -12,6 +12,60 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+
+    public function getRecommendedProducts(Request $request)
+    {
+        try {
+            // Find the current product
+            $currentProduct = Product::with('category')->find($request->product_id);
+
+            // If the product is not found, return a 404 response
+            if (!$currentProduct) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+
+            $recommendedProducts = Product::with(['category', 'product_image'])
+                ->where('category_id', $currentProduct->category_id)
+                ->where('product_id', '!=', $request->product_id)
+                ->orderBy('created_at', 'desc') // Optional: Sort by latest
+                ->take(5) // Optional: Limit the number of recommendations
+                ->get();
+
+            // Map the products to the desired format
+            $recommendations = $recommendedProducts->map(function ($p) {
+                $descriptions = [];
+                for ($i = 1; $i <= 11; $i++) {
+                    $descriptionField = "des_$i";
+                    if (!empty($p->$descriptionField)) {
+                        $descriptions[$descriptionField] = $p->$descriptionField;
+                    }
+                }
+                return [
+                    'product_id' => $p->product_id,
+                    'product_name' => $p->product_name,
+                    'quantity' => $p->quantity ?? 0,
+                    'category_name' => $p->category->category_name,
+                    'category_id' => $p->category->category_id,
+                    'product_price' => number_format($p->product_price, 2),
+                    'descriptions' => $descriptions,
+                    'images' => $p->product_image->pluck('image_path')->toArray(),
+                ];
+            });
+
+            return response()->json([
+                'status' => 200,
+                'data' => $recommendations
+            ], 200);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
     public function getAll()
     {
         try {

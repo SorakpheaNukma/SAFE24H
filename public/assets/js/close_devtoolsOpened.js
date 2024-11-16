@@ -13,7 +13,7 @@ document.addEventListener('contextmenu', function (e) {
 
         if (width) {
             devtoolsOpened = true;
-            alert("Please do not use developer tools!");
+            // alert("Please do not use developer tools!");
             // Optionally redirect or close the tab (not recommended)
             // window.close();
         } else {

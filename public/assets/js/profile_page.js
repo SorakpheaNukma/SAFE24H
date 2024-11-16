@@ -95,7 +95,7 @@ $(document).ready(function () {
     });
 
 
-    function getOrdersLogin(callback) {
+    function getOrdersCurrentLogin(callback) {
         $.ajax({
             url: '/get-order-current-login',
             method: 'GET',
@@ -136,26 +136,34 @@ $(document).ready(function () {
         });
     }
 
-    getOrdersLogin(function (success) {
+    getOrdersCurrentLogin(function (success) {
         if (success) {
-            // Call getOrderItems and provide a callback to handle the result
+            // ok get more orders items
             getOrderItems(function (orderItems) {
-                // Handle the orderItems here
-                console.log('Order Items1:', orderItems);
 
-                //
+                // Handle the orderItems here
                 if (orderItems.length > 0) {
+                    goToViewOrderHistoryPage();
+
+                } else {
                     $('#id-link-to-order-history').on('click', function (e) {
                         e.preventDefault();
 
-                        window.location.href = `/order-history-page?processCount=${processCountGL}&toShipCount=${toShipCountGL}&orderItems=${JSON.stringify(orderItems)}`;
+                        alert('we don\'t have Items, please order some items');
                     });
-                } else {
-                    alert('we don\'t have Items');
                 }
             });
         }
     });
+
+
+    function goToViewOrderHistoryPage() {
+        $('#id-link-to-order-history-toShip, #id-link-to-order-history-completed, #id-link-to-order-history-processing').on('click', function (e) {
+            e.preventDefault();
+
+            window.location.href = '/order-history-page';
+        });
+    }
 
     function getOrderItems(callback) {
         $.ajax({
@@ -167,11 +175,6 @@ $(document).ready(function () {
             success: function (res) {
                 if (res.status === 200) {
                     const filteredItems = res.data.filter(item => orderIds.includes(item.order_id));
-
-                    // filteredItems.forEach(item => {
-                    //     console.log('Item:', item);
-                    //     console.log('Order ID:', item.order_id);
-                    // });
 
                     callback(filteredItems);
                 } else {

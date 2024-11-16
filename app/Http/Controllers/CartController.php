@@ -16,14 +16,26 @@ class CartController extends Controller
     public function getAllCartItems()
     {
         try {
-            //
-            $cartItems = Cart::with(['product'])->get();
+            $user = auth()->user();
+
+            if (!$user) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+
+            // Fetch cart items for the logged-in user
+            $cartItems = Cart::with('product')
+                ->where('user_id', $user->user_id)
+                ->get();
+
             return response()->json([
                 'status' => 200,
                 'data' => $cartItems
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while processing your request.'], 500);
+            return response()->json([
+                'message' => 'An error occurred while processing your request.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 

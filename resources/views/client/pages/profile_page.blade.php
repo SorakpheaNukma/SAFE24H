@@ -59,7 +59,8 @@
 
                 <div class="col-12 d-flex justify-content-around py-4">
                     <!-- To Pay Section -->
-                    <a id="id-link-to-order-history" class="text-center text-decoration-none" style="cursor: pointer;">
+                    <a id="id-link-to-order-history-processing" class="text-center text-decoration-none"
+                        style="cursor: pointer;">
                         <span id="idBadges-processing"
                             class="d-none custom-badge position-absolute start-10 badge rounded-pill"
                             style="background-color: blue; color: white; transform:translate(242%,-50%)!important"></span>
@@ -69,7 +70,8 @@
                     </a>
 
                     <!-- To Ship Section -->
-                    <a id="id-link-to-order-history" class="text-center text-decoration-none" style="cursor: pointer;">
+                    <a id="id-link-to-order-history-toShip" class="text-center text-decoration-none"
+                        style="cursor: pointer;">
 
                         <span id="idBadges-Ship"
                             class="d-none custom-badge position-absolute start-10 badge rounded-pill"
@@ -80,7 +82,8 @@
                     </a>
 
                     <!-- To Receive Section -->
-                    <a id="id-link-to-order-history" class="text-center text-decoration-none" style="cursor: pointer;">
+                    <a id="id-link-to-order-history-completed" class="text-center text-decoration-none"
+                        style="cursor: pointer;">
 
                         <i class="fas fa-box-open fa-2x changeFontAwesomeColor"></i>
                         <p>Completed</p>

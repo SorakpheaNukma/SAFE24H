@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderItem;
+use App\Models\Product;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -45,7 +47,7 @@ class OrderItemController extends Controller
         $items = $request->input('items');
         $createdItems = [];
 
-        foreach ($items as $item) {
+        foreach ($items as $index => $item) {
             $validatedData = Validator::make($item, [
                 'order_id' => 'required|exists:orders,order_id',
                 'product_id' => 'required|exists:products,product_id',
@@ -63,13 +65,40 @@ class OrderItemController extends Controller
                 'order_item' => $createdItem,
                 'product_name' => $productName,
             ];
+
+            // MinusStockProduct for the first product only
+            if ($index == 0) {
+                $this->MinusStockProduct($createdItem->product_id);
+            }
         }
+
+
 
         return response()->json([
             'status' => 200,
             'message' => 'Order items successfully added',
             'data' => $createdItems,
         ]);
+    }
+
+    public function MinusStockProduct($product_id)
+    {
+        try {
+            $product = Product::find($product_id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+            $product->quantity = $product->quantity - 1;
+            $product->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Stock updated successfully',
+                'data' => $product
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update stock' . $e->getMessage()], 500);
+        }
     }
 
 

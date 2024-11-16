@@ -67,6 +67,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
 
 
     //
+    Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
+
     Route::get('/getall-order', [OrderController::class, 'getAllOrders']);
     Route::get('/get-order-current-login', [OrderController::class, 'getOrdersCurrentLogin']);
     Route::post('/save-order', [OrderController::class, 'createOrders']);

@@ -4,83 +4,95 @@ const itemsPerPage = 10;
 var quantityInputGL = 0;
 const user_idGL = document.querySelector('meta[name="user_id"]').content;
 
-function loadItemsRecommend() {
+function loadItemsRecommend(items) {
     const itemsGrid = document.getElementById('recommend-items-grid');
-    itemsGrid.innerHTML = 'please wait...., we\'re on development ';
+    itemsGrid.innerHTML = '';
 
-    // // Determine the number of items to load
-    // const itemsToLoad = items.slice(currentIndex, currentIndex + itemsPerPage);
+    if (!items || items.length === 0) {
+        itemsGrid.innerHTML = `<p>No recommendations available at the moment.</p>`;
+        return;
+    }
 
-    // itemsToLoad.forEach(item => {
-    //     const itemDiv = document.createElement('div');
-    //     itemDiv.classList.add('col-lg-5-custom', 'col-6', 'p-2');
+    const dmain = window.location.origin;
+    const itemsToLoad = items.slice(currentIndex, currentIndex + itemsPerPage);
 
-    //     const link = document.createElement('a');
-    //     link.href = '#';
-    //     link.classList.add('text-decoration-none');
-    //     link.addEventListener('click', (e) => {
-    //         e.preventDefault();
-    //         alert(`You clicked on ${item.title}`);
-    //         // Simulate navigating to a new page
-    //         window.location.href = link.href;
-    //     });
+    itemsToLoad.forEach((item, i) => {
+        const image = `
+            <a href="/product/${item.product_id}">
+                <img src="${dmain}/uploads/products/${item.images[0] || 'default-image.jpg'}" alt="${item.product_name}">
+            </a>
+        `;
 
-    //     // Create the inner HTML content
-    //     link.innerHTML = `
-    //         <div class="border rounded">
-    //             <div id="IdImgGrid" class="mx-2 mt-2">
-    //                 <img width="100px" height="100px" src="${item.image}" alt="${item.title}">
-    //             </div>
-    //             <p class="product-title">${item.title}</p>
-    //             <p class="product-description">${item.description}</p>
-    //             <div class="product-price-rating">
-    //                 <p class="product-price">${item.price}</p>
-    //                 <p class="product-rating">${item.rating} <i class="fa-solid fa-star" style="color: yellow;"></i></p>
-    //             </div>
-    //         </div>
-    //     `;
+        const html = `
+            <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom p-2">
+                <div class="grid-item" data-product-index="${i}">
+                    <div class="image-container">
+                        ${image} 
+                    </div>
+                    <div class="product-title">${item.product_name}</div>
+                    <div class="product-description">${item.descriptions.des_1 || ''}</div>
+                    <div class="product-price-rating d-flex align-items-center">
+                        <div class="product-price">\$${item.product_price}</div>
+                        <div class="product-rating d-flex align-items-center">
+                            <img src="assets/images/Star.png" alt="Star" style="margin-right: 5px;">
+                            <span style="color: black; font-weight: bold;">4.5</span> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
-    //     itemDiv.appendChild(link);
-    //     itemsGrid.appendChild(itemDiv);
-    // });
+        itemsGrid.innerHTML += html;
+    });
 
-    // currentIndex += itemsPerPage;
+    currentIndex += itemsPerPage;
 
-    // // Hide the "View More" button if all items are loaded
-    // if (currentIndex >= items.length) {
-    //     document.getElementById('view-more-container').style.display = 'none';
-    // } else {
-    //     document.getElementById('view-more-container').style.display = 'block';
-    // }
+    // Toggle the "View More" button
+    const viewMoreContainer = document.getElementById('view-more-container');
+    if (currentIndex >= items.length) {
+        viewMoreContainer.style.display = 'none';
+    } else {
+        viewMoreContainer.style.display = 'block';
+    }
 }
 
-function goBackHome() {
-    window.history.back();
-}
 
-function getProductRecommend() {
+function getProductRecommend(productId) {
+    const itemsGrid = document.getElementById('recommend-items-grid');
+    itemsGrid.innerHTML = '<p>Loading recommendations...</p>';
+
     $.ajax({
-        url: '/',
+        url: '/products-recommendations',
         method: 'GET',
+        data: {
+            'product_id': productId,
+        },
         success: function (res) {
-            if (res.status == 200) {
+            if (res.status === 200) {
+                loadItemsRecommend(res.data);
 
             } else {
-                $.alert('Failed to get product recommend!');
+                showError("Failed to get product recommendations!");
+                itemsGrid.innerHTML = `<p>Failed to load recommendations.</p>`;
             }
         },
         error: function (res) {
+            itemsGrid.innerHTML = `<p>Error loading recommendations. Please try again later.</p>`;
             if (res.status === 422) {
-                let error = res.responseJSON.error;
-                let firstError = Object.values(error)[0][0];
+                const error = res.responseJSON.error;
+                const firstError = Object.values(error)[0][0];
                 showError(firstError);
             } else if (res.status === 500) {
                 showError('An error occurred. Please try again later.');
             } else {
-                showError('Something went wrong!!');
+                showError('Something went wrong!');
             }
         }
     });
+}
+
+function goBackHome() {
+    window.history.back();
 }
 
 function addMoreItems() {
@@ -261,6 +273,8 @@ function displayProductImages(ProductsImages) {
 $(document).ready(function () {
 
     var { productData, images } = getItemDataFromUrl();
+
+    getProductRecommend(productData.product_id);
 
     $.ajaxSetup({
         headers: {
