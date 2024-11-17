@@ -22,8 +22,8 @@
     <link rel="stylesheet" href="{{ asset('assets/lib/toastr.min.css') }}">
 
 
-    <link rel="stylesheet" href="{{asset('assets/css/home_page.css')}}" />
-    <link rel="stylesheet" href="{{asset('assets/css/detail_page.css')}}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/home_page.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/detail_page.css') }}" />
 
     <script src="{{ asset('assets/lib/jquery.min.js') }}"></script>
 </head>
@@ -54,7 +54,7 @@
     <!--custom toast-->
     <script src="{{ asset('assets/toasts/toast.js') }}"></script>
 
-    <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script> --}}
 </body>
 
 </html>

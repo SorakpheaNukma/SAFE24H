@@ -153,7 +153,7 @@ $(document).ready(function () {
         updateOrderTotal();
     });
 
-    window.onload = function () {
+    function initializeData() {
         ProductsLsGL.forEach(product => {
             if (detailParam === 'true') {
                 addSingleProductItem(product);
@@ -161,7 +161,9 @@ $(document).ready(function () {
                 addProductItem(product);
             }
         });
-    };
+    }
+
+    initializeData();
 
     function showSpinner() {
         const spinner = document.getElementById('spinner');

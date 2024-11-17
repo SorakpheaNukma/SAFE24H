@@ -60,7 +60,7 @@ class CartController extends Controller
             if ($existingCartItem) {
                 return response()->json([
                     'status' => 200,
-                    'message' => 'This item already have in cart !!'
+                    'message' => 'This item have already in cart !!'
                 ], 200);
             }
 

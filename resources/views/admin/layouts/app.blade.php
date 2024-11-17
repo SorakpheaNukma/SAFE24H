@@ -23,9 +23,9 @@
     <link rel="stylesheet" href="{{ asset('assets/lib/toastr.min.css') }}">
 
     <!---->
-    <link rel="stylesheet" href="{{asset('assets/css/home_dashboard.css')}}" />
-    <link rel="stylesheet" href="{{asset('assets/css/home_dashboard_2.css')}}" />
-    <link rel="stylesheet" href="{{asset('assets/css/animation_slide.css')}}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/home_dashboard.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/home_dashboard_2.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/animation_slide.css') }}" />
     <!---->
 </head>
 
@@ -44,7 +44,7 @@
     <script src="{{ asset('assets/js/home_dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/home_dashboard_2.js') }}"></script>
     <script src="{{ asset('assets/js/home_dashboard_push_notify.js') }}"></script>
-    <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script> --}}
 
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -6,7 +6,6 @@ $(document).ready(function () {
 
 
     // here pusher
-
     const pusherKey = document.querySelector('meta[name="pusher-key"]').content;
     const pusherCluster = document.querySelector('meta[name="pusher-cluster"]').content;
 
@@ -45,7 +44,10 @@ $(document).ready(function () {
     let categoriesLsGL = [];
     let productsLsGL = [];
     let OrdersLsGL = [];
+
     let countUsersGl = 0;
+    let totalAmountGl = 0;
+    let todayAmountGl = 0;
 
     const dashboardContent = document.getElementById("dashboard-content");
     const productContent = document.getElementById("product-content");
@@ -585,14 +587,23 @@ $(document).ready(function () {
     }
 
     getAllOrders(function (data) {
+        data.forEach(item => {
+            totalAmountGl += item.total_amount;
+
+            const today = new Date().toISOString().slice(0, 10);
+
+            if (item.order_date.slice(0, 10) === today) {
+                todayAmountGl += item.total_amount;
+            }
+        });
+
         if (data) {
             getAllProdut([], function (dataPro) {
                 if (dataPro) {
-                    console.log('here datapro');
+                    // console.log('here datapro');
 
                     // function from home_dashboard_2 js file 
                     getAllUsers(function (usersData) {
-                        console.log('here usersData:' + usersData.length);
 
                         if (usersData) {
                             countUsersGl = usersData.length;
@@ -1842,7 +1853,7 @@ $(document).ready(function () {
                             <i class="fa fa-shopping-cart fa-3x me-3" aria-hidden="true"></i>
                             <div class="text-end">
                                 <h6>Today's Sales</h6>
-                                <h5>$0</h5>
+                                <h5>\$ ${todayAmountGl}</h5>
                             </div>
                         </div>
                     </div>
@@ -1853,7 +1864,7 @@ $(document).ready(function () {
                             <i class="fa fa-line-chart fa-3x me-3" aria-hidden="true"></i>
                             <div class="text-end">
                                 <h6>Total Sales</h6>
-                                <h4>$0</h4>
+                                <h4>\$ ${totalAmountGl}</h4>
                             </div>
                         </div>
                     </div>
@@ -1973,19 +1984,52 @@ $(document).ready(function () {
         document.querySelectorAll(".view-details-btn").forEach(button => {
             button.addEventListener("click", function () {
                 const orderIndex = this.getAttribute("data-index");
-                const order = OrdersLsGL[orderIndex];
+                const orderData = OrdersLsGL[orderIndex];
+                const dmain = window.location.origin;
+
+                const orderItemsHTML = orderData.order_items.map(item => `
+                    <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
+                        <img src="${dmain}/uploads/products/${item.product.product_image[0]?.image_path}" 
+                             style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                        <div>
+                            <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center;">
+                                🛒 ${item.product.product_name}
+                            </h5>
+                            <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
+                            <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                        </div>
+                    </div>
+                `).join('');
 
                 // Use jConfirm or a similar modal to display order details
                 MyJConfirmDialog({
-                    title: `Order #${order.order_id} Details`,
+                    title: `Order #${orderData.order_id} Details`,
                     content: `
-                        <p><strong>Customer:</strong> ${order.users.username}</p>
-                        <p><strong>Total Amount:</strong> $${order.total_amount.toFixed(2)}</p>
-                        <p><strong>Status:</strong> ${order.status}</p>
-                        <p><strong>Order Date:</strong> ${formatDate(order.order_date)}</p>
-                    `,
+                        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                            <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
+                            <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
+                            <p><strong>🔄 Status:</strong> ${orderData.status}</p>
+                            <p><strong>💰 Total Amount:</strong> $${orderData.total_amount}</p>
+                            <p><strong>📅 Order Date:</strong> ${formatDate(orderData.order_date)}</p>
+                            
+                            <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+                            
+                            <h4 style="color: #333; margin-bottom: 10px;">👤 User Info</h4>
+                            <p><strong>📛 Name:</strong> ${orderData.users.username}</p>
+                            <p><strong>✉️ Email:</strong> ${orderData.users.email}</p>
+                            <p><strong>📞 Phone:</strong> ${orderData.users.phone_number}</p>
+                            <p><strong>🏠 Address:</strong> ${orderData.users.address}</p>
+                            
+                            <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+                
+                            <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                ${orderItemsHTML}
+                            </div>
+                        </div>`,
                     confirmText: "Close",
                     confirmBtnClass: "btn-info",
+                    columnClass: "m",
                     type: "blue",
                     onConfirm: function () { /* Close dialog */ }
                 });
@@ -2040,4 +2084,14 @@ $(document).ready(function () {
 
     //////////////////////////////////////////////////////
     // end all about in content dashboard
+
+    // btn refresh
+    function refresh() {
+        $('#btn-refresh').on('click', function () {
+            location.reload();
+        });
+    }
+    // end btn refresh
+    refresh();
+
 });
