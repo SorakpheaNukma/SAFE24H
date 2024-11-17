@@ -24,6 +24,21 @@ class LoginController extends Controller
         return view('commons.login');
     }
 
+    public function getAllUsers()
+    {
+        try {
+            $users = User::all();
+
+            return response()->json([
+                'status' => 200,
+                'data' => $users,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['errors' => 'Error occurred while getting users' . $e->getMessage()], 500);
+        }
+    }
+
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [

@@ -58,6 +58,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::delete('/delete-product-img', [ProductController::class, 'deleteProductImg']);
     Route::get('/logout', [LoginController::class, 'logout']);
 
+    Route::get('/get-all-users', [LoginController::class, 'getAllUsers']);
+
     //
     Route::get('/get-all-cart-items', [CartController::class, 'getAllCartItems']);
     Route::post('/add-to-cart', [CartController::class, 'store']);

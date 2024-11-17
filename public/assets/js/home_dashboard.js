@@ -45,6 +45,7 @@ $(document).ready(function () {
     let categoriesLsGL = [];
     let productsLsGL = [];
     let OrdersLsGL = [];
+    let countUsersGl = 0;
 
     const dashboardContent = document.getElementById("dashboard-content");
     const productContent = document.getElementById("product-content");
@@ -192,7 +193,7 @@ $(document).ready(function () {
         });
     }
 
-    function getAllProdut(callbacks = []) {
+    function getAllProdut(callbacks = [], callbackdata = null) {
         if (callbacks.length === 0) {
             Loading();
         }
@@ -216,6 +217,10 @@ $(document).ready(function () {
                             descriptions: p.descriptions || {},
                         });
                     });
+
+                    if (callbackdata && typeof callbackdata === 'function') {
+                        callbackdata(res.data);
+                    }
 
                     if (callbacks.length === 0) {
                         hideLoading();
@@ -252,7 +257,6 @@ $(document).ready(function () {
         });
     }
 
-    getAllProdut();
 
     function updateProduct(formData, callback) {
         $.ajax({
@@ -563,7 +567,7 @@ $(document).ready(function () {
                         callback(res.data);
                     }
                 } else {
-                    alert('Failed');
+                    alert('Failed get orders.!!');
                 }
             },
             error: function (res) {
@@ -582,8 +586,23 @@ $(document).ready(function () {
 
     getAllOrders(function (data) {
         if (data) {
-            // Trigger click on dashboardActionLink to load the dashboard on page load
-            dashboardActionLink.click();
+            getAllProdut([], function (dataPro) {
+                if (dataPro) {
+                    console.log('here datapro');
+
+                    // function from home_dashboard_2 js file 
+                    getAllUsers(function (usersData) {
+                        console.log('here usersData:' + usersData.length);
+
+                        if (usersData) {
+                            countUsersGl = usersData.length;
+                            // Trigger click on dashboardActionLink to load the dashboard on page load
+                            dashboardActionLink.click();
+                        }
+                    });
+
+                }
+            });
         }
     });
 
@@ -1823,7 +1842,7 @@ $(document).ready(function () {
                             <i class="fa fa-shopping-cart fa-3x me-3" aria-hidden="true"></i>
                             <div class="text-end">
                                 <h6>Today's Sales</h6>
-                                <h5>$12,555.00</h5>
+                                <h5>$0</h5>
                             </div>
                         </div>
                     </div>
@@ -1834,7 +1853,7 @@ $(document).ready(function () {
                             <i class="fa fa-line-chart fa-3x me-3" aria-hidden="true"></i>
                             <div class="text-end">
                                 <h6>Total Sales</h6>
-                                <h4>$122,400.00</h4>
+                                <h4>$0</h4>
                             </div>
                         </div>
                     </div>
@@ -1845,8 +1864,8 @@ $(document).ready(function () {
                         <div class="d-flex align-items-center justify-content-around">
                             <i class="fa fa-users fa-3x me-3" aria-hidden="true"></i>
                             <div class="text-end">
-                                <h6>Users</h6>
-                                <h4>1,500</h4>
+                                <h6>Total Users</h6>
+                                <h4>${countUsersGl}</h4>
                             </div>
                         </div>
                     </div>
@@ -1856,7 +1875,7 @@ $(document).ready(function () {
                         <div class="d-flex align-items-center justify-content-around">
                             <i class="fa fa-cart-arrow-down fa-3x me-3" aria-hidden="true"></i>
                             <div class="text-end">
-                                <h6>Orders</h6>
+                                <h6>Total Orders</h6>
                                 <h4>${OrdersLsGL.length}</h4>
                             </div>
                         </div>
@@ -1867,7 +1886,7 @@ $(document).ready(function () {
                         <div class="d-flex align-items-center justify-content-around">
                             <i class="fa fa-cube fa-3x me-3" aria-hidden="true"></i>
                             <div class="text-end">
-                                <h6>Products</h6>
+                                <h6>Total Products</h6>
                                 <h4>${productsLsGL.length}</h4>
                             </div>
                         </div>
