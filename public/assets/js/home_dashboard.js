@@ -1,3 +1,5 @@
+import { exportToExcel } from "./fun_export_file.js";
+
 $(document).ready(function () {
     $('.sidebar-toggler').click(function () {
         $('.sidebar, .content').toggleClass("open");
@@ -49,6 +51,7 @@ $(document).ready(function () {
     let totalAmountGl = 0;
     let todayAmountGl = 0;
     let LsOrderDataGl = [];
+    let dataExportToExcelGl = [];
 
     const dashboardContent = document.getElementById("dashboard-content");
     const productContent = document.getElementById("product-content");
@@ -1982,6 +1985,20 @@ $(document).ready(function () {
                 </div>
             </div>    
         `;
+
+        // btn export data to Excel
+        $('#export-excel-btn').on('click', function () {
+
+            const data = [
+                ["Name", "Email", "Age", "Country"],
+                ["John Doe", "john@example.com", 25, "USA"]
+            ];
+            // dataExportToExcelGl
+
+            // export function exportToExcel(data, fileName , sheetName, title, description) {
+            // exportToExcel(data, "MyExportedData.xlsx", "Sheet1", "Exported Data", "Data with icons");
+        });
+
 
         // Populate Orders Table with "View Details" button and attach event listener
         const ordersTableBody = document.getElementById("orders-table-body");
