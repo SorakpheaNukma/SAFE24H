@@ -24,6 +24,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/css/home_page.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/detail_page.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/nav_bar.css') }}" />
 
     <script src="{{ asset('assets/lib/jquery.min.js') }}"></script>
 </head>

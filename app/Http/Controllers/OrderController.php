@@ -15,7 +15,7 @@ class OrderController extends Controller
     {
         try {
             // Fetch all orders with related data
-            $orders = Order::with(['users', 'payment', 'orderItems.product.product_image'])->get();
+            $orders = Order::with(['users', 'payment', 'orderItems.product.product_image', 'orderItems.product.category'])->get();
 
             return response()->json([
                 'status' => 200,

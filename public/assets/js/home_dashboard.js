@@ -48,6 +48,7 @@ $(document).ready(function () {
     let countUsersGl = 0;
     let totalAmountGl = 0;
     let todayAmountGl = 0;
+    let LsOrderDataGl = [];
 
     const dashboardContent = document.getElementById("dashboard-content");
     const productContent = document.getElementById("product-content");
@@ -587,11 +588,15 @@ $(document).ready(function () {
     }
 
     getAllOrders(function (data) {
+
         data.forEach(item => {
             totalAmountGl += item.total_amount;
 
+            LsOrderDataGl.push(item);
+
             const today = new Date().toISOString().slice(0, 10);
 
+            // Get today amount 
             if (item.order_date.slice(0, 10) === today) {
                 todayAmountGl += item.total_amount;
             }
@@ -604,7 +609,6 @@ $(document).ready(function () {
 
                     // function from home_dashboard_2 js file 
                     getAllUsers(function (usersData) {
-
                         if (usersData) {
                             countUsersGl = usersData.length;
                             // Trigger click on dashboardActionLink to load the dashboard on page load
@@ -1838,7 +1842,6 @@ $(document).ready(function () {
     logout();
 
 
-
     // all about in content dashboard
     //////////////////////////////////////////////////////
     function displayContentDashboard() {
@@ -1909,13 +1912,32 @@ $(document).ready(function () {
             <div class="row">
                 <div class="col-lg-6 col-md-12 mb-4 slide-in-left">
                     <div class="chart-box p-3">
-                        <h5 class="text-center">Top 3 Product Categories</h5>
+                        <h5 class="text-center">Top Product Categories</h5>
                         <canvas id="pieChart" style="width: 100%; height: 300px;"></canvas>
+
+                        <!-- Message for no report -->
+                        <p id="noReportMessagePieChart" style="display:none; color:red;">No data category available.</p>
+
                     </div>
                 </div>
+
                 <div class="col-lg-6 col-md-12 mb-4 slide-in-right">
                     <div class="chart-box p-3">
                         <h5 class="text-center">Monthly Sales Report</h5>
+
+                        <!-- Dropdown to select Year -->
+                        <div class="d-flex justify-content-between mb-3">
+                            <label class="form-label"></label>
+
+                            <select id="yearSelect-column-chart" class="form-select" style="width: 150px;">
+                                <!-- Add any years here -->
+                            </select>
+                        </div>
+
+                        <!-- Message for no report -->
+                        <p id="noReportMessage" style="display:none; color:red;">No monthly sales report available.</p>
+
+                        <!-- Canvas for the chart -->
                         <canvas id="columnChart" style="width: 100%; height: 300px;"></canvas>
                     </div>
                 </div>
@@ -2038,28 +2060,156 @@ $(document).ready(function () {
 
         // Initialize Pie Chart for Top 3 Product Categories
         const pieChartCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieChartCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Electronics', 'Apparel', 'Groceries'], // Example top categories
-                datasets: [{
-                    label: 'Product Categories',
-                    data: [35, 30, 20], // Example data for top categories
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-                    hoverOffset: 4
-                }]
-            }
+        const noDataPieChart = document.getElementById('noReportMessagePieChart');
+
+        // Map to store total sales for each category
+        const categorySales = {};
+
+        // Process orders to calculate sales per category
+        LsOrderDataGl.forEach(order => {
+            order.order_items.forEach(item => {
+                const { category_name } = item.product.category;
+                const sold = item.product.sold;
+
+                // Add sales to the respective category
+                categorySales[category_name] = (categorySales[category_name] || 0) + sold;
+            });
         });
+
+        // Sort categories by total sales in descending order and take the top 
+        const topCategories = Object.entries(categorySales)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 3);
+
+        // Extract labels and data for the chart
+        const labels = topCategories.map(([name, sales]) => `${name} (Sold: ${sales})`);
+        const data = topCategories.map(([, sales]) => sales);
+
+        // console.log("Category Sales Data: ", categorySales);
+        // console.log("Top Categories: ", topCategories);
+
+        if (LsOrderDataGl.length > 0) {
+            noDataPieChart.style.display = 'none';
+
+            // Display the Pie Chart and Column Chart
+            document.getElementById('pieChart').style.display = 'block';
+
+            // Create the Pie Chart
+            new Chart(pieChartCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const label = tooltipItem.label || '';
+                                    return `${label}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('pieChart').style.display = 'none';
+            noDataPieChart.style.display = 'block';
+        }
+
 
         // Initialize Column Chart
         const columnChartCtx = document.getElementById('columnChart').getContext('2d');
-        new Chart(columnChartCtx, {
+
+        // Create an object to store the monthly data for each year
+        // Example structure: { '2024': [100, 200, 150, ...], '2025': [200, 300, 250, ...] }
+        const monthlyDataByYear = {};
+
+        // Create a list to store unique years for the dropdown
+        const uniqueYears = [];
+
+        // Loop through the data and accumulate the monthly sales data based on year and month
+        for (var i = 0; i < LsOrderDataGl.length; i++) {
+            const orderDate = new Date(LsOrderDataGl[i].order_date);
+
+            // Get month index (0-11)
+            const monthIndex = orderDate.getMonth();
+
+            // Extract year from the date
+            const year = orderDate.getFullYear();
+            const totalAmount = LsOrderDataGl[i].total_amount || 0;
+
+            // Initialize the data structure for a new year if it doesn't exist
+            if (!monthlyDataByYear[year]) {
+                monthlyDataByYear[year] = Array(12).fill(0);
+                uniqueYears.push(year);
+            }
+
+            // Accumulate the amount for the given month and year
+            monthlyDataByYear[year][monthIndex] += totalAmount;
+            // console.log(`Added ${totalAmount} to year ${year}, month ${monthIndex}`);
+        }
+
+        // Populate the year select dropdown
+        const selectYear = document.getElementById('yearSelect-column-chart');
+        const noReportMessage = document.getElementById('noReportMessage');
+
+        // Clear previous options and reset the "no report" message
+        selectYear.innerHTML = '';
+        if (noReportMessage) {
+            noReportMessage.style.display = 'none';
+        }
+
+        if (uniqueYears && uniqueYears.length > 0) {
+            // Add options for each unique year
+            uniqueYears.forEach(function (year) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                selectYear.appendChild(option);
+            });
+
+            selectYear.style.display = 'block';
+        } else {
+            if (noReportMessage) {
+                noReportMessage.style.display = 'block';
+            }
+
+            selectYear.style.display = 'none';
+        }
+
+        // Function to update the chart based on the selected year
+        function updateChart(selectedYear) {
+            // Get the monthly data for the selected year
+            const filteredData = monthlyDataByYear[selectedYear] || Array(12).fill(0);
+            // Default to 0 if no data for the year
+
+            // Update the chart data with filtered data for the selected year
+            chart.data.datasets[0].data = filteredData;
+            chart.update();
+        }
+
+        // Create the initial chart object
+        let selectedYear = uniqueYears[0]; // Default to the first year
+        const initialData = monthlyDataByYear[selectedYear] || Array(12).fill(0);
+
+        const chart = new Chart(columnChartCtx, {
             type: 'bar',
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 datasets: [{
                     label: 'Monthly Sales',
-                    data: [12, 19, 10, 17, 25, 30, 23, 20, 18, 24, 22, 28],
+                    data: initialData, // Use the data for the first selected year
                     backgroundColor: '#36A2EB',
                     borderColor: '#36A2EB',
                     borderWidth: 1
@@ -2068,11 +2218,35 @@ $(document).ready(function () {
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return '$' + value; // Add $ symbol to Y-axis labels
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return `$${tooltipItem.raw}`; // Add $ symbol in tooltips
+                            }
+                        }
                     }
                 }
             }
         });
+
+        // Add event listener for year change
+        selectYear.addEventListener('change', function () {
+            selectedYear = selectYear.value;
+            console.log('Selected Year:', selectedYear);
+
+            // Update chart with new filtered data for the selected year
+            updateChart(selectedYear);
+        });
+
     }
 
     // Helper function to format dates
