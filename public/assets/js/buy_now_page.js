@@ -1,17 +1,18 @@
 $(document).ready(function () {
     let totalPrice = 0;
     let itemCount = 0;
-    const shippingFee = 5.00;
+    const shippingFee = 2.00;
     var ProductsLsGL = [];
 
     const user_idGL = document.querySelector('meta[name="user_id"]').content;
 
     var UserDataGL = [];
-    var ProductNameDataGL = [];
 
     $('#id-change-address').on('click', function () {
         window.location.href = '/address-page';
     });
+
+    $('#shipping-total').text(shippingFee.toFixed(2) + "$");
 
     function getItemDataFromUrl() {
         const params = new URLSearchParams(window.location.search);

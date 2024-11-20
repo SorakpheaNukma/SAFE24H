@@ -169,12 +169,17 @@ function checkAddress(callback) {
 }
 
 
-function btnBuyNow() {
+function btnBuyNow(quantityStock) {
     $('#id-btn-buy-now').on('click', function (e) {
-        e.preventDefault(); // Prevent the default behavior of the button click
+        e.preventDefault();
 
         if (quantityInputGL === 0) {
             alert('Please add quantity before buying!');
+            return;
+        }
+
+        if (quantityStock === 0) {
+            alert('This product is out of stock');
             return;
         }
 
@@ -328,8 +333,15 @@ $(document).ready(function () {
         });
     }
 
-    function btnAddToCart() {
+    function btnAddToCart(quantityStock) {
         $('#id-btn-add-to-cart').on('click', function (e) {
+            e.preventDefault();
+
+            if (quantityStock === 0) {
+                alert('This product is out of stock');
+                return;
+            }
+
             if (quantityInputGL > 0) {
                 addItemToCarts(user_idGL, productData.product_id, quantityInputGL);
             } else {
@@ -351,8 +363,8 @@ $(document).ready(function () {
     btnAddQuantityProduct();
     btnMinusQuantityProduct();
 
-    btnBuyNow();
-    btnAddToCart();
+    btnBuyNow(productData.quantity);
+    btnAddToCart(productData.quantity);
 
     if (!images.length > 0) {
         console.log('No images found.');

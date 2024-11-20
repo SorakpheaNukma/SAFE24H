@@ -11,8 +11,7 @@ $(document).ready(function () {
                 hideSpinner();
                 if (res.status === 200 && res.data && res.data.length > 0) {
                     cartsItemsGL = res.data;
-
-                    // console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
+                    //console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
 
                     // Render items if available
                     renderCartItems(cartsItemsGL);
@@ -75,7 +74,7 @@ $(document).ready(function () {
                         </div>
                         <p>${item.product.des_1}</p>
                     </div>
-                    <p class="text-primary g-0 p-0 m-0">In Stock</p>
+                    <p class="text-primary g-0 p-0 m-0">${item.product.quantity === 0 ? 'Out Stock' : 'In Stock'}</p>
                     <div class="quantity-container mb-2">
                         <div class="d-flex align-items-center">
                             <h7>Quantity</h7>
@@ -233,15 +232,113 @@ $(document).ready(function () {
         }
     });
 
+    function MyJConfirmDialog(options) {
+        let config = {
+            title: options.title || 'Confirm',
+            content: options.content || 'Are you sure?',
+            columnClass: options.columnClass || 'm',
+            draggable: true,
+            typeAnimated: true,
+            type: options.type || 'blue',
+            buttons: {}
+        };
+
+        // Add Confirm button if confirmText is not null
+        if (options.confirmText != null) {
+            config.buttons.Confirm = {
+                text: options.confirmText || 'Confirm',
+                btnClass: options.confirmBtnClass || 'btn-blue',
+                action: options.onConfirm || function () { }
+            };
+        }
+
+        // Always add Cancel button
+        config.buttons.Cancel = {
+            text: options.cancelText || 'Cancel',
+            action: options.onCancel || function () { }
+        };
+
+        config.onOpenBefore = function () {
+            if (options.onOpenBefore) {
+                options.onOpenBefore();
+            }
+        };
+
+        config.onContentReady = function () {
+            if (options.onContentReady) {
+                options.onContentReady();
+            }
+
+            const contentArea = this.$content;
+            contentArea.css({
+                'max-height': '70vh', // Make the content scrollable if it's too long
+                'overflow-y': 'auto',  // Add vertical scroll
+            });
+        };
+
+        // Auto-close option
+        if (options.autoClose != null) {
+            config.autoClose = options.autoClose;
+        }
+
+        // Show the confirm dialog
+        $.confirm(config);
+    }
 
     function btnCheckOut() {
         $('#id-btn-checkout').on('click', function () {
-            // Filter only the checked items
+            // Filter the checked items
             const FilterOnlyCartItemsSelected = cartsItemsGL.filter((item, index) => {
                 const checkbox = document.getElementById(`item${index}`);
                 return checkbox && checkbox.checked;
             });
 
+            // Check for out-of-stock items in the selected list
+            const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => cartItem.product.quantity === 0);
+
+            if (outOfStockItems.length > 0) {
+                const dmain = window.location.origin;
+
+                const titleDialog = '<strong>These Products Are Out of Stock</strong>';
+
+                const contentDialog = outOfStockItems.map(item => {
+                    const productName = item.product.product_name;
+
+                    const imagePath = item.product.product_image.length > 0
+                        ? `${dmain}/uploads/products/${item.product.product_image[0].image_path}`
+                        : 'https://via.placeholder.com/100?text=No+Image';
+
+                    return `
+                         <div style="font-size: 14px; color: #555; margin-bottom: 10px;">
+                            Please deselect products that are out of stock:
+                        </div>
+
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <img width="100px" style="border-radius: 8px; margin-right: 10px;" src="${imagePath}" alt="${productName}">
+                            <span style="font-size: 16px; font-weight: bold;">${productName}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                // Show dialog for out-of-stock items
+                MyJConfirmDialog({
+                    title: titleDialog,
+                    content: contentDialog,
+                    autoClose: 'Cancel|30000',
+                    type: 'red',
+                    onConfirm: function () {
+
+                    },
+                    cancelText: 'Cancel',
+                    onCancel: function () {
+
+                    }
+                });
+
+                return;
+            }
+
+            // If no out-of-stock items are selected
             if (FilterOnlyCartItemsSelected.length > 0) {
                 window.location.href = `/buy-now-page?items=${JSON.stringify(FilterOnlyCartItemsSelected)}`;
             } else {

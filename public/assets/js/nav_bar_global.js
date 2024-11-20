@@ -96,24 +96,13 @@ $(document).ready(function () {
         }
     }
 
-    function hideBadgeCartNumber() {
-        var badge = document.getElementById('idBadges');
-        if (badge) {
-            badge.classList.add('d-none');
-        }
-    }
-
     function updateBadgeNumber(number) {
         var badge = document.getElementById('idBadges');
         if (badge) {
             badge.innerHTML = number;
         }
 
-        if (number > 0) {
-            showBadgeCartNumber();
-        } else {
-            hideBadgeCartNumber();
-        }
+        showBadgeCartNumber();
     }
 
     window.getAllCartItems = function getAllCartItems() {
