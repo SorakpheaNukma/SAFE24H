@@ -55,7 +55,7 @@
     <!--custom toast-->
     <script src="{{ asset('assets/toasts/toast.js') }}"></script>
 
-    {{-- <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script> --}}
+    <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script>
 </body>
 
 </html>

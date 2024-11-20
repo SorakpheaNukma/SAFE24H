@@ -47,7 +47,7 @@
     <script src="{{ asset('assets/js/home_dashboard_2.js') }}"></script>
     <script src="{{ asset('assets/js/home_dashboard_push_notify.js') }}"></script>
 
-    {{-- <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script> --}}
+    <script src="{{ asset('assets/js/close_devtoolsOpened.js') }}"></script>
 
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
