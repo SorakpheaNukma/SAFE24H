@@ -1,4 +1,4 @@
-import { exportToExcel } from "./fun_export_file.js";
+import { exportToExcel1, exportToExcel2 } from "./fun_export_file.js";
 
 $(document).ready(function () {
     $('.sidebar-toggler').click(function () {
@@ -715,8 +715,7 @@ $(document).ready(function () {
         $('.btn-view-order').on('click', function (e) {
             e.stopPropagation();
             var orderData = $(this).closest("td").find(".order-data").val();
-
-            console.log("orderData: " + orderData);
+            //console.log("orderData: " + orderData);
             orderData = JSON.parse(orderData);
 
             viewOrderDialog(orderData);
@@ -769,10 +768,10 @@ $(document).ready(function () {
             type: 'blue',
             cancelText: 'Close',
             onCancel: function () {
-                console.log('Dialog cancelled');
+
             },
-            confirmBtnClass: 'btn-warning',
-            confirmText: 'Save To Excel',
+            // confirmBtnClass: 'btn-warning',
+            // confirmText: 'Save To Excel',
             onConfirm: function () {
             }
         });
@@ -1986,19 +1985,13 @@ $(document).ready(function () {
             </div>    
         `;
 
-        // btn export data to Excel
-        $('#export-excel-btn').on('click', function () {
-
-            const data = [
-                ["Name", "Email", "Age", "Country"],
-                ["John Doe", "john@example.com", 25, "USA"]
-            ];
-            // dataExportToExcelGl
-
-            // export function exportToExcel(data, fileName , sheetName, title, description) {
-            // exportToExcel(data, "MyExportedData.xlsx", "Sheet1", "Exported Data", "Data with icons");
+        dataExportToExcelGl.push({
+            'today_sale': todayAmountGl,
+            'total_sales': totalAmountGl,
+            'total_users': countUsersGl,
+            'total_orders': OrdersLsGL.length,
+            'total_products': productsLsGL.length,
         });
-
 
         // Populate Orders Table with "View Details" button and attach event listener
         const ordersTableBody = document.getElementById("orders-table-body");
@@ -2106,6 +2099,10 @@ $(document).ready(function () {
         // console.log("Top Categories: ", topCategories);
 
         if (LsOrderDataGl.length > 0) {
+            dataExportToExcelGl.push({
+                'top_categories': categorySales,
+            });
+
             noDataPieChart.style.display = 'none';
 
             // Display the Pie Chart and Column Chart
@@ -2255,6 +2252,12 @@ $(document).ready(function () {
             }
         });
 
+        // console.log("monthly dataYear:" + JSON.stringify(monthlyDataByYear));;
+        dataExportToExcelGl.push({
+            'monthlyDataByYear': monthlyDataByYear,
+            'order_data': OrdersLsGL,
+        });
+
         // Add event listener for year change
         selectYear.addEventListener('change', function () {
             selectedYear = selectYear.value;
@@ -2264,6 +2267,13 @@ $(document).ready(function () {
             updateChart(selectedYear);
         });
 
+
+        // btn export data to Excel
+        $('#export-excel-btn').on('click', function () {
+            //console.log("dataExport:" + JSON.stringify(dataExportToExcelGl));
+
+            exportToExcel2(dataExportToExcelGl);
+        });
     }
 
     // Helper function to format dates
