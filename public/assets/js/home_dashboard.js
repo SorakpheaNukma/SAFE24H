@@ -2272,7 +2272,11 @@ $(document).ready(function () {
         $('#export-excel-btn').on('click', function () {
             //console.log("dataExport:" + JSON.stringify(dataExportToExcelGl));
 
-            exportToExcel2(dataExportToExcelGl);
+            if (dataExportToExcelGl.length > 0) {
+                exportToExcel2(dataExportToExcelGl);
+            } else {
+                alert("No data available to export to Excel.");
+            }
         });
     }
 
