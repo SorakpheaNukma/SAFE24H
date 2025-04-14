@@ -1067,6 +1067,30 @@ $(document).ready(function () {
                             <input type="number" min="0" id="productStock" placeholder="Enter Stock" class="form-control" required />
                         </div>
                         <div class="form-group">
+                        <label>Size Options</label>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label>Size S Quantity</label>
+                                <input type="number" min="0" id="sizeSQty" placeholder="Enter quantity for size S" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size M Quantity</label>
+                                <input type="number" min="0" id="sizeMQty" placeholder="Enter quantity for size M" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size L Quantity</label>
+                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size L" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size XL Quantity</label>
+                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size XL" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size 2XL Quantity</label>
+                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size 2XL" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label>Category</label>
                             <select id="category" class="form-control" required>
                                 <option value="">Select a category</option>
@@ -1397,6 +1421,30 @@ $(document).ready(function () {
                         <label>Product Stock</label>
                         <input type="number" min="0" id="productStock" placeholder="Enter Stock" class="form-control" required />
                     </div>
+                    <div class="form-group">
+                        <label>Size Options</label>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label>Size S Quantity</label>
+                                <input type="number" min="0" id="sizeSQty" placeholder="Enter quantity for size S" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size M Quantity</label>
+                                <input type="number" min="0" id="sizeMQty" placeholder="Enter quantity for size M" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size L Quantity</label>
+                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size L" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size XL Quantity</label>
+                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size XL" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Size 2XL Quantity</label>
+                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size 2XL" class="form-control" />
+                            </div>
+                        </div>
                     <div class="form-group">
                         <label>Category</label>
                         <select id="category" class="form-control" required>

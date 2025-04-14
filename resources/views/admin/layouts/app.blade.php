@@ -13,8 +13,8 @@
 
     <meta name="username" content="{{ Auth::user()->username }}">
 
-    <link rel="icon" type="image/png" sizes="50x50" href="{{ asset('assets/images/logo.png') }}">
-    <title>SkinCare Shop</title>
+    <link rel="icon" type="image/png" sizes="50x50" href="{{ asset('assets/images/24h.png') }}">
+    <title>SAFE 24H</title>
 
     <link rel="stylesheet" href="{{ asset('assets/lib/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />

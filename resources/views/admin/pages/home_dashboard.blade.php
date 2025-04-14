@@ -21,7 +21,7 @@
         <div id="idSideBar" class="sidebar pe-4 pb-3">
             <nav class="navbar navbar-dark">
                 <a href="index.html" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary"><i class="fa fa-user-edit me-2"></i>SkinCare</h3>
+                    <h3 class="text-primary"><i class="fa fa-user-edit me-2"></i>SAFE 24H</h3>
                 </a>
 
                 <button type="button" class="sidebar-toggler btn btn-link position-absolute top-0 end-0"
