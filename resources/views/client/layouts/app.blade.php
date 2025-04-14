@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/png" sizes="50x50" href="{{ asset('assets/images/logo.png') }}">
+    <link rel="icon" type="image/png" sizes="50x50" href="{{ asset('assets/images/24h.png') }}">
 
-    <title>SkinCare Shop</title>
+    <title>SAFE 24H</title>
 
     <!--images carousel -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">

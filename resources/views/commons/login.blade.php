@@ -51,6 +51,16 @@
                     </div>
                 </div>
                 <button id="loginButton" type="button" class="btn btn-dark w-100 mb-3">Login</button>
+                <script>
+                    // Lắng nghe sự kiện khi nhấn phím
+                    document.addEventListener('keydown', function(event) {
+                        // Kiểm tra nếu phím Enter được nhấn
+                        if (event.key === 'Enter') {
+                            // Thực hiện hành động khi nhấn Enter (giả sử là login)
+                            document.getElementById('loginButton').click();
+                        }
+                    });
+                </script>
 
                 <!-- -->
                 <div class="text-center">

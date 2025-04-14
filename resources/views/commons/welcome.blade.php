@@ -33,13 +33,13 @@
     <div class="row g0" style="--bs-gutter-x: 0; --bs-gutter-y: 0;">
         <div class="col-md-6">
             <img id="welcomeImage" src="{{ asset('assets/images/24h.png') }}" alt="Welcome Image"
-                style="width: 100%; object-fit: fill;">
+                style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover;">
         </div>
 
         <div
             class="col-md-6 d-flex flex-column justify-content-center align-items-center align-items-lg-start align-items-md-start">
-            <h1 class="mx-2">Welcome to SkinCare</h1>
-            <p class="mx-2">Your journey to better skin starts here.</p>
+            <h1 class="mx-2">Welcome to SAFE 24H </h1>
+            <p class="mx-2">Your journey to better product starts here.</p>
             <a href="/login" class="btn btn-dark mt-2 mx-2 styleBtn">Login</a>
             <a href="/sign-up" class="btn btn-dark  mt-2 mx-2 styleBtn">Sign Up</a>
         </div>
