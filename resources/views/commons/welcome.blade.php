@@ -32,7 +32,7 @@
 <div id="pageContent">
     <div class="row g0" style="--bs-gutter-x: 0; --bs-gutter-y: 0;">
         <div class="col-md-6">
-            <img id="welcomeImage" src="{{ asset('assets/images/logo.png') }}" alt="Welcome Image"
+            <img id="welcomeImage" src="{{ asset('assets/images/24h.png') }}" alt="Welcome Image"
                 style="width: 100%; object-fit: fill;">
         </div>
 

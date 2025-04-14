@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('product_name');
             $table->float('product_price', 10, 2);
             $table->integer('quantity')->nullable();
-            $table->integer('sold')->default(0)->nullable(); // Set default value to 0
+            $table->integer('sold')->default(0)->nullable();
             $table->string('des_1')->nullable();
             $table->string('des_2')->nullable();
             $table->string('des_3')->nullable();

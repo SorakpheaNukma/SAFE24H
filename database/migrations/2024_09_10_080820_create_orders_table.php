@@ -20,9 +20,6 @@ return new class extends Migration {
             $table->dateTime('order_date'); // Change from timestamp to dateTime
             $table->timestamps();
 
-            //Cascade on Delete: The onDelete('cascade') rule only applies to deletions 
-            // in the parent table (in this case, the users table). If a user is deleted, 
-            // any associated orders in the orders table will be deleted automatically.
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
     }

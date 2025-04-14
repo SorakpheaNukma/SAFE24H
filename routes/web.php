@@ -14,6 +14,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignUpController;
 use App\Http\Controllers\ForgetController;
 use App\Http\Controllers\OTPController;
+use App\Http\Controllers\BannerImageController;
 
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -44,6 +45,9 @@ Route::middleware('MyMiddlewareNavigation')->group(function () {
 
 //can be use all of this if already logged in (auth)
 Route::middleware('MyMiddleWareAuth')->group(function () {
+    //Banner Image
+    Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
+
     Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);
     Route::post('/add-category', [CategoryController::class, 'createCategory']);
     Route::put('/edit-category', [CategoryController::class, 'updateCategory']);
@@ -89,6 +93,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     // push notifications 
     Route::post('/save-push-notification-sub', [PushNotificationBrowserController::class, 'saveSubscription']);
     Route::post('/send-push-notification', [PushNotificationBrowserController::class, 'sendNotification']);
+
+
 });
 
 
@@ -129,6 +135,7 @@ Route::middleware('MyUserMiddleWare')->group(function () {
     Route::get('/details-page', function () {
         return view('client.pages.detail_page');
     });
+    
 });
 
 

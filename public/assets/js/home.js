@@ -1,6 +1,6 @@
 $(document).ready(function () {
     let productsLsGL = [];
-    const itemsPerPage = 10;
+    const itemsPerPage = 30; //show so luong
     let currentItemsCount = 0;
     let isSearchActive = false;
     let currentHeaderTitle = 'All Products';
@@ -8,7 +8,7 @@ $(document).ready(function () {
 
     function initializeDefaultCategory() {
         const defaultCategoryId = "all";
-        const defaultHeaderTitle = "All Products";
+        const defaultHeaderTitle = "All Products"; //ở đây là chỉnh
 
         // Set dropdown to default
         $('#categoryDropdown').val(defaultCategoryId);
@@ -158,12 +158,12 @@ $(document).ready(function () {
         let html = '';
         const dmain = window.location.origin;
 
-        if (!filteredProducts || filteredProducts.length === 0) {
-            grid.innerHTML = '<p class="text-center">No products found.</p>';
-            $('#viewMore').hide();
-            return;
-        }
-
+        // if (!filteredProducts || filteredProducts.length === 0) {
+        //     grid.innerHTML = '<p class="text-center">No products found.</p>';
+        //     $('#viewMore').hide();
+        //     return;
+        // }
+        
         // Calculate the end index for pagination
         const end = Math.min(currentItemsCount + itemsPerPage, filteredProducts.length);
 
@@ -181,13 +181,17 @@ $(document).ready(function () {
                         <div class="image-container">
                             ${image} 
                         </div>
-                        <div class="product-title">${item.product_name}</div>
-                        <div class="product-description">${item.descriptions.des_1 || ''}</div>
-                        <div class="product-price-rating d-flex align-items-center">
-                            <div class="product-price">\$${item.product_price}</div>
-                            <div class="product-rating d-flex align-items-center">
-                                <img src="assets/images/Star.png" alt="Star" style="margin-right: 5px;">
-                                <span style="color: black; font-weight: bold;">4.5</span> 
+                        <div class="item-description">
+                            <div>
+                                <div class="product-title">${item.product_name}</div>
+                            </div>
+                            <div style="display:flex; flex-direction:row;">
+                                <div style="display:flex; flex-direction:column;">
+                                    <div class="product-price">\$${item.product_price}</div>
+                                </div>
+                                <div style="display:flex; justify-content: center; align-items: center; margin-left: auto;">
+                                    <div class="product-description">${item.descriptions.des_1 || ''}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -199,11 +203,11 @@ $(document).ready(function () {
         currentItemsCount = end;
 
         // Show or hide the "View More" button based on the number of products
-        if (filteredProducts.length <= itemsPerPage) {
-            $('#viewMore').hide();
-        } else {
-            $('#viewMore').show();
-        }
+        // if (filteredProducts.length <= itemsPerPage) {
+        //     $('#viewMore').hide();
+        // } else {
+        //     $('#viewMore').show();
+        // }
 
         // Attach click handler to the grid container
         grid.addEventListener('click', function (e) {
@@ -217,13 +221,101 @@ $(document).ready(function () {
             }
         });
 
-        if (currentItemsCount >= filteredProducts.length) {
-            $('#viewMore').hide();
-        }
+        // if (currentItemsCount >= filteredProducts.length) {
+        //     $('#viewMore').hide();
+        // }
     }
 
-    $('#viewMore').on('click', function () {
-        populateGrid();
+    // $('#viewMore').on('click', function () {
+    //     populateGrid();
+    // });
+
+    //banner images
+    $.ajax({
+        url: 'http://127.0.0.1:8000/banner-images', // Địa chỉ API của bạn
+        method: 'GET', // Phương thức GET để lấy dữ liệu
+        success: function (res) {
+            if (res.status === 200) {
+                // Xử lý dữ liệu
+                const imagesLsGL = [];
+
+                // Nếu res.data là một mảng ảnh
+                res.data.forEach(function (img) {
+                    imagesLsGL.push({
+                        banner_images_id: img.banner_images_id,
+                        image_path: img.image_path,
+                        create_at: img.create_at,
+                        update_at: img.update_at,
+                    });
+                });
+
+                setTimeout(() => {
+                    hideSpinner();  // Ẩn spinner sau khi load xong dữ liệu
+                }, 200);
+
+                populateGallery(imagesLsGL); // Hàm hiển thị gallery
+            } else {
+                hideSpinner();
+                $.alert('Failed to get banner images!');
+            }
+        },
+        error: function (res) {
+            hideSpinner();
+            if (res.status === 422) {
+                let error = res.responseJSON.error;
+                let firstError = Object.values(error)[0][0];
+                showError(firstError);
+            } else if (res.status === 500) {
+                showError('An error occurred. Please try again later.');
+            } else {
+                showError('Something went wrong!!');
+            }
+        }
     });
 
-});
+    let currentIndex = 0;
+    let imagesList = [];
+
+    function populateGallery(images) {
+        const gallery = $('#gallery');
+        const dmain = window.location.origin;
+
+        // Reset danh sách ảnh tránh lặp
+        imagesList = [];
+
+        // Xóa nội dung cũ
+        gallery.empty();
+
+        if (images.length === 0) return;
+
+        // Thêm ảnh đầu tiên vào gallery
+        const img = $('<img>', {
+            src: `${dmain}/uploads/products/${images[0].image_path}`,
+            alt: 'Gallery Image',
+            class: 'gallery-image'
+        });
+
+        gallery.append(img);
+
+        // Lưu danh sách đường dẫn ảnh
+        images.forEach(image => {
+            imagesList.push(`${dmain}/uploads/products/${image.image_path}`);
+        });
+
+        // Bắt đầu slideshow
+        startSlideshow();
+    }
+
+    function startSlideshow() {
+        if (imagesList.length === 0) return;
+
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % imagesList.length;
+
+            // Chuyển đổi ảnh với hiệu ứng fade
+            $('#gallery img').fadeOut(500, function () {
+                $(this).attr('src', imagesList[currentIndex]).fadeIn(500);
+            });
+        }, 3000); // Chuyển ảnh mỗi 3 giây
+    }
+}); 

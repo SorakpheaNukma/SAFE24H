@@ -2,7 +2,12 @@
 <nav class="navbar navbar-expand-lg navbar-light my-Bg">
     <div class="container">
         <!-- Logo -->
-        <a class="navbar-brand fs-2 fw-bold" href="/home-page">Japan Care</a>
+        <div class="logo_container">
+            <a href="/home-page">
+                <img src="assets/images/Ellipse_3.png" alt="">
+            </a>
+        </div>
+        <a class="navbar-brand fs-2 fw-bold" href="/home-page">SAFE 24H</a>
 
         <!--  Button for Sidebar -->
         <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="offcanvas"
@@ -27,17 +32,17 @@
                         style="width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 10px; border-radius: 10px; background-color: #F3F3F3;">
                         Delivery to Cambodia ...
                     </div>
-                    <div class="input-group"">
-                            <select class=" form-select" id="categoryDropdown">
+
+                    <!-- search -->
+                    <div class="input-group">
+                        <select class="form-select" id="categoryDropdown">
                         </select>
-                        <input type="text" class="form-control" placeholder="Search...">
+                        <input type="text" class="form-control" placeholder="|  Search products...">
                         <button id="id-btn-search" class="btn btn-primary" type="button">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
                 </div>
-
-
 
                 <div class="d-flex align-items-center">
                     <!-- -->

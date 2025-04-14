@@ -17,10 +17,9 @@ return new class extends Migration {
             $table->unsignedInteger('order_id');
             $table->unsignedInteger('product_id');
             $table->integer('quantity');
-            $table->float('price', 10, 2);// Price at the time of order for historical accuracy
+            $table->float('price', 10, 2);
             $table->timestamps();
 
-            // Foreign keys
             $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
             $table->foreign('product_id')->references('product_id')->on('products')->onDelete('cascade');
         });

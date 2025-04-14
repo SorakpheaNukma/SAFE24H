@@ -23,19 +23,23 @@ function loadItemsRecommend(items) {
             </a>
         `;
 
-        const html = `
-            <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom p-2">
+        const html = `  
+            <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
                 <div class="grid-item" data-product-index="${i}">
                     <div class="image-container">
-                        ${image}
+                        ${image} 
                     </div>
-                    <div class="product-title">${item.product_name}</div>
-                    <div class="product-description">${item.descriptions.des_1 || ''}</div>
-                    <div class="product-price-rating d-flex align-items-center">
-                        <div class="product-price">\$${item.product_price}</div>
-                        <div class="product-rating d-flex align-items-center">
-                            <img src="assets/images/Star.png" alt="Star" style="margin-right: 5px;">
-                            <span style="color: black; font-weight: bold;">4.5</span>
+                    <div class="item-description">
+                        <div>
+                            <div class="product-title">${item.product_name}</div>
+                        </div>
+                        <div style="display:flex; flex-direction:row;">
+                            <div style="display:flex; flex-direction:column;">
+                                <div class="product-price">\$${item.product_price}</div>
+                            </div>
+                            <div style="display:flex; justify-content: center; align-items: center; margin-left: auto;">
+                                <div class="product-description">${item.descriptions.des_1 || ''}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -234,30 +238,29 @@ function getItemDataFromUrl() {
 
 function displayProductDesDetails(descriptions) {
     const desContent = document.getElementById('product-detail-id');
-
     desContent.innerHTML = '';
 
     if (descriptions && typeof descriptions === 'object') {
-        let descriptionHTML = '<ul>';
+        let descriptionHTML = '<ul class="list-unstyled">';
 
         Object.keys(descriptions).forEach(function (key) {
-            descriptionHTML += `<li>${descriptions[key]}</li>`;
+            descriptionHTML += `<li>• ${descriptions[key]}</li>`;
         });
 
         descriptionHTML += '</ul>';
-
         desContent.innerHTML = descriptionHTML;
     } else {
         desContent.innerHTML = '<p>No descriptions available.</p>';
     }
 }
 
-function displsyImgAbout(Images) {
-    const dvImg = document.getElementById('id-img-about');
-    const dmain = window.location.origin;
 
-    dvImg.innerHTML += ` <img width="80%" src="${dmain}/uploads/products/${Images}" class="img-fluid">`;
-}
+// function displsyImgAbout(Images) {
+//     const dvImg = document.getElementById('id-img-about');
+//     const dmain = window.location.origin;
+
+//     dvImg.innerHTML += ` <img width="80%" src="${dmain}/uploads/products/${Images}" class="img-fluid">`;
+// }
 
 function displayProductImages(ProductsImages) {
     var dvProductImages = document.getElementById('id-product-images');
@@ -268,7 +271,7 @@ function displayProductImages(ProductsImages) {
         ProductsImages.forEach((image, index) => {
             const activeClass = index === 0 ? 'active' : '';  // Set first image as active
             dvProductImages.innerHTML += `
-                <div class="carousel-item ${activeClass}">
+                <div class="carousel-item ${activeClass}" style="width:273px; height:409px;">
                     <div class="my-image-container">
                         <img src="${dmain}/uploads/products/${image}" class="d-block" alt="Product Image">
                     </div>
@@ -356,7 +359,7 @@ $(document).ready(function () {
     $('#id-price').text(`$${productData.product_price}`);
     displayProductDesDetails(productData.descriptions);
 
-    displsyImgAbout(images[0]);
+    // displsyImgAbout(images[0]);
     displayProductImages(images);
 
     loadItemsRecommend();

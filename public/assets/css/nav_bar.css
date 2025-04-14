@@ -3,3 +3,25 @@
         margin-right: -83px !important;
     }
 }
+
+.logo_container {
+    max-height: 58px;
+    max-width: 58px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;  /* Căn giữa theo chiều dọc */
+    justify-content: center; /* Căn giữa theo chiều ngang nếu muốn */
+    margin-right: 20px;
+}
+
+.logo_container img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    height: auto;
+    width: auto;
+}
+
+.navbar-brand{
+    font-size: 16px !important;
+}
