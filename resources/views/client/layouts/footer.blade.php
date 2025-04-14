@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="fw-bold">SAFE 24H</h2>
+                <h2 class="fw-bold">SAFE 24H day la fetch lan 1</h2>
             </div>
         </div>
 
