@@ -102,7 +102,7 @@ main {
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    -webkit-line-clamp: 1;
+    --webkit-line-clamp: 1;
     display: -webkit-box;
     -webkit-box-orient: vertical;
 }
@@ -171,6 +171,7 @@ main {
 .footer .contact-info a:hover {
     text-decoration: underline;
 }
+
 
 /* Spinner */
 #spinner {

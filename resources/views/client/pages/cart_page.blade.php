@@ -5,28 +5,34 @@
 
 <main class="mx-3 mb-3">
     <!-- Back Icon and Text Home -->
-    <div class="container d-flex align-items-center mb-3">
-        <div class="d-flex justify-content-center align-items-center rounded-circle"
-            style="width: 40px; height: 40px; background-color: #F3F3F3;">
-            <a href="{{ url()->previous() }}" class=" text-blue text-decoration-none">
-                <i class="fa-solid fa-arrow-left fa-lg"></i>
-            </a>
-        </div>
-        <span class="fs-4 ms-2">Your cart</span>
+    <div class="container_back d-flex align-items-center mb-3" style="gap: 8px; padding-left: 0; margin-left: 0;">
+    <div class="d-flex justify-content-center align-items-center rounded-circle"
+        style="width: 40px; height: 40px; background-color: #F3F3F3;">
+        <a onclick="goBackHome()" class="text-blue text-decoration-none d-flex align-items-center justify-content-center" style="cursor: pointer;">
+            <i class="fa-solid fa-arrow-left fa-lg"></i>
+        </a>
     </div>
+
+    <span class="text" style="font-size: 16px;">ត្រឡប់ក្រោយ</span>
+</div>
+
+
 
     <div class="container">
         <!-- Select All -->
         <div class="row align-items-center mb-3 bottom-border">
             <div class="col-12">
                 <div class="form-check">
+                <div class="text-center">
+                    <p class="fw-semibold fs-4 p-0 m-0">បញ្ជីទំនិញក្នុងកន្ត្រកស្តុក</p>
+                </div>
                     <input class="form-check-input" type="checkbox" id="selectAll" />
-                    <label class="form-check-label" for="selectAll">Select All</label>
+                    <label class="form-check-label" for="selectAll">ជ្រើសរើសយកទាំងអស់</label>
 
-                    <!--btn delete-->
+                    <!--btn delete
                     <label id="deleteSelectedAllItems" class="form-check-label ms-3" for="item1">
                         <i class="fa-solid fa-trash-can" style="cursor: pointer;"></i>
-                    </label>
+                    </label>-->
                 </div>
             </div>
         </div>
@@ -37,16 +43,19 @@
     </div>
     <!--End Cart Items -->
 
-    <div id="totalPriceContainer" class="mt-4 container"></div>
+    <!--<div id="totalPriceContainer" class="mt-4 container"></div>-->
+    <div id="totalPriceContainer" class="mt-4 container d-flex justify-content-center"></div>
+
 
     <!-- Check Out Button -->
     <div id="id-check-out" class="d-none container mt-4">
         <div class="row">
             <div class="col-12 text-end">
-                <button id="id-btn-checkout" class="btn btn-primary">Check Out</button>
+                <button id="id-btn-checkout" class="btn btn-primary" style="width: 226px; height: 49px;">ទិញឥឡូវនេះ</button>
             </div>
         </div>
     </div>
+    
 
 </main>
 

@@ -8,7 +8,7 @@ $(document).ready(function () {
 
     function initializeDefaultCategory() {
         const defaultCategoryId = "all";
-        const defaultHeaderTitle = "All Products"; //ở đây là chỉnh
+        const defaultHeaderTitle = "ទំនិញទាំងអស់"; //ở đây là chỉnh
 
         // Set dropdown to default
         $('#categoryDropdown').val(defaultCategoryId);
@@ -82,7 +82,7 @@ $(document).ready(function () {
                 )
             );
 
-            currentHeaderTitle = `Search results: ${filteredProducts.length}`;
+            currentHeaderTitle = `ការស្វែងរក: ${filteredProducts.length}`;
             $('#id-title-header').text(currentHeaderTitle);
             currentItemsCount = 0;
             populateGrid(filteredProducts);

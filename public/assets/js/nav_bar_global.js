@@ -60,7 +60,7 @@ $(document).ready(function () {
             method: 'GET',
             success: function (res) {
                 if (res.status == 200 && res.data.length > 0) {
-                    let categoryOptions = '<option value="all" selected>All Categories</option>';
+                    let categoryOptions = '<option value="all" selected>ទំនិញគ្រប់ប្រភេទ</option>';
 
                     res.data.forEach(category => {
                         categoryOptions += `<option value="${category.category_id}" data-category-name="${category.category_name}">${category.category_name}</option>`;

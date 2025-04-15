@@ -1214,8 +1214,7 @@ $(document).ready(function () {
                             $(`#des${i}`).val(product.descriptions[desKey] || '');
                         }
                     }
-                //});
-            },
+                },
         });
     }
 
@@ -1279,8 +1278,8 @@ $(document).ready(function () {
                     <td>${index + 1}</td>
                     <td>${product.product_name}</td>
                     <td>${imageList}</td>
-                    
-                </tr>
+                
+                    </tr>
             `;
             tbody.innerHTML += r;
         });
@@ -1294,7 +1293,7 @@ $(document).ready(function () {
         proDescription1.innerHTML = "";
 
         var tableHtml = `
-        <table class="table table-hover" id="product-table1-des">
+        <table class=" " id="product-table1-des">
             <thead>
                 <tr class="table-info fw-bold thead-danger">
                     <th class="text-nowrap">Nº</th>

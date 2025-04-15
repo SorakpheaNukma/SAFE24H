@@ -30,14 +30,14 @@
                 <div class="search-container d-flex align-items-center">
                     <div id="id_location" class="mx-2"
                         style="width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 10px; border-radius: 10px; background-color: #F3F3F3;">
-                        Delivery to Cambodia ...
+                        ដឹកជញ្ជូនទៅដល់ ..............
                     </div>
 
                     <!-- search -->
                     <div class="input-group">
                         <select class="form-select" id="categoryDropdown">
                         </select>
-                        <input type="text" class="form-control" placeholder="|  Search products...">
+                        <input type="text" class="form-control" placeholder="|  ស្វែងរកទំនិញ...">
                         <button id="id-btn-search" class="btn btn-primary" type="button">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -70,8 +70,8 @@
                             <i id="dropdown-icon" class="fas fa-chevron-down ms-2"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom">
-                            <a id="id-profile" class="dropdown-item">My Profile</a>
-                            <a id="id-logout" id="id-logout" class="dropdown-item">Log Out</a>
+                            <a id="id-profile" class="dropdown-item">ព័ត៌មានរបស់អ្នក</a>
+                            <a id="id-logout" id="id-logout" class="dropdown-item">ចាកចេញ</a>
                         </div>
                     </div>
 
