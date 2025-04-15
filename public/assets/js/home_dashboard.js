@@ -1195,20 +1195,22 @@ $(document).ready(function () {
 
             },
             onOpenBefore: function () {
-                productsLsGL.forEach(function (p, index) {
-                    $('#productName').val(p.product_name);
-                    $('#productPrice').val(p.product_price);
-                    $('#productStock').val(p.quantity || 0);
-                    $('#category').val(p.category_id);
+                const product = productsLsGL.find(p => p.product_id === product_id);
+                //$('#productName').val(p.product_name);
+                // productsLsGL.forEach(function (p, index) {
+                    $('#productName').val(product.product_name);
+                    $('#productPrice').val(product.product_price);
+                    $('#productStock').val(product.quantity || 0);
+                    $('#category').val(product.category_id);
 
-                    if (p.descriptions) {
+                    if (product.descriptions) {
                         for (let i = 1; i <= 11; i++) {
                             const desKey = `des_${i}`;
 
-                            $(`#des${i}`).val(p.descriptions[desKey] || '');
+                            $(`#des${i}`).val(product.descriptions[desKey] || '');
                         }
                     }
-                });
+                //});
             },
         });
     }
