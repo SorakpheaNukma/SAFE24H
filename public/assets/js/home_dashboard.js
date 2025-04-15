@@ -1029,13 +1029,17 @@ $(document).ready(function () {
 
         MyDataTable('#product-table');
 
-        $(".btn-edit-product").on('click', function (e) {
+        //$(document).on('click', '.btn-edit-product', function (e) {
+        //$(".btn-edit-product").off('click').on('click', function (e) {
+        $(document).off('click', '.btn-edit-product').on('click', '.btn-edit-product', function (e) {
             e.stopPropagation();
             var product_id = $(this).data("product-id");
             updateProductDialog(product_id, productsLsGL);
         });
 
-        $(".btn-delete-product").on('click', function (e) {
+        $(document).off('click', '.btn-delete-product').on('click', '.btn-delete-product', function (e) {
+        //$(document).on('click', '.btn-delete-product', function (e) {
+        //$(".btn-delete-product").on('click', function (e) {
             e.stopPropagation();
             var product_id = $(this).data("product-id");
             var product_name = $(this).data("product-name");
