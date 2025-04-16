@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="fw-bold">SAFE 24H</h2>
+                <h2 class="fw-bold" >SAFE 24H</h2>
             </div>
         </div>
 
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Phần liên hệ -->
-        <div style="display:flex; flex-direction: column; align-items: center; margin-left: 20px;">
+        <div style="display:flex; flex-direction: column; align-items: center; margin-left: 100px;">
             <h6 class="sizeFooter">ទំនាក់ទំនងពួកយើង</h6>
             <p>អ៊ីម៉ែល: <a href="https://www.facebook.com/uniforms.expertkh" class="text-white">SAFE24H@gmail.com</a></p>
             <p>លេខទូរស័ព្ទ: +855 17 725 050</p>
@@ -31,8 +31,8 @@
         </div>
 
         <!-- Phần bản đồ Google Maps -->
-        <div style="padding:5px; margin-left: 20px;">
-                <iframe src="https://www.google.ca/maps/place/Uniforms+Expert/@11.5588933,104.878445,17z/data=!3m1!4b1!4m6!3m5!1s0x310951707c6f4103:0x73a2fdcf91f9f19d!8m2!3d11.5588881!4d104.8810199!16s%2Fg%2F11qbsbb9ry?entry=ttu&g_ep=EgoyMDI1MDQxMy4wIKXMDSoASAFQAw%3D%3D"
+        <div style="padding:5px; margin-left: 100px;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3908.901853465418!2d104.878445!3d11.5588933!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310951707c6f4103%3A0x73a2fdcf91f9f19d!2sUniforms%20Expert!5e0!3m2!1svi!2s!4v1744786277440!5m2!1svi!2s"
                     width="500" height="200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
             </div>
@@ -41,7 +41,7 @@
 
         
     </div>
-    <div style="display:flex; align-items: center;justify-content: left;">
-            <p style="margin:0;">© 2024, All rights reserved</p>
-        </div>
+    <div style="display: flex; align-items: center;">
+        <p style="margin: 0; font-size: 14px;">© 2024, All rights reserved</p>
+    </div>
 </footer>

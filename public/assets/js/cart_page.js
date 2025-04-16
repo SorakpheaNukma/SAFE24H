@@ -198,43 +198,43 @@ $(document).ready(function () {
 
 
     // Function to delete selected items (bulk delete)
-    document.getElementById('deleteSelectedAllItems').addEventListener('click', function () {
-        const selectedItems = cartsItemsGL.filter((item, index) => document.getElementById(`item${index}`).checked);
-        const selectedItemIds = selectedItems.map(item => item.id);
+    // document.getElementById('deleteSelectedAllItems').addEventListener('click', function () {
+    //     const selectedItems = cartsItemsGL.filter((item, index) => document.getElementById(`item${index}`).checked);
+    //     const selectedItemIds = selectedItems.map(item => item.id);
 
-        if (selectedItemIds.length > 0) {
-            $.ajax({
-                url: '/delete-multiple-from-cart',
-                method: 'DELETE',
-                data: {
-                    'ids': selectedItemIds,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (res) {
-                    if (res.status === 200) {
-                        // Remove selected items from the global array based on selected IDs
-                        cartsItemsGL = cartsItemsGL.filter(item => !selectedItemIds.includes(item.id));
+    //     if (selectedItemIds.length > 0) {
+    //         $.ajax({
+    //             url: '/delete-multiple-from-cart',
+    //             method: 'DELETE',
+    //             data: {
+    //                 'ids': selectedItemIds,
+    //             },
+    //             headers: {
+    //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //             },
+    //             success: function (res) {
+    //                 if (res.status === 200) {
+    //                     // Remove selected items from the global array based on selected IDs
+    //                     cartsItemsGL = cartsItemsGL.filter(item => !selectedItemIds.includes(item.id));
 
-                        // Re-render the cart and update the total price
-                        renderCartItems(cartsItemsGL);
-                        updateTotalPrice();
+    //                     // Re-render the cart and update the total price
+    //                     renderCartItems(cartsItemsGL);
+    //                     updateTotalPrice();
 
-                        // call from other js
-                        getAllCartItems();
+    //                     // call from other js
+    //                     getAllCartItems();
 
-                        showSuccess('deleted cart successfully🎉');
-                    } else {
-                        showError('Failed to delete selected items.');
-                    }
-                },
-                error: function () {
-                    showError('Error deleting the selected items.');
-                }
-            });
-        }
-    });
+    //                     showSuccess('deleted cart successfully🎉');
+    //                 } else {
+    //                     showError('Failed to delete selected items.');
+    //                 }
+    //             },
+    //             error: function () {
+    //                 showError('Error deleting the selected items.');
+    //             }
+    //         });
+    //     }
+    // });
 
     function MyJConfirmDialog(options) {
         let config = {

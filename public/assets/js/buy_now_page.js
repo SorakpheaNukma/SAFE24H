@@ -1,6 +1,7 @@
 $(document).ready(function () {
     let totalPrice = 0;
     let itemCount = 0;
+    //let dmain = "https://safe24h.com";
     const shippingFee = 2.00;
     var ProductsLsGL = [];
 
@@ -32,7 +33,8 @@ $(document).ready(function () {
             product_name: productData.product_name,
             product_price: productData.product_price,
             image_path: images,
-            quantity: productData.quantity
+            quantity: productData.quantity,
+            size: productData.size
         });
     } else {
         ProductsLsGL = productData;
@@ -45,6 +47,7 @@ $(document).ready(function () {
         const price = product.product_price;
         const dmain = window.location.origin;
         const imagePath = product.image_path ? product.image_path : 'default.jpg';
+        const size = product.size;
 
         totalPrice += price * quantity;
         itemCount++;
@@ -58,6 +61,7 @@ $(document).ready(function () {
             <div class="col-12 col-md-8 d-flex flex-column">
                 <h6 class="fw-semibold"> ${productName}</h6>
                 <p class="mb-0">ចំនួន: ${quantity}</p>
+                <p class="mb-0">Size: ${size}</p>
             </div>
            
         </div>
@@ -86,6 +90,7 @@ $(document).ready(function () {
         const price = product.product.product_price;
         const dmain = window.location.origin;
         const imagePath = product.product.product_image.length > 0 ? product.product.product_image[0].image_path : 'default.jpg';
+        const size = product.size;
 
         totalPrice += price * quantity;
         itemCount++;
@@ -93,14 +98,15 @@ $(document).ready(function () {
         const productId = `product-${product.product.product_id}`;
 
         const productHTML = `
-    <div id="${productId}" class="container m-2 product-item">
-        <div class="row d-flex align-items-center flex-column flex-md-row">
-            <div class="col-12 col-md-2 mb-3 mb-md-0">
+        <div id="${productId}" class="container m-2 product-item">
+            <div class="row d-flex align-items-center flex-column flex-md-row">
+                <div class="col-12 col-md-2 mb-3 mb-md-0">
                 <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
-            </div>
+        </div>
             <div class="col-12 col-md-8 d-flex flex-column">
                 <h6 class="fw-semibold"> ${productName}</h6>
-                <p class="mb-0">ចំនួន: ${quantity}</p>
+                <p class="mb-0">ចំនួនretert: ${quantity}</p>
+                <p class="mb-0">Size: ${size}</p>
             </div>
             <div class="col-12 col-md-2 text-md-end mt-3 mt-md-0">
                 <h6 class="text-primary remove-item" data-product-id="${productId}" data-price="${price * quantity}" data-quantity="${quantity}">Remove</h6>

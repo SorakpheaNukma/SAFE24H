@@ -189,19 +189,26 @@ function btnBuyNow(quantityStock) {
             return;
         }
 
+        const selectedSize = $('#id-sizeSelect').val();
+        if (!selectedSize) {
+            alert('Please add size before buying!');
+            return;
+        }
         // First, check if the user has an address
         checkAddress(function (hasAddress) {
             if (hasAddress) {
                 // If user has an address, proceed to "Buy Now" page
                 var { productData, images } = getItemDataFromUrl();
+                var firstImage = images.length > 0 ? images[0] : 'default.jpg';  // default.jpg nếu không có ảnh
                 var newProduct = {
                     product_id: productData.product_id,
                     product_name: productData.product_name,
                     product_price: productData.product_price,
-                    quantity: quantityInputGL
+                    quantity: quantityInputGL,
+                    size: selectedSize
                 };
-
-                window.location.href = `/buy-now-page?detail=true&items=${JSON.stringify(newProduct)}&images=${images}`;
+                const productStr = encodeURIComponent(JSON.stringify(newProduct));
+                window.location.href = `/buy-now-page?detail=true&items=${productStr}&images=${encodeURIComponent(firstImage)}`;
             } else {
                 //
                 $.confirm({
@@ -306,7 +313,7 @@ $(document).ready(function () {
         }
     });
 
-    function addItemToCarts(user_id, product_id, quantity) {
+    function addItemToCarts(user_id, product_id, quantity, size) {
         $.ajax({
             url: '/add-to-cart',
             method: 'POST',
@@ -314,7 +321,7 @@ $(document).ready(function () {
                 'user_id': user_id,
                 'product_id': product_id,
                 'quantity': quantity,
-                //'size': selectedSize,
+                'size': size,
             },
             success: function (res) {
                 if (res.status == 200) {
@@ -354,7 +361,7 @@ $(document).ready(function () {
             // }
 
             if (quantityInputGL > 0) {
-                addItemToCarts(user_idGL, productData.product_id, quantityInputGL)//, selectedSize);
+                addItemToCarts(user_idGL, productData.product_id, quantityInputGL, productData.size)//, selectedSize);
             } else {
                 alert('Please add items for add to cart');
                 return;

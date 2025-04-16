@@ -64,10 +64,12 @@
                 <div class="col-12">
                     <h6 class="fw-bold">ជម្រើសការទូរទាត់ប្រាក់</h6>
                 </div>
-                <div class="mx-3 d-flex">
-                    <input id="id-payment-method" type="checkbox" />
-                    <span class="ms-2">ទូរទាត់តាមរយៈអ្នកដឹកជញ្ជូន</span>
+                <div class="mx-3 d-flex align-items-center">
+                    <input id="id-payment-method" type="checkbox" style="width: 20px; height: 20px;"/>
+                    <label for="id-payment-method" class="ms-2" style="font-size: 16px; margin-bottom: 0;">ទូរទាត់តាមរយៈអ្នកដឹកជញ្ជូន</label>
                 </div>
+
+
             </div>
         </div>
 
