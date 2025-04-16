@@ -30,11 +30,11 @@
                 </div>
                 <div class="col-md-12 col-10 mt-2">
                     <div class="container">
-                        <p class="fw-semibold mb-1">ឈ្មោះ: {{ Auth::user()->username }}</p>
-                        <p class="mb-1">លេខទូរស័ព្ទ: {{ Auth::user()->phone_number }}</p>
+                        <p class="fw-semibold mb-1"> {{ Auth::user()->username }}</p>
+                        <p class="mb-1"> {{ Auth::user()->phone_number }}</p>
 
                         @if (Auth::user()->address && Auth::user()->country)
-                            <p class="mb-0">ទីតាំង: {{ Auth::user()->address }}, {{ Auth::user()->country }}</p>
+                            <p class="mb-0"> {{ Auth::user()->address }}, {{ Auth::user()->country }}</p>
                         @else
                             <p class="mb-0"></p>
                         @endif
