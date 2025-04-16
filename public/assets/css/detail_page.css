@@ -59,3 +59,8 @@
     border: solid 1px #ccc;
     border-radius: 10px;
 }
+
+.product-description {
+    display: inline-block;
+    white-space: nowrap;
+}
