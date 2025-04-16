@@ -105,6 +105,8 @@ main {
     --webkit-line-clamp: 1;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    white-space: nowrap;        /* Không xuống dòng */
+    display: inline-block;
 }
 
 .product-price {

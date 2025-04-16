@@ -189,7 +189,7 @@ $(document).ready(function () {
                                 <div style="display:flex; flex-direction:column;">
                                     <div class="product-price">\$${item.product_price}</div>
                                 </div>
-                                <div style="display:flex; justify-content: center; align-items: center; margin-left: auto;">
+                                <div style="display:flex; justify-content: center; align-items: center; margin-left: auto; width: 300px; overflow: hidden;">
                                     <div class="product-description">${item.descriptions.des_1 || ''}</div>
                                 </div>
                             </div>
