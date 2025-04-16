@@ -49,7 +49,7 @@ $(document).ready(function () {
     function createCartItem(item, index) {
         const dmain = window.location.origin;
         const imagePath = item.product.product_image.length > 0 ? item.product.product_image[0].image_path : 'default.jpg';
-
+    
         return `
             <div class="row align-items-center mb-4">
                 <div class="col-1">
@@ -65,19 +65,22 @@ $(document).ready(function () {
                     <div class="product-description mb-0 p-0">
                         <div class="row">
                             <div class="col-12 d-flex flex-column flex-md-row justify-content-between">
-                                <div><h5>${item.product.product_name}</h5></div>
+                                <div>
+                                    <h5>${item.product.product_name}</h5>
+                                    <div><small>ទំហំ: <strong>${item.selectedSize || 'N/A'}</strong></small></div>
+                                </div>
                                 <div class="d-flex">
-                                    <p class="mb-0">Price:</p>
+                                    <p class="mb-0">តម្លៃ:</p>
                                     <p class="mb-0 ms-2">$${item.product.product_price}</p>
                                 </div>
                             </div>
                         </div>
                         <p>${item.product.des_1}</p>
                     </div>
-                    <p class="text-primary g-0 p-0 m-0">${item.product.quantity === 0 ? 'Out Stock' : 'In Stock'}</p>
+                    <p class="text-primary g-0 p-0 m-0">${item.product.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
                     <div class="quantity-container mb-2">
                         <div class="d-flex align-items-center">
-                            <h7>Quantity</h7>
+                            <h7>ចំនួន</h7>
                             <div class="d-flex align-items-center mx-2">
                                 <button class="btn btn-secondary btn-sm minus-btn" data-index="${index}">-</button>
                                 <input type="number" class="form-control mx-2 quantity-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 60px;">
@@ -85,7 +88,7 @@ $(document).ready(function () {
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
-                            <h7>Subtotal:</h7>
+                            <h7>សរុបរង:</h7>
                             <span class="text-success subtotal" id="subtotal${index}">$${(item.product.product_price * item.quantity).toFixed(2)}</span>
                         </div>
                     </div>
@@ -93,6 +96,7 @@ $(document).ready(function () {
             </div>
         `;
     }
+    
 
     // Function to render all cart items
     function renderCartItems(items) {

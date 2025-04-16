@@ -4,17 +4,22 @@
 @include('client.layouts.nav_bar')
 
 <main class="mx-3 mb-3">
-    <!-- Back Icon and Text Home -->
-    <div class="container_back d-flex align-items-center mb-3" style="gap: 8px; padding-left: 0; margin-left: 0;">
-    <div class="d-flex justify-content-center align-items-center rounded-circle"
-        style="width: 40px; height: 40px; background-color: #F3F3F3;">
-        <a onclick="goBackHome()" class="text-blue text-decoration-none d-flex align-items-center justify-content-center" style="cursor: pointer;">
-            <i class="fa-solid fa-arrow-left fa-lg"></i>
-        </a>
-    </div>
+    <!-- Back Icon and Text Home lỗi chưa back được -->
+    <div class="container_back" style="display: flex; align-items: center; padding-left: 12px; gap: 8px;">
+        <div class="d-flex justify-content-center align-items-center rounded-circle"
+            style="width: 40px; height: 40px; background-color: #F3F3F3;">
+            <a onclick="goBackHome()" style="cursor: pointer" class="text-blue text-decoration-none d-flex align-items-center justify-content-center">
+                <i class="fa-solid fa-arrow-left fa-lg"></i>
+            </a>
+        </div>
 
-    <span class="text" style="font-size: 16px;">ត្រឡប់ក្រោយ</span>
-</div>
+        <span class="text" style="font-size: 16px;">ត្រឡប់ក្រោយ</span>
+    </div>
+    <script>
+        function goBackHome() {
+            window.history.back();
+        }
+    </script>
 
 
 
@@ -27,7 +32,7 @@
                     <p class="fw-semibold fs-4 p-0 m-0">បញ្ជីទំនិញក្នុងកន្ត្រកស្តុក</p>
                 </div>
                     <input class="form-check-input" type="checkbox" id="selectAll" />
-                    <label class="form-check-label" for="selectAll">ជ្រើសរើសយកទាំងអស់</label>
+                    <label class="form-check-label" for="selectAll" style="color: blue;">ជ្រើសរើសយកទាំងអស់</label>
 
                     <!--btn delete
                     <label id="deleteSelectedAllItems" class="form-check-label ms-3" for="item1">

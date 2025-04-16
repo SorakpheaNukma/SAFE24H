@@ -56,14 +56,14 @@ $(document).ready(function () {
                 <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
             </div>
             <div class="col-12 col-md-8 d-flex flex-column">
-                <h6 class="fw-semibold">Product Name: ${productName}</h6>
-                <p class="mb-0">Quantity: ${quantity}</p>
+                <h6 class="fw-semibold"> ${productName}</h6>
+                <p class="mb-0">ចំនួន: ${quantity}</p>
             </div>
            
         </div>
         <div class="row mt-2">
             <div class="col-6">
-                <h6>Price</h6>
+                <h6>តម្លៃ</h6>
             </div>
             <div class="col-6 text-end">
                 <h6 class="fw-bold">$${price}</h6>
@@ -99,8 +99,8 @@ $(document).ready(function () {
                 <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
             </div>
             <div class="col-12 col-md-8 d-flex flex-column">
-                <h6 class="fw-semibold">Product Name: ${productName}</h6>
-                <p class="mb-0">Quantity: ${quantity}</p>
+                <h6 class="fw-semibold"> ${productName}</h6>
+                <p class="mb-0">ចំនួន: ${quantity}</p>
             </div>
             <div class="col-12 col-md-2 text-md-end mt-3 mt-md-0">
                 <h6 class="text-primary remove-item" data-product-id="${productId}" data-price="${price * quantity}" data-quantity="${quantity}">Remove</h6>
@@ -108,7 +108,7 @@ $(document).ready(function () {
         </div>
         <div class="row mt-2">
             <div class="col-6">
-                <h6>Price</h6>
+                <h6>តម្លៃ</h6>
             </div>
             <div class="col-6 text-end">
                 <h6 class="fw-bold">$${price.toFixed(2)}</h6>
@@ -133,7 +133,7 @@ $(document).ready(function () {
         document.getElementById('final-total').textContent = `$${totalPayment.toFixed(2)}`;
 
         orderTotalElement.innerHTML = `
-    <h6 class="fw-bold mb-2 mb-md-0">Order Total (${itemCount} Item${itemCount > 1 ? 's' : ''}):</h6>
+    <h6 class="fw-bold mb-2 mb-md-0">សរុបទំនិញ (${itemCount} ទំនិញ${itemCount > 1 ? 's' : ''}):</h6>
     <h6 class="fw-bold text-md-end">$${merchandiseTotal.toFixed(2)}</h6>`;
     }
 

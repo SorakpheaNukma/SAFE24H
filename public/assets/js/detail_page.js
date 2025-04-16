@@ -312,6 +312,7 @@ $(document).ready(function () {
                 'user_id': user_id,
                 'product_id': product_id,
                 'quantity': quantity,
+                //'size': selectedSize,
             },
             success: function (res) {
                 if (res.status == 200) {
@@ -344,9 +345,14 @@ $(document).ready(function () {
                 alert('This product is out of stock');
                 return;
             }
+            // const selectedSize = $('#id-sizeSelect').val();
+            // if (!selectedSize) {
+            //     alert('សូមជ្រើសរើសទំហំមុនពេលបញ្ចូលទៅក្នុងកន្ត្រក'); // Vui lòng chọn size
+            //     return;
+            // }
 
             if (quantityInputGL > 0) {
-                addItemToCarts(user_idGL, productData.product_id, quantityInputGL);
+                addItemToCarts(user_idGL, productData.product_id, quantityInputGL)//, selectedSize);
             } else {
                 alert('Please add items for add to cart');
                 return;
