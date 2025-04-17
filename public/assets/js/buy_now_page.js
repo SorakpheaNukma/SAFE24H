@@ -105,7 +105,7 @@ $(document).ready(function () {
         </div>
             <div class="col-12 col-md-8 d-flex flex-column">
                 <h6 class="fw-semibold"> ${productName}</h6>
-                <p class="mb-0">ចំនួនretert: ${quantity}</p>
+                <p class="mb-0">ចំនួន: ${quantity}</p>
                 <p class="mb-0">Size: ${size}</p>
             </div>
             <div class="col-12 col-md-2 text-md-end mt-3 mt-md-0">

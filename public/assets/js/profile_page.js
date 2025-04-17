@@ -10,23 +10,23 @@ $(document).ready(function () {
 
     $('#id-edit-info').on('click', function () {
         $.confirm({
-            title: '<strong>Edit Information</strong>',
+            title: '<strong>ព័ត៌មានរបស់អ្នក</strong>',
             content: `
                 <form id="editInfoForm" class="formName">
                     <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" placeholder="Enter your name" class="form-control" required />
+                        <label for="name">ឈ្មោះ</label>
+                        <input type="text" id="name" placeholder="សូមបំពេញឈ្មោះ" class="form-control" required />
                     </div>
                     <div class="form-group mt-3">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" id="phone" placeholder="Enter your phone number" class="form-control" required />
+                        <label for="phone">លេខទូរស័ព្ទ</label>
+                        <input type="text" id="phone" placeholder="សូមបំពេញលេខទូរស័ព្ទ" class="form-control" required />
                     </div>
                     <div class="form-group mt-3">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="Enter your email" class="form-control" required />
+                        <label for="email">អ៊ីម៉ែល</label>
+                        <input type="email" id="email" placeholder="សូមបំពេញអ៊ីម៉ែល" class="form-control" required />
                     </div>
                     <div class="form-group mt-3">
-                        <label for="profile-image">Profile Image</label>
+                        <label for="profile-image">រូបភាព</label>
                         <input type="file" id="profile-image" class="form-control" accept="image/*" />
                     </div>
                 </form>
@@ -37,7 +37,7 @@ $(document).ready(function () {
             type: 'blue',
             buttons: {
                 yes: {
-                    text: 'Submit',
+                    text: '​យល់ព្រម',
                     action: function () {
                         alert('we\'re in development !!');
                         var name = this.$content.find('#name').val();
@@ -46,7 +46,7 @@ $(document).ready(function () {
                         var profileImage = this.$content.find('#profile-image')[0].files[0];
 
                         if (!name || !phone || !email) {
-                            $.alert('Please fill all the fields.');
+                            $.alert('សូមបំពេញព័ត៌មានរបស់អ្នក');
                             return false;
                         }
 
@@ -82,7 +82,7 @@ $(document).ready(function () {
                     }
                 },
                 no: {
-                    text: 'Cancel',
+                    text: 'បោះបង់',
                     action: function () { }
                 },
             },

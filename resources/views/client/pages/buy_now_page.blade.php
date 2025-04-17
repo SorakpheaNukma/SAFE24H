@@ -19,6 +19,7 @@
     <script>
         function goBackHome() {
             window.history.back();
+            //window.location.href = "/detail_page";
         }
     </script>
         <!-- 1: Address Information -->

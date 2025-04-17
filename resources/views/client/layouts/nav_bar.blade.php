@@ -1,5 +1,5 @@
-<!--  -->
 <nav class="navbar navbar-expand-lg navbar-light my-Bg">
+    
     <div class="container">
         <!-- Logo -->
         <div class="logo_container">
@@ -28,21 +28,24 @@
             <div class="offcanvas-body sidebar-content p-0 p-lg-0">
                 <!-- Box with text and search bar -->
                 <div class="search-container d-flex align-items-center">
-                    <div id="id_location" class="mx-2"
-                        style="width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 10px; border-radius: 10px; background-color: #F3F3F3;">
-                        ដឹកជញ្ជូនទៅដល់ ..............
-                    </div>
+                <button id="id_location" class="mx-2"
+                        style="width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 10px; border-radius: 10px; background-color: #F3F3F3; border: none; cursor: pointer;">
+                    ដឹកជញ្ជូនទៅដល់ ..............
+                </button>
 
-                    <!-- search -->
+
+
                     <div class="input-group">
-                        <select class="form-select" id="categoryDropdown">
+                            <select class=" form-select" id="categoryDropdown">
                         </select>
-                        <input type="text" class="form-control" placeholder="|  ស្វែងរកទំនិញ...">
+                        <input type="text" class="form-control" placeholder="Search...">
                         <button id="id-btn-search" class="btn btn-primary" type="button">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
                 </div>
+
+
 
                 <div class="d-flex align-items-center">
                     <!-- -->

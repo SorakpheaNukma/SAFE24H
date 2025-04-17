@@ -147,7 +147,7 @@ $(document).ready(function () {
         });
 
         document.getElementById('totalPriceContainer').innerHTML = `
-            <h5>តម្លៃទំនិញសរុប: <span class="text-primary">$${totalPrice.toFixed(2)}</span></h5>
+            <h5 class="fw-bold" style="font-size: 24px; color:blue;">តម្លៃទំនិញសរុប: <span class="text-primary" >$${totalPrice.toFixed(2)}</span></h5>
         `;
     }
 

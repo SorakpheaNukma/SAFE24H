@@ -15,6 +15,7 @@ $(document).ready(function () {
 
     // Build order card HTML
     function buildOrderCard(order) {
+        // console.log("size:", item.size); 
         const dmain = window.location.origin;
         let itemListHTML = '';
 
@@ -25,7 +26,8 @@ $(document).ready(function () {
                     <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
                     <div>
                         <p class="mb-1 fw-bold">${item.product.product_name}</p>
-                        <p class="text-muted mb-0">Quantity: ${item.quantity}</p>
+                        <p class="text-muted mb-0">ចំនួន: ${item.quantity}</p>
+                        <p class="text-muted mb-0">ទំហំ: ${item.size}</p>
                     </div>
                 </div>
             `;
@@ -35,10 +37,10 @@ $(document).ready(function () {
         return `
             <div class="card shadow-sm mb-4 border-0">
                 <div class="card-body">
-                    <h5 class="card-title fw-bold">Order #${order.order_id}</h5>
+                    <h5 class="card-title fw-bold">ល.រ #${order.order_id}</h5>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <p class="mb-0 text-muted">Total Amount: <span class="fw-bold">$${order.total_amount}</span></p>
-                        <p class="mb-0 text-muted">Order Date: ${order.order_date.split('T')[0]}</p>
+                        <p class="mb-0 text-muted">តម្លៃសរុប: <span class="fw-bold">$${order.total_amount}</span></p>
+                        <p class="mb-0 text-muted">កាលបរិច្ឆេទ: ${order.order_date.split('T')[0]}</p>
                     </div>
                     <span class="badge ${order.status === 'processing' ? 'bg-warning text-dark' : 'bg-primary'}">${order.status}</span>
                     <div class="order-items mt-3">
@@ -96,9 +98,9 @@ $(document).ready(function () {
                     });
 
                     // Display messages for empty sections
-                    if (!hasProcessing) displayEmptyMessage('processing-orders', 'No processing orders.');
-                    if (!hasShipped) displayEmptyMessage('shipped-orders', 'No shipped orders.');
-                    if (!hasDelivered) displayEmptyMessage('received-orders', 'No delivered orders.');
+                    if (!hasProcessing) displayEmptyMessage('processing-orders', 'គ្មានទំនិញរៀបចំ.');
+                    if (!hasShipped) displayEmptyMessage('shipped-orders', 'គ្មានទំនិញដឹកជញ្ជូន.');
+                    if (!hasDelivered) displayEmptyMessage('received-orders', 'គ្មានមុខទំនិញ.');
                 } else {
                     // Handle empty data case
                     displayEmptyMessage('processing-orders', 'No processing orders.');

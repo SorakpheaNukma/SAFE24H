@@ -59,7 +59,7 @@
         <div class="row mt-3">
             <div>
                 <div>
-                    <h5>ប្រតិបត្តិការទំនិញរបស់អ្នក</h5>
+                    <h5 class="fw-bold mb-3">ប្រតិបត្តិការទំនិញរបស់អ្នក</h5>
                 </div>
 
                 <div class="col-12 d-flex justify-content-around py-4">

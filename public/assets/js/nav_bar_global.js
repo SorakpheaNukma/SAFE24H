@@ -52,6 +52,10 @@ $(document).ready(function () {
 
         window.performSearch(searchInput);
     });
+    $('#id_location').click(function() {
+        // Chuyển hướng đến trang '/address-page'
+        window.location.href = '/address-page'; // Thay '/address-page' bằng URL trang bạn muốn chuyển đến
+    });
 
 
     function getAllCategories() {

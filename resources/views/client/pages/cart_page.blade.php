@@ -48,18 +48,21 @@
     </div>
     <!--End Cart Items -->
 
-    <!--<div id="totalPriceContainer" class="mt-4 container"></div>-->
-    <div id="totalPriceContainer" class="mt-4 container d-flex justify-content-center"></div>
+            <!-- Wrapper: căn giữa và nằm ngang -->
+        <div class="container mt-4 d-flex justify-content-center align-items-center gap-4 flex-wrap">
+            
+            <!-- Tổng tiền -->
+            <div id="totalPriceContainer" class="mb-0" style="color:blue"></div>
 
-
-    <!-- Check Out Button -->
-    <div id="id-check-out" class="d-none container mt-4">
-        <div class="row">
-            <div class="col-12 text-end">
-                <button id="id-btn-checkout" class="btn btn-primary" style="width: 226px; height: 49px;">ទិញឥឡូវនេះ</button>
+            <!-- Nút thanh toán -->
+            <div id="id-check-out" class="">
+                <button id="id-btn-checkout" class="btn btn-primary" style="width: 226px; height: 49px;">
+                    ទិញឥឡូវនេះ
+                </button>
             </div>
-        </div>
-    </div>
+
+</div>
+
     
 
 </main>
