@@ -12,7 +12,7 @@ class Order extends Model
     protected $primaryKey = 'order_id';
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'total_amount',
         'status',
         'order_date',
