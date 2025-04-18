@@ -221,6 +221,7 @@ $(document).ready(function () {
                             quantity: p.quantity || 'Out of stock',
                             images: p.images && Array.isArray(p.images) ? p.images : [],
                             descriptions: p.descriptions || {},
+                            variants: p.variants || [],
                         });
                     });
 
@@ -355,6 +356,13 @@ $(document).ready(function () {
         for (let i = 0; i < formData.images.length; i++) {
             fd.append(`images[]`, formData.images[i]);
         }
+
+        // Thêm các size (S, M, L, XL, 2XL)
+        fd.append('size_s_quantity', formData.size_s_quantity || 0);
+        fd.append('size_m_quantity', formData.size_m_quantity || 0);
+        fd.append('size_l_quantity', formData.size_l_quantity || 0);
+        fd.append('size_xl_quantity', formData.size_xl_quantity || 0);
+        fd.append('size_2xl_quantity', formData.size_2xl_quantity || 0);
 
         $.ajax({
             url: '/add-product',
@@ -1443,11 +1451,11 @@ $(document).ready(function () {
                             </div>
                             <div class="col-md-6 mb-2">
                                 <label>Size XL Quantity</label>
-                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size XL" class="form-control" />
+                                <input type="number" min="0" id="sizeXLQty" placeholder="Enter quantity for size XL" class="form-control" />
                             </div>
                             <div class="col-md-6 mb-2">
                                 <label>Size 2XL Quantity</label>
-                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size 2XL" class="form-control" />
+                                <input type="number" min="0" id="size2XLQty" placeholder="Enter quantity for size 2XL" class="form-control" />
                             </div>
                         </div>
                     <div class="form-group">
@@ -1537,6 +1545,11 @@ $(document).ready(function () {
                                 category_id: category,
                                 images: []
                             };
+                            formData.size_s_quantity = $('#sizeSQty').val() || 0;
+                            formData.size_m_quantity = $('#sizeMQty').val() || 0;
+                            formData.size_l_quantity = $('#sizeLQty').val() || 0;
+                            formData.size_xl_quantity = $('#sizeXLQty').val() || 0;
+                            formData.size_2xl_quantity = $('#size2XLQty').val() || 0;
 
                             for (let i = 1; i <= 11; i++) {
                                 let desValue = $(`#des${i} `).val();

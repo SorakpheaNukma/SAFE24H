@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\ProductImages;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use App\Models\ProductVariant;
+
 
 use Illuminate\Support\Str;
 
@@ -137,11 +139,28 @@ class ProductController extends Controller
         }
 
         try {
+            // Lấy số lượng tổng từ request
+            $totalQuantity = $request->quantity;
+
+            // Tính tổng số lượng của các size
+            $totalSizeQuantity = 0;
+            $sizes = ['S', 'M', 'L', 'XL', '2XL'];
+            foreach ($sizes as $size) {
+                $quantityField = 'size_' . strtolower($size) . '_quantity';
+                if ($request->$quantityField > 0) {
+                    $totalSizeQuantity += $request->$quantityField;
+                }
+            }
+
+            // Kiểm tra nếu tổng số lượng size không khớp với quantity
+            if ($totalSizeQuantity != $totalQuantity) {
+                return response()->json(['error' => 'Tổng số lượng các size phải khớp với số lượng tổng.'], 422);
+            }
             $product = new Product();
             $product->product_name = $request->product_name;
             $product->product_price = number_format($request->product_price, 2);
             $product->category_id = $request->category_id;
-            $product->quantity = $request->quantity;
+            $product->quantity = $totalQuantity;
 
             for ($i = 1; $i <= 11; $i++) {
                 $descriptionField = "des_$i";
@@ -149,6 +168,28 @@ class ProductController extends Controller
             }
 
             $product->save();
+            // Thêm các biến thể kích thước vào bảng product_variants
+            foreach ($sizes as $size) {
+                $quantityField = 'size_' . strtolower($size) . '_quantity';
+                if ($request->$quantityField > 0) {
+                    $variant = new ProductVariant();
+                    $variant->product_id = $product->product_id;
+                    $variant->size = $size;
+                    $variant->quantity = $request->$quantityField;
+                    $variant->sold = 0; // Mặc định là 0, có thể thay đổi sau
+                    $variant->save();
+                }
+            }foreach ($sizes as $size) {
+            $quantityField = 'size_' . strtolower($size) . '_quantity';
+            if ($request->$quantityField > 0) {
+                $variant = new ProductVariant();
+                $variant->product_id = $product->product_id;
+                $variant->size = $size;
+                $variant->quantity = $request->$quantityField;
+                $variant->sold = 0; // Mặc định là 0, có thể thay đổi sau
+                $variant->save();
+            }
+        }
             return response()->json([
                 'status' => 200,
                 'data' => $product
@@ -217,11 +258,27 @@ class ProductController extends Controller
             if (!$product) {
                 return response()->json(['error' => 'Product not found'], 404);
             }
+            // Lấy số lượng tổng từ request
+            $totalQuantity = $request->quantity;
+
+            // Tính tổng số lượng của các size
+            $totalSizeQuantity = 0;
+            $sizes = ['S', 'M', 'L', 'XL', '2XL'];
+            foreach ($sizes as $size) {
+                $quantityField = 'size_' . strtolower($size) . '_quantity';
+                if ($request->$quantityField > 0) {
+                    $totalSizeQuantity += $request->$quantityField;
+                }
+            }
+
+            if ($totalSizeQuantity != $totalQuantity) {
+                return response()->json(['error' => 'NO.'], 402);
+            }
 
             $product->product_name = $request->product_name;
             $product->category_id = $request->category_id;
             $product->product_price = number_format($request->product_price, 2);
-            $product->quantity = $request->quantity;
+            $product->quantity = $totalQuantity;
 
             for ($i = 1; $i <= 11; $i++) {
                 $descriptionField = "des_$i";
@@ -232,6 +289,35 @@ class ProductController extends Controller
             }
 
             $product->save();
+            // Cập nhật các biến thể kích thước
+            $sizes = ['S', 'M', 'L', 'XL', '2XL'];
+            foreach ($sizes as $size) {
+                $quantityField = 'size_' . strtolower($size) . '_quantity';
+                $variant = ProductVariant::where('product_id', $product->product_id)
+                    ->where('size', $size)
+                    ->first();
+
+                if ($request->$quantityField > 0) {
+                    // Nếu biến thể kích thước đã tồn tại, cập nhật lại số lượng
+                    if ($variant) {
+                        $variant->quantity = $request->$quantityField;
+                        $variant->save();
+                    } else {
+                        // Nếu biến thể chưa tồn tại, tạo mới
+                        $variant = new ProductVariant();
+                        $variant->product_id = $product->product_id;
+                        $variant->size = $size;
+                        $variant->quantity = $request->$quantityField;
+                        $variant->sold = 0; // Mặc định là 0
+                        $variant->save();
+                    }
+                } else {
+                    // Nếu số lượng size = 0, xóa biến thể
+                    if ($variant) {
+                        $variant->delete();
+                    }
+                }
+            }
 
             return response()->json([
                 'status' => 200,
