@@ -42,7 +42,13 @@
             <!-- Product Details -->
             <div class="col-12 col-md-4 d-flex flex-column justify-content-start align-items-start">
                 <!-- Product Name -->
-                <h1 id="id-product-name" class="product-title" style="padding-left: 0;"></h1>
+                <div class="marquee-container">
+                    <div class="marquee-text" id="id-product-name">
+                        Đây là một tên sản phẩm cực kỳ dài mà bạn không thể bỏ qua đâu nha!
+                    </div>
+                </div>
+
+
                 <!-- Price -->
                 <div>
                     <span id="id-price" class="fs-4 fw-bold"></span>
@@ -68,7 +74,10 @@
                 </div>
 
                 <!-- Sold -->
-                <p id="id-sold"></p> 
+                <div style="display:flex; flex-direction:row; gap:10px;">
+                    <p id="id-sold"></p> 
+                    <p id="id-stock"></p>
+                </div>
                 <!-- Quantity Selector -->
                 <div class="quantity-container mt-3 mb-3">
                     <span class="fw-medium" style="white-space: nowrap;">ចំនួន:</span>

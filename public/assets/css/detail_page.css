@@ -64,3 +64,23 @@
     display: inline-block;
     white-space: nowrap;
 }
+
+.marquee-container {
+    max-width: 472px;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+
+.marquee-text {
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+    left: 0;
+    transition: left 0.3s ease-out;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+  
+  

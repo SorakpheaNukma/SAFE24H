@@ -185,7 +185,7 @@ function btnBuyNow(quantityStock) {
         }
 
         if (quantityStock === 0) {
-            alert('This product is out of stock');
+            alert('This product is out of stock'); //bookmark
             return;
         }
 
@@ -237,13 +237,18 @@ function getItemDataFromUrl() {
     const itemData = params.get('item');
     const imgData = params.get('img');
 
-    const productData = JSON.parse(itemData);
+    let productData = {};
+    try {
+        productData = JSON.parse(decodeURIComponent(itemData)); // 👈 Thêm decode ở đây
+    } catch (err) {
+        console.error("Lỗi parse JSON:", err);
+    }
 
-    // Split the images if there are multiple images passed as a comma-separated string
     const images = imgData ? imgData.split(',') : [];
 
     return { productData, images };
 }
+
 
 function displayProductDesDetails(descriptions) {
     const desContent = document.getElementById('product-detail-id');
@@ -303,8 +308,21 @@ $(document).ready(function () {
 
     var { productData, images } = getItemDataFromUrl();
 
-    $('#id-sold').text(productData.sold + " Sold");
+    $('#id-sizeSelect').on('change', function () {
+        const selectedSize = $(this).val();
 
+        if (!selectedSize || !productData.variants) return;
+
+        const variant = productData.variants.find(v => v.size === selectedSize);
+        if (variant) {
+            $('#id-sold').text(`${variant.sold} Sold`);
+            $('#id-stock').text(`${variant.quantity} In Stock`);
+
+            // Optional: set max value cho quantity input
+            $('#id-quantityInput').attr('max', variant.quantity);
+        }
+    });
+    //bookmark - nút tăng giảm số lượng dựa trên tối đa sản phẩm in stock - sửa thêm trong admin
     getProductRecommend(productData.product_id);
 
     $.ajaxSetup({
@@ -369,8 +387,28 @@ $(document).ready(function () {
         });
     }
 
-
     $('#id-product-name').text(productData.product_name);
+
+    setTimeout(() => {
+        const text = document.getElementById('id-product-name');
+        const container = text.parentElement;
+    
+        if (text.scrollWidth > container.clientWidth) {
+            let direction = -1;
+            let position = 0;
+            const maxScroll = text.scrollWidth - container.clientWidth;
+    
+            setInterval(() => {
+                position += direction;
+                if (position <= -maxScroll || position >= 0) {
+                    direction *= -1;
+                }
+                text.style.left = `${position}px`;
+            }, 30); // điều chỉnh tốc độ tại đây
+        }
+    }, 100); // delay một chút để DOM tính toán đúng scrollWidth
+
+    
     $('#id-price').text(`$${productData.product_price}`);
     displayProductDesDetails(productData.descriptions);
 

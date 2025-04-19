@@ -1,662 +1,658 @@
 import { exportToExcel1, exportToExcel2 } from "./fun_export_file.js";
 
-$(document).ready(function () {
-    $('.sidebar-toggler').click(function () {
-        $('.sidebar, .content').toggleClass("open");
-        return false;
-    });
+$(document).ready(function() {
+            $('.sidebar-toggler').click(function() {
+                $('.sidebar, .content').toggleClass("open");
+                return false;
+            });
 
 
-    // here pusher
-    const pusherKey = document.querySelector('meta[name="pusher-key"]').content;
-    const pusherCluster = document.querySelector('meta[name="pusher-cluster"]').content;
+            // here pusher
+            const pusherKey = document.querySelector('meta[name="pusher-key"]').content;
+            const pusherCluster = document.querySelector('meta[name="pusher-cluster"]').content;
 
-    const usernameGL = document.querySelector('meta[name="username"]').content;
-    var LsOrdersForCountBadgeNumber = [];
+            const usernameGL = document.querySelector('meta[name="username"]').content;
+            var LsOrdersForCountBadgeNumber = [];
 
-    if (usernameGL) {
-        $('#id-username').text(usernameGL);
-    }
-
-    // here for pusher 
-    const pusher = new Pusher(pusherKey, {
-        cluster: pusherCluster,
-    });
-
-
-    const channel = pusher.subscribe('send_notify_skincare');
-    channel.bind('my-message', function (data) {
-        console.log('Real-time notification order js: ' + JSON.stringify(data.message.order));
-        console.log('Real-time notification users js1: ' + JSON.stringify(data.message.users));
-
-        if (data.message.order.status === 'processing') {
-            getAllOrders();
-        }
-
-    });
-    // end of pusher
-
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    let categoriesLsGL = [];
-    let productsLsGL = [];
-    let OrdersLsGL = [];
-
-    let countUsersGl = 0;
-    let totalAmountGl = 0;
-    let todayAmountGl = 0;
-    let LsOrderDataGl = [];
-    let dataExportToExcelGl = [];
-
-    const dashboardContent = document.getElementById("dashboard-content");
-    const productContent = document.getElementById("product-content");
-    const proImageContent = document.getElementById('product-images-content');
-    const orderContent = document.getElementById('id-content-order');
-    const dashboardActionLink = document.getElementById("id_dashBoard");
-    const productActionLink = document.getElementById("id_product");
-    var proDescription1 = document.getElementById('product-description1-tb');
-    var proDescription2 = document.getElementById('product-description2-tb');
-
-    // const UserActionLink = document.getElementById('id_user');
-    // const PaymentActionLink = document.getElementById('id_payment');
-    const OrderActionLink = document.getElementById('id_order');
-
-    function Loading() {
-        $('#IDSpinner').removeClass('my-hidden');
-    }
-
-    function hideLoading() {
-        $('#IDSpinner').addClass('my-hidden');
-    }
-
-    function getAllCategories(callback) {
-        $.ajax({
-            url: '/getAllCategory',
-            method: 'GET',
-            success: function (res) {
-                if (res.status == 200) {
-                    categoriesLsGL = [];
-
-                    res.data.forEach(function (category) {
-                        categoriesLsGL.push({
-                            category_id: category.category_id,
-                            category_name: category.category_name
-                        });
-                    });
-
-                    if (typeof callback === 'function') {
-                        callback();
-                    }
-                } else {
-                    $.alert('Failed to get categories');
-                }
-            },
-            error: function (res) {
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong!!');
-                }
+            if (usernameGL) {
+                $('#id-username').text(usernameGL);
             }
-        });
-    }
 
-    getAllCategories();
+            // here for pusher 
+            const pusher = new Pusher(pusherKey, {
+                cluster: pusherCluster,
+            });
 
-    function addCategory(formData, callback) {
-        $.ajax({
-            url: '/add-category',
-            method: 'POST',
-            data: formData,
-            success: function (res) {
-                if (res.status == 200) {
-                    getAllCategories(displayCategoriesTable);
 
-                    callback(true);
-                } else {
-                    callback(false);
-                }
-            },
-            error: function (res) {
-                callback(false);
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong. Please try again later!');
-                }
-            }
-        });
-    }
+            const channel = pusher.subscribe('send_notify_skincare');
+            channel.bind('my-message', function(data) {
+                console.log('Real-time notification order js: ' + JSON.stringify(data.message.order));
+                console.log('Real-time notification users js1: ' + JSON.stringify(data.message.users));
 
-    function updateCategory(formData) {
-        $.ajax({
-            url: '/edit-category',
-            method: 'PUT',
-            data: formData,
-            success: function (res) {
-                if (res.status == 200) {
-                    getAllCategories(displayCategoriesTable);
-
-                    showSuccess('updated successfully🎉');
-                } else {
-                    $.alert('Failed to update category');
-                }
-            },
-            error: function (res) {
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong. Please try again later.');
-                }
-            }
-        });
-    }
-
-    function deleteCategory(formdata) {
-        $.ajax({
-            url: '/delete-category',
-            method: 'DELETE',
-            data: formdata,
-            success: function (res) {
-                if (res.status == 200) {
-                    getAllCategories(displayCategoriesTable);
-                    showSuccess('deleted successfully🎉');
-                } else {
-                    $.alert('Failed to delete category');
-                }
-            },
-            error: function (res) {
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else if (res.status === 404) {
-                    showError(res.responseJSON.error);
-                }
-                else {
-                    showError('Something went wrong. Please try again later.');
-                }
-            }
-        });
-    }
-
-    function getAllProdut(callbacks = [], callbackdata = null) {
-        if (callbacks.length === 0) {
-            Loading();
-        }
-
-        $.ajax({
-            url: '/getAllProducts',
-            method: 'GET',
-            success: function (res) {
-                if (res.status == 200) {
-                    productsLsGL = [];
-
-                    res.data.forEach(function (p) {
-                        productsLsGL.push({
-                            product_id: p.product_id || 0,
-                            product_name: p.product_name || 'Unknown',
-                            product_price: p.product_price || 0,
-                            category_id: p.category_id || 0,
-                            category_name: p.category_name || 'N/A',
-                            quantity: p.quantity || 'Out of stock',
-                            images: p.images && Array.isArray(p.images) ? p.images : [],
-                            descriptions: p.descriptions || {},
-                            variants: p.variants || [],
-                        });
-                    });
-
-                    if (callbackdata && typeof callbackdata === 'function') {
-                        callbackdata(res.data);
-                    }
-
-                    if (callbacks.length === 0) {
-                        hideLoading();
-                    }
-
-                    callbacks.forEach(function (callback) {
-                        if (typeof callback === 'function') {
-                            callback();
-                        }
-                    });
-                } else {
-                    if (callbacks.length === 0) {
-                        hideLoading();
-                    }
-
-                    $.alert('Failed to get product!');
-                }
-            },
-            error: function (res) {
-                if (callbacks.length === 0) {
-                    hideLoading();
+                if (data.message.order.status === 'processing') {
+                    getAllOrders();
                 }
 
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong!!');
-                }
-            }
-        });
-    }
+            });
+            // end of pusher
 
 
-    function updateProduct(formData, callback) {
-        $.ajax({
-            url: '/edit-product',
-            method: 'PUT',
-            data: formData,
-            success: function (res) {
-                if (res.status === 200) {
-                    if (typeof callback === 'function') {
-                        callback(null, res);
-                    }
-                } else {
-                    $.alert('Failed to update product');
-
-                    if (typeof callback === 'function') {
-                        callback('Failed to update product', null);
-                    }
-                }
-            },
-            error: function (res) {
-                let errorMessage = 'An error occurred. Please try again later.';
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    errorMessage = Object.values(error)[0][0];
-                } else if (res.status === 500) {
-                    errorMessage = 'A server error occurred.';
-                }
-
-                showError(errorMessage);
-
-                if (typeof callback === 'function') {
-                    callback(errorMessage, null);
-                }
-            }
-        });
-    }
-
-
-    function deleteProduct(formData, callback) {
-        $.ajax({
-            url: '/delete-product',
-            method: 'DELETE',
-            data: formData,
-            success: function (res) {
-                if (res.status === 200) {
-                    if (typeof callback === 'function') {
-                        callback(null, res);
-                    }
-                } else {
-                    $.alert('Failed to delete product');
-
-                    if (typeof callback === 'function') {
-                        callback('Failed to delete product', null);
-                    }
-                }
-            },
-            error: function (res) {
-                let errorMessage = 'An error occurred. Please try again later.';
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    errorMessage = Object.values(error)[0][0];
-                } else if (res.status === 404) {
-                    errorMessage = 'Product not found. Please try again later.';
-                }
-                else if (res.status === 500) {
-                    errorMessage = 'A server error occurred.';
-                }
-
-                showError(errorMessage);
-
-                if (typeof callback === 'function') {
-                    callback(errorMessage, null);
-                }
-            }
-        });
-    }
-
-
-    function addProduct(formData) {
-        let fd = new FormData();
-        fd.append('product_name', formData.product_name);
-        fd.append('product_price', formData.product_price);
-        fd.append('category_id', formData.category_id);
-        fd.append('quantity', formData.quantity);
-
-        for (let i = 1; i <= 11; i++) {
-            fd.append(`des_${i}`, formData[`des_${i} `] ?? '');
-        }
-
-        for (let i = 0; i < formData.images.length; i++) {
-            fd.append(`images[]`, formData.images[i]);
-        }
-
-        // Thêm các size (S, M, L, XL, 2XL)
-        fd.append('size_s_quantity', formData.size_s_quantity || 0);
-        fd.append('size_m_quantity', formData.size_m_quantity || 0);
-        fd.append('size_l_quantity', formData.size_l_quantity || 0);
-        fd.append('size_xl_quantity', formData.size_xl_quantity || 0);
-        fd.append('size_2xl_quantity', formData.size_2xl_quantity || 0);
-
-        $.ajax({
-            url: '/add-product',
-            method: 'POST',
-            data: fd,
-            contentType: false,
-            processData: false,
-            success: function (res) {
-                if (res.status === 200) {
-                    let fdData = {
-                        "product_id": res.data.product_id,
-                        "quantity": formData.quantity
-                    };
-
-                    addProductImg(res.data.product_id, formData.images);
-                } else {
-                    $.alert('Failed to add Product');
-                }
-            },
-            error: function (res) {
-                // console.log(res.responseJSON);
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError(res.responseJSON.error);
-                } else {
-                    showError('Something went wrong. Please try again later!');
-                }
-            }
-        });
-    }
-
-
-    function addProductImg(productId, images) {
-        let fd = new FormData();
-        fd.append('product_id', productId);
-        for (let i = 0; i < images.length; i++) {
-            fd.append(`images[]`, images[i]);
-        }
-
-        $.ajax({
-            url: '/add-product-img',
-            method: 'POST',
-            data: fd,
-            contentType: false,
-            processData: false,
-            success: function (res) {
-                if (res.status == 200) {
-                    getAllProdut([
-                        displayTbProducts,
-                        displayProductImages,
-                        displayProductDescription1,
-                        displayProductDescription2
-                    ]);
-
-                    showSuccess('product added successfully🎉');
-                } else {
-                    $.alert('Failed to add Product image');
-                }
-            },
-            error: function (res) {
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError(res.responseJSON.error);
-                } else {
-                    showError('Something went wrong. Please try again later!');
-                }
-            }
-        });
-    }
-
-    function updateProductImg(productId, images) {
-        let fd = new FormData();
-        fd.append('product_id', productId);
-        for (let i = 0; i < images.length; i++) {
-            fd.append(`images[]`, images[i]);
-        }
-
-        $.ajax({
-            url: '/edit-product-img',
-            method: 'POST',
-            data: fd,
-            contentType: false,
-            processData: false,
-            success: function (res) {
-                if (res.status == 200) {
-                    getAllProdut([
-                        displayTbProducts,
-                        displayProductImages,
-                        displayProductDescription1,
-                        displayProductDescription2
-                    ]);
-
-                    showSuccess(res.message);
-                } else {
-                    $.alert('Failed to add Product image');
-                }
-            },
-            error: function (res) {
-                console.log("Error: " + JSON.stringify(res));
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError(res.responseJSON.error);
-                } else {
-                    showError('Something went wrong. Please try again later!');
-                }
-            }
-        });
-    }
-
-    function deleteProductImg(id) {
-        $.ajax({
-            url: '/delete-product-img',
-            method: 'DELETE',
-            data: {
-                product_id: id
-            },
-            success: function (res) {
-                if (res.status === 200) {
-                    getAllProdut([
-                        displayTbProducts,
-                        displayProductImages,
-                        displayProductDescription1,
-                        displayProductDescription2
-                    ]);
-
-                    showSuccess1('Product deleted successfully🎉');
-                } else {
-                    $.alert('Failed to delete product');
-                }
-            },
-            error: function (res) {
-                let errorMessage = 'An error occurred. Please try again later.';
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    errorMessage = Object.values(error)[0][0];
-                } else if (res.status === 404) {
-                    errorMessage = res.responseJSON.error;
-                }
-                else if (res.status === 500) {
-                    errorMessage = 'A server error occurred.';
-                }
-
-                showError(errorMessage);
-            }
-        });
-    }
-
-    function removeActiveClass() {
-        document.querySelectorAll('.nav-link').forEach(navLink => {
-            navLink.classList.remove('active');
-        });
-    }
-
-    dashboardActionLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        removeActiveClass();
-        this.classList.add('active');
-        showDashboard();
-    });
-
-
-    OrderActionLink.addEventListener("click", function (e) {
-        e.preventDefault();
-        removeActiveClass();
-        this.classList.add('active');
-
-        ShowOrderContent();
-    });
-
-    function ShowOrderContent() {
-        orderContent.style.display = 'block';
-        dashboardContent.style.display = "none";
-        productContent.style.display = "none";
-        proImageContent.style.display = "none";
-        proDescription1.style.display = "none";
-        proDescription2.style.display = "none";
-    }
-
-
-    // fun getAllOrders
-    function getAllOrders(callback = null) {
-        $.ajax({
-            url: '/getall-order',
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (res) {
-                if (res.status === 200) {
-                    LsOrdersForCountBadgeNumber = [];
-                    OrdersLsGL = [];
-
-                    res.data.forEach(item => {
-                        OrdersLsGL.push(item);
-
-                        if (item.status === 'processing') {
-                            LsOrdersForCountBadgeNumber.push(item);
-                        }
-                    });
-
-
-                    $('#id-badge-order').text(LsOrdersForCountBadgeNumber.length).removeClass('d-none');
-
-                    displayContentOrders();
-
-                    if (callback && typeof callback === 'function') {
-                        callback(res.data);
-                    }
-                } else {
-                    alert('Failed get orders.!!');
-                }
-            },
-            error: function (res) {
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong!');
-                }
-            }
-        });
-    }
-
-    getAllOrders(function (data) {
-
-        data.forEach(item => {
-            totalAmountGl += item.total_amount;
-
-            LsOrderDataGl.push(item);
-
-            const today = new Date().toISOString().slice(0, 10);
-
-            // Get today amount 
-            if (item.order_date.slice(0, 10) === today) {
-                todayAmountGl += item.total_amount;
-            }
-        });
-
-        if (data) {
-            getAllProdut([], function (dataPro) {
-                if (dataPro) {
-                    // console.log('here datapro');
-
-                    // function from home_dashboard_2 js file 
-                    getAllUsers(function (usersData) {
-                        if (usersData) {
-                            countUsersGl = usersData.length;
-                            // Trigger click on dashboardActionLink to load the dashboard on page load
-                            dashboardActionLink.click();
-                        }
-                    });
-
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-        }
-    });
 
-    // formate date
-    function formatDate(inputDate) {
-        const date = new Date(inputDate);
+            let categoriesLsGL = [];
+            let productsLsGL = [];
+            let OrdersLsGL = [];
 
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based
-        const year = date.getUTCFullYear();
+            let countUsersGl = 0;
+            let totalAmountGl = 0;
+            let todayAmountGl = 0;
+            let LsOrderDataGl = [];
+            let dataExportToExcelGl = [];
 
-        let hours = date.getUTCHours();
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+            const dashboardContent = document.getElementById("dashboard-content");
+            const productContent = document.getElementById("product-content");
+            const proImageContent = document.getElementById('product-images-content');
+            const orderContent = document.getElementById('id-content-order');
+            const dashboardActionLink = document.getElementById("id_dashBoard");
+            const productActionLink = document.getElementById("id_product");
+            var proDescription1 = document.getElementById('product-description1-tb');
+            var proDescription2 = document.getElementById('product-description2-tb');
 
-        // Determine AM or PM and convert hours to 12-hour format
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? String(hours).padStart(2, '0') : '12'; // the hour '0' should be '12'
+            // const UserActionLink = document.getElementById('id_user');
+            // const PaymentActionLink = document.getElementById('id_payment');
+            const OrderActionLink = document.getElementById('id_order');
 
-        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
-    }
+            function Loading() {
+                $('#IDSpinner').removeClass('my-hidden');
+            }
 
-    //Content Orders
-    function displayContentOrders() {
-        const dvContentOrder = document.getElementById("id-content-order");
+            function hideLoading() {
+                $('#IDSpinner').addClass('my-hidden');
+            }
 
-        dvContentOrder.innerHTML = `
+            function getAllCategories(callback) {
+                $.ajax({
+                    url: '/getAllCategory',
+                    method: 'GET',
+                    success: function(res) {
+                        if (res.status == 200) {
+                            categoriesLsGL = [];
+
+                            res.data.forEach(function(category) {
+                                categoriesLsGL.push({
+                                    category_id: category.category_id,
+                                    category_name: category.category_name
+                                });
+                            });
+
+                            if (typeof callback === 'function') {
+                                callback();
+                            }
+                        } else {
+                            $.alert('Failed to get categories');
+                        }
+                    },
+                    error: function(res) {
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError('An error occurred. Please try again later.');
+                        } else {
+                            showError('Something went wrong!!');
+                        }
+                    }
+                });
+            }
+
+            getAllCategories();
+
+            function addCategory(formData, callback) {
+                $.ajax({
+                    url: '/add-category',
+                    method: 'POST',
+                    data: formData,
+                    success: function(res) {
+                        if (res.status == 200) {
+                            getAllCategories(displayCategoriesTable);
+
+                            callback(true);
+                        } else {
+                            callback(false);
+                        }
+                    },
+                    error: function(res) {
+                        callback(false);
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError('An error occurred. Please try again later.');
+                        } else {
+                            showError('Something went wrong. Please try again later!');
+                        }
+                    }
+                });
+            }
+
+            function updateCategory(formData) {
+                $.ajax({
+                    url: '/edit-category',
+                    method: 'PUT',
+                    data: formData,
+                    success: function(res) {
+                        if (res.status == 200) {
+                            getAllCategories(displayCategoriesTable);
+
+                            showSuccess('updated successfully🎉');
+                        } else {
+                            $.alert('Failed to update category');
+                        }
+                    },
+                    error: function(res) {
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError('An error occurred. Please try again later.');
+                        } else {
+                            showError('Something went wrong. Please try again later.');
+                        }
+                    }
+                });
+            }
+
+            function deleteCategory(formdata) {
+                $.ajax({
+                    url: '/delete-category',
+                    method: 'DELETE',
+                    data: formdata,
+                    success: function(res) {
+                        if (res.status == 200) {
+                            getAllCategories(displayCategoriesTable);
+                            showSuccess('deleted successfully🎉');
+                        } else {
+                            $.alert('Failed to delete category');
+                        }
+                    },
+                    error: function(res) {
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError('An error occurred. Please try again later.');
+                        } else if (res.status === 404) {
+                            showError(res.responseJSON.error);
+                        } else {
+                            showError('Something went wrong. Please try again later.');
+                        }
+                    }
+                });
+            }
+
+            function getAllProdut(callbacks = [], callbackdata = null) {
+                if (callbacks.length === 0) {
+                    Loading();
+                }
+
+                $.ajax({
+                    url: '/getAllProducts',
+                    method: 'GET',
+                    success: function(res) {
+                        if (res.status == 200) {
+                            productsLsGL = [];
+
+                            res.data.forEach(function(p) {
+                                productsLsGL.push({
+                                    product_id: p.product_id || 0,
+                                    product_name: p.product_name || 'Unknown',
+                                    product_price: p.product_price || 0,
+                                    category_id: p.category_id || 0,
+                                    category_name: p.category_name || 'N/A',
+                                    quantity: p.quantity || 'Out of stock', //sửa lại đoạn này bookmark
+                                    images: p.images && Array.isArray(p.images) ? p.images : [],
+                                    descriptions: p.descriptions || {},
+                                    variants: p.variants || [],
+                                });
+                            });
+
+                            if (callbackdata && typeof callbackdata === 'function') {
+                                callbackdata(res.data);
+                            }
+
+                            if (callbacks.length === 0) {
+                                hideLoading();
+                            }
+
+                            callbacks.forEach(function(callback) {
+                                if (typeof callback === 'function') {
+                                    callback();
+                                }
+                            });
+                        } else {
+                            if (callbacks.length === 0) {
+                                hideLoading();
+                            }
+
+                            $.alert('Failed to get product!');
+                        }
+                    },
+                    error: function(res) {
+                        if (callbacks.length === 0) {
+                            hideLoading();
+                        }
+
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError('An error occurred. Please try again later.');
+                        } else {
+                            showError('Something went wrong!!');
+                        }
+                    }
+                });
+            }
+
+            function updateProduct(formData, callback) {
+                $.ajax({
+                    url: '/edit-product',
+                    method: 'PUT',
+                    data: formData,
+                    success: function(res) {
+                        if (res.status === 200) {
+                            if (typeof callback === 'function') {
+                                callback(null, res);
+                            }
+                        } else {
+                            $.alert('Failed to update product');
+
+                            if (typeof callback === 'function') {
+                                callback('Failed to update product', null);
+                            }
+                        }
+                    },
+                    error: function(res) {
+                        let errorMessage = 'An error occurred. Please try again later.';
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            errorMessage = Object.values(error)[0][0];
+                        } else if (res.status === 500) {
+                            errorMessage = 'A server error occurred.';
+                        }
+
+                        showError(errorMessage);
+
+                        if (typeof callback === 'function') {
+                            callback(errorMessage, null);
+                        }
+                    }
+                });
+            }
+
+
+            function deleteProduct(formData, callback) {
+                $.ajax({
+                    url: '/delete-product',
+                    method: 'DELETE',
+                    data: formData,
+                    success: function(res) {
+                        if (res.status === 200) {
+                            if (typeof callback === 'function') {
+                                callback(null, res);
+                            }
+                        } else {
+                            $.alert('Failed to delete product');
+
+                            if (typeof callback === 'function') {
+                                callback('Failed to delete product', null);
+                            }
+                        }
+                    },
+                    error: function(res) {
+                        let errorMessage = 'An error occurred. Please try again later.';
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            errorMessage = Object.values(error)[0][0];
+                        } else if (res.status === 404) {
+                            errorMessage = 'Product not found. Please try again later.';
+                        } else if (res.status === 500) {
+                            errorMessage = 'A server error occurred.';
+                        }
+
+                        showError(errorMessage);
+
+                        if (typeof callback === 'function') {
+                            callback(errorMessage, null);
+                        }
+                    }
+                });
+            }
+
+
+            function addProduct(formData) {
+                let fd = new FormData();
+                fd.append('product_name', formData.product_name);
+                fd.append('product_price', formData.product_price);
+                fd.append('category_id', formData.category_id);
+                fd.append('quantity', formData.quantity);
+
+                for (let i = 1; i <= 11; i++) {
+                    fd.append(`des_${i}`, formData[`des_${i}`] ?? '');
+                }
+
+                for (let i = 0; i < formData.images.length; i++) {
+                    fd.append(`images[]`, formData.images[i]);
+                }
+
+                // Thêm các size (S, M, L, XL, 2XL)
+                fd.append('size_s_quantity', formData.size_s_quantity || 0);
+                fd.append('size_m_quantity', formData.size_m_quantity || 0);
+                fd.append('size_l_quantity', formData.size_l_quantity || 0);
+                fd.append('size_xl_quantity', formData.size_xl_quantity || 0);
+                fd.append('size_2xl_quantity', formData.size_2xl_quantity || 0);
+
+                $.ajax({
+                    url: '/add-product',
+                    method: 'POST',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(res) {
+                        if (res.status === 200) {
+                            let fdData = {
+                                "product_id": res.data.product_id,
+                                "quantity": formData.quantity
+                            };
+
+                            addProductImg(res.data.product_id, formData.images);
+                        } else {
+                            $.alert('Failed to add Product');
+                        }
+                    },
+                    error: function(res) {
+                        // console.log(res.responseJSON);
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError(res.responseJSON.error);
+                        } else {
+                            showError('Something went wrong. Please try again later!');
+                        }
+                    }
+                });
+            }
+
+
+            function addProductImg(productId, images) {
+                let fd = new FormData();
+                fd.append('product_id', productId);
+                for (let i = 0; i < images.length; i++) {
+                    fd.append(`images[]`, images[i]);
+                }
+
+                $.ajax({
+                    url: '/add-product-img',
+                    method: 'POST',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(res) {
+                        if (res.status == 200) {
+                            getAllProdut([
+                                displayTbProducts,
+                                displayProductImages,
+                                displayProductDescription1,
+                                displayProductDescription2
+                            ]);
+
+                            showSuccess('product added successfully🎉');
+                        } else {
+                            $.alert('Failed to add Product image');
+                        }
+                    },
+                    error: function(res) {
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError(res.responseJSON.error);
+                        } else {
+                            showError('Something went wrong. Please try again later!');
+                        }
+                    }
+                });
+            }
+
+            function updateProductImg(productId, images) {
+                let fd = new FormData();
+                fd.append('product_id', productId);
+                for (let i = 0; i < images.length; i++) {
+                    fd.append(`images[]`, images[i]);
+                }
+
+                $.ajax({
+                    url: '/edit-product-img',
+                    method: 'POST',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(res) {
+                        if (res.status == 200) {
+                            getAllProdut([
+                                displayTbProducts,
+                                displayProductImages,
+                                displayProductDescription1,
+                                displayProductDescription2
+                            ]);
+
+                            showSuccess(res.message);
+                        } else {
+                            $.alert('Failed to add Product image');
+                        }
+                    },
+                    error: function(res) {
+                        console.log("Error: " + JSON.stringify(res));
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError(res.responseJSON.error);
+                        } else {
+                            showError('Something went wrong. Please try again later!');
+                        }
+                    }
+                });
+            }
+
+            function deleteProductImg(id) {
+                $.ajax({
+                    url: '/delete-product-img',
+                    method: 'DELETE',
+                    data: {
+                        product_id: id
+                    },
+                    success: function(res) {
+                        if (res.status === 200) {
+                            getAllProdut([
+                                displayTbProducts,
+                                displayProductImages,
+                                displayProductDescription1,
+                                displayProductDescription2
+                            ]);
+
+                            showSuccess1('Product deleted successfully🎉');
+                        } else {
+                            $.alert('Failed to delete product');
+                        }
+                    },
+                    error: function(res) {
+                        let errorMessage = 'An error occurred. Please try again later.';
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            errorMessage = Object.values(error)[0][0];
+                        } else if (res.status === 404) {
+                            errorMessage = res.responseJSON.error;
+                        } else if (res.status === 500) {
+                            errorMessage = 'A server error occurred.';
+                        }
+
+                        showError(errorMessage);
+                    }
+                });
+            }
+
+            function removeActiveClass() {
+                document.querySelectorAll('.nav-link').forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+            }
+
+            dashboardActionLink.addEventListener("click", function(event) {
+                event.preventDefault();
+                removeActiveClass();
+                this.classList.add('active');
+                showDashboard();
+            });
+
+
+            OrderActionLink.addEventListener("click", function(e) {
+                e.preventDefault();
+                removeActiveClass();
+                this.classList.add('active');
+
+                ShowOrderContent();
+            });
+
+            function ShowOrderContent() {
+                orderContent.style.display = 'block';
+                dashboardContent.style.display = "none";
+                productContent.style.display = "none";
+                proImageContent.style.display = "none";
+                proDescription1.style.display = "none";
+                proDescription2.style.display = "none";
+            }
+
+
+            // fun getAllOrders
+            function getAllOrders(callback = null) {
+                $.ajax({
+                    url: '/getall-order',
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(res) {
+                        if (res.status === 200) {
+                            LsOrdersForCountBadgeNumber = [];
+                            OrdersLsGL = [];
+
+                            res.data.forEach(item => {
+                                OrdersLsGL.push(item);
+
+                                if (item.status === 'processing') {
+                                    LsOrdersForCountBadgeNumber.push(item);
+                                }
+                            });
+
+
+                            $('#id-badge-order').text(LsOrdersForCountBadgeNumber.length).removeClass('d-none');
+
+                            displayContentOrders();
+
+                            if (callback && typeof callback === 'function') {
+                                callback(res.data);
+                            }
+                        } else {
+                            alert('Failed get orders.!!');
+                        }
+                    },
+                    error: function(res) {
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            let firstError = Object.values(error)[0][0];
+                            showError(firstError);
+                        } else if (res.status === 500) {
+                            showError('An error occurred. Please try again later.');
+                        } else {
+                            showError('Something went wrong!');
+                        }
+                    }
+                });
+            }
+
+            getAllOrders(function(data) {
+
+                data.forEach(item => {
+                    totalAmountGl += item.total_amount;
+
+                    LsOrderDataGl.push(item);
+
+                    const today = new Date().toISOString().slice(0, 10);
+
+                    // Get today amount 
+                    if (item.order_date.slice(0, 10) === today) {
+                        todayAmountGl += item.total_amount;
+                    }
+                });
+
+                if (data) {
+                    getAllProdut([], function(dataPro) {
+                        if (dataPro) {
+                            // console.log('here datapro');
+
+                            // function from home_dashboard_2 js file 
+                            getAllUsers(function(usersData) {
+                                if (usersData) {
+                                    countUsersGl = usersData.length;
+                                    // Trigger click on dashboardActionLink to load the dashboard on page load
+                                    dashboardActionLink.click();
+                                }
+                            });
+
+                        }
+                    });
+                }
+            });
+
+            // formate date
+            function formatDate(inputDate) {
+                const date = new Date(inputDate);
+
+                const day = String(date.getUTCDate()).padStart(2, '0');
+                const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const year = date.getUTCFullYear();
+
+                let hours = date.getUTCHours();
+                const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+                // Determine AM or PM and convert hours to 12-hour format
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? String(hours).padStart(2, '0') : '12'; // the hour '0' should be '12'
+
+                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+            }
+
+            //Content Orders
+            function displayContentOrders() {
+                const dvContentOrder = document.getElementById("id-content-order");
+
+                dvContentOrder.innerHTML = `
             <div class="container mt-3">
                 <h2 class="mb-2">Orders Management</h2>
                 <div class="table-responsive">
@@ -677,15 +673,15 @@ $(document).ready(function () {
             </div>
         `;
 
-        const ordersTableBody = document.getElementById("ordersTableBody");
-        let numberCount = 0;
+                const ordersTableBody = document.getElementById("ordersTableBody");
+                let numberCount = 0;
 
-        OrdersLsGL.forEach(order => {
-            numberCount++;
-            const formattedDateTime = formatDate(order.order_date);
+                OrdersLsGL.forEach(order => {
+                    numberCount++;
+                    const formattedDateTime = formatDate(order.order_date);
 
-            const row = document.createElement("tr");
-            row.innerHTML = `
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
                 <td>${numberCount}</td>
                 <td>${order.users.username}</td>
                 <td>$${order.total_amount}</td>
@@ -699,41 +695,41 @@ $(document).ready(function () {
                     <input type="hidden" class="order-data" value='${JSON.stringify(order)}' />
                 </td>
             `;
-            ordersTableBody.appendChild(row);
-        });
+                    ordersTableBody.appendChild(row);
+                });
 
-        MyDataTable('#ordersTable', 15);
+                MyDataTable('#ordersTable', 15);
 
-        $(".btn-edit-order").on('click', function (e) {
-            e.stopPropagation();
-            var order_id = $(this).data("order-id");
-            var order_status = $(this).data("order-status");
+                $(".btn-edit-order").on('click', function(e) {
+                    e.stopPropagation();
+                    var order_id = $(this).data("order-id");
+                    var order_status = $(this).data("order-status");
 
-            editOrderDialog(order_id, order_status);
-        });
+                    editOrderDialog(order_id, order_status);
+                });
 
-        $(".btn-delete-order").on('click', function (e) {
-            e.stopPropagation();
-            var orderData = $(this).closest("td").find(".order-data").val();
-            orderData = JSON.parse(orderData);
+                $(".btn-delete-order").on('click', function(e) {
+                    e.stopPropagation();
+                    var orderData = $(this).closest("td").find(".order-data").val();
+                    orderData = JSON.parse(orderData);
 
-            deleteOrderDialog(orderData);
-        });
+                    deleteOrderDialog(orderData);
+                });
 
-        $('.btn-view-order').on('click', function (e) {
-            e.stopPropagation();
-            var orderData = $(this).closest("td").find(".order-data").val();
-            //console.log("orderData: " + orderData);
-            orderData = JSON.parse(orderData);
+                $('.btn-view-order').on('click', function(e) {
+                    e.stopPropagation();
+                    var orderData = $(this).closest("td").find(".order-data").val();
+                    //console.log("orderData: " + orderData);
+                    orderData = JSON.parse(orderData);
 
-            viewOrderDialog(orderData);
-        });
-    }
+                    viewOrderDialog(orderData);
+                });
+            }
 
-    function viewOrderDialog(orderData) {
-        const dmain = window.location.origin;
+            function viewOrderDialog(orderData) {
+                const dmain = window.location.origin;
 
-        const orderItemsHTML = orderData.order_items.map(item => `
+                const orderItemsHTML = orderData.order_items.map(item => `
             <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
                 <img src="${dmain}/uploads/products/${item.product.product_image[0]?.image_path}" 
                      style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
@@ -747,9 +743,9 @@ $(document).ready(function () {
             </div>
         `).join('');
 
-        MyJConfirmDialog({
-            title: `<strong>👁️ View Order</strong>`,
-            content: `
+                MyJConfirmDialog({
+                    title: `<strong>👁️ View Order</strong>`,
+                    content: `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6;">
                     <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
                     <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
@@ -772,25 +768,24 @@ $(document).ready(function () {
                         ${orderItemsHTML}
                     </div>
                 </div>`,
-            columnClass: 'm',
-            type: 'blue',
-            cancelText: 'Close',
-            onCancel: function () {
+                    columnClass: 'm',
+                    type: 'blue',
+                    cancelText: 'Close',
+                    onCancel: function() {
 
-            },
-            // confirmBtnClass: 'btn-warning',
-            // confirmText: 'Save To Excel',
-            onConfirm: function () {
+                    },
+                    // confirmBtnClass: 'btn-warning',
+                    // confirmText: 'Save To Excel',
+                    onConfirm: function() {}
+                });
             }
-        });
-    }
 
 
-    function editOrderDialog(orderId, status) {
-        MyJConfirmDialog({
-            title: '<strong><i class="fas fa-sync-alt" style="color: orange; margin-right: 5px;"></i> Update Order</strong>',
-            confirmText: 'Update',
-            content: `
+            function editOrderDialog(orderId, status) {
+                MyJConfirmDialog({
+                    title: '<strong><i class="fas fa-sync-alt" style="color: orange; margin-right: 5px;"></i> Update Order</strong>',
+                    confirmText: 'Update',
+                    content: `
                 <div style="margin-top: 10px;">
                     <label for="orderStatus" style="font-weight: bold;">Order Status:</label>
                     <select id="orderStatus" class="form-control mt-2">
@@ -800,61 +795,61 @@ $(document).ready(function () {
                     </select>
                 </div>
             `,
-            confirmBtnClass: 'btn-warning',
-            columnClass: 'm',
-            type: 'orange',
-            onConfirm: function () {
-                const selectedStatus = document.getElementById("orderStatus").value;
+                    confirmBtnClass: 'btn-warning',
+                    columnClass: 'm',
+                    type: 'orange',
+                    onConfirm: function() {
+                        const selectedStatus = document.getElementById("orderStatus").value;
 
-                updateOrder(orderId, selectedStatus);
-            },
-            cancelText: 'Cancel',
-            onCancel: function () {
+                        updateOrder(orderId, selectedStatus);
+                    },
+                    cancelText: 'Cancel',
+                    onCancel: function() {
 
-            },
-            onOpenBefore: function () {
+                    },
+                    onOpenBefore: function() {
 
-            },
-        });
-    }
-
-    function updateOrder(order_id, status) {
-        $.ajax({
-            url: '/edit-order',
-            method: 'PUT',
-            data: {
-                "order_id": order_id,
-                "status": status,
-            },
-            success: function (res) {
-                if (res.status === 200) {
-                    getAllOrders();
-
-                    showSuccess("Order updated successfully🎉");
-                } else {
-                    $.alert('Failed to update order');
-                }
-            },
-            error: function (res) {
-                let errorMessage = 'An error occurred. Please try again later.';
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    errorMessage = Object.values(error)[0][0];
-                } else if (res.status === 500) {
-                    errorMessage = 'A server error occurred.';
-                }
-
-                showError(errorMessage);
+                    },
+                });
             }
-        });
-    }
 
-    function deleteOrderDialog(orderData) {
-        const { order_id, total_amount, status, order_date, order_items, users } = orderData;
-        const { username, email, phone_number, address, country } = users;
+            function updateOrder(order_id, status) {
+                $.ajax({
+                    url: '/edit-order',
+                    method: 'PUT',
+                    data: {
+                        "order_id": order_id,
+                        "status": status,
+                    },
+                    success: function(res) {
+                        if (res.status === 200) {
+                            getAllOrders();
 
-        // Create HTML for order items (products with their images, names, and quantities)
-        const orderItemsHTML = order_items.map(item => `
+                            showSuccess("Order updated successfully🎉");
+                        } else {
+                            $.alert('Failed to update order');
+                        }
+                    },
+                    error: function(res) {
+                        let errorMessage = 'An error occurred. Please try again later.';
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            errorMessage = Object.values(error)[0][0];
+                        } else if (res.status === 500) {
+                            errorMessage = 'A server error occurred.';
+                        }
+
+                        showError(errorMessage);
+                    }
+                });
+            }
+
+            function deleteOrderDialog(orderData) {
+                const { order_id, total_amount, status, order_date, order_items, users } = orderData;
+                const { username, email, phone_number, address, country } = users;
+
+                // Create HTML for order items (products with their images, names, and quantities)
+                const orderItemsHTML = order_items.map(item => `
             <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0;">
                 <img src="${window.location.origin}/uploads/products/${item.product.product_image[0]?.image_path}" 
                      style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
@@ -865,11 +860,11 @@ $(document).ready(function () {
             </div>
         `).join('');
 
-        // Confirm Dialog for Deleting Order
-        MyJConfirmDialog({
-            title: '<strong><i class="fas fa-trash-alt" style="color: red; margin-right: 5px;"></i> Delete Order</strong>',
-            confirmText: 'Delete Order',
-            content: `
+                // Confirm Dialog for Deleting Order
+                MyJConfirmDialog({
+                    title: '<strong><i class="fas fa-trash-alt" style="color: red; margin-right: 5px;"></i> Delete Order</strong>',
+                    confirmText: 'Delete Order',
+                    content: `
                 <div style="text-align: center; padding: 10px;">
                     <p style="font-size: 16px; color: #555;">
                         Are you sure you want to delete this order for customer: <strong>${username}</strong>?
@@ -903,93 +898,93 @@ $(document).ready(function () {
                     <i class="fas fa-exclamation-triangle" style="color: orange; font-size: 40px; margin-top: 15px;"></i>
                 </div>
             `,
-            confirmText: 'Delete Order',
-            confirmBtnClass: 'btn-danger',
-            cancelBtnClass: 'btn-secondary',
-            autoClose: 'Cancel|50000',
-            columnClass: 'm',
-            type: 'red',
-            onConfirm: function () {
-                deleteOrder(order_id);  // Function to delete the order
-            },
-            cancelText: 'Cancel',
-            onCancel: function () {
-                // Handle cancel action
-            },
-            onOpenBefore: function () {
-                // Optional: Action to take before the dialog opens
-            },
-        });
-    }
-
-    function deleteOrder(order_id) {
-        $.ajax({
-            url: '/delete-order',
-            method: 'DELETE',
-            data: {
-                "order_id": order_id
-            },
-            success: function (res) {
-                if (res.status === 200) {
-                    getAllOrders();
-
-                    showSuccess("Order deleted successfully🎉");
-                } else {
-                    $.alert('Failed to delete order');
-                }
-            },
-            error: function (res) {
-                let errorMessage = 'An error occurred. Please try again later.';
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    errorMessage = Object.values(error)[0][0];
-                } else if (res.status === 500) {
-                    errorMessage = 'A server error occurred.';
-                }
-
-                showError(errorMessage);
+                    confirmText: 'Delete Order',
+                    confirmBtnClass: 'btn-danger',
+                    cancelBtnClass: 'btn-secondary',
+                    autoClose: 'Cancel|50000',
+                    columnClass: 'm',
+                    type: 'red',
+                    onConfirm: function() {
+                        deleteOrder(order_id); // Function to delete the order
+                    },
+                    cancelText: 'Cancel',
+                    onCancel: function() {
+                        // Handle cancel action
+                    },
+                    onOpenBefore: function() {
+                        // Optional: Action to take before the dialog opens
+                    },
+                });
             }
-        });
-    }
+
+            function deleteOrder(order_id) {
+                $.ajax({
+                    url: '/delete-order',
+                    method: 'DELETE',
+                    data: {
+                        "order_id": order_id
+                    },
+                    success: function(res) {
+                        if (res.status === 200) {
+                            getAllOrders();
+
+                            showSuccess("Order deleted successfully🎉");
+                        } else {
+                            $.alert('Failed to delete order');
+                        }
+                    },
+                    error: function(res) {
+                        let errorMessage = 'An error occurred. Please try again later.';
+                        if (res.status === 422) {
+                            let error = res.responseJSON.error;
+                            errorMessage = Object.values(error)[0][0];
+                        } else if (res.status === 500) {
+                            errorMessage = 'A server error occurred.';
+                        }
+
+                        showError(errorMessage);
+                    }
+                });
+            }
 
 
-    productActionLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        removeActiveClass();
-        this.classList.add('active');
-        prodcut_Content();
-    });
+            productActionLink.addEventListener("click", function(event) {
+                event.preventDefault();
+                removeActiveClass();
+                this.classList.add('active');
+                prodcut_Content();
+            });
 
-    function showDashboard() {
-        dashboardContent.style.display = "block";
-        orderContent.style.display = 'none';
-        productContent.style.display = "none";
-        proImageContent.style.display = "none";
-        proDescription1.style.display = "none";
-        proDescription2.style.display = "none";
+            function showDashboard() {
+                dashboardContent.style.display = "block";
+                orderContent.style.display = 'none';
+                productContent.style.display = "none";
+                proImageContent.style.display = "none";
+                proDescription1.style.display = "none";
+                proDescription2.style.display = "none";
 
-        displayContentDashboard();
-    }
+                displayContentDashboard();
+            }
 
 
-    function prodcut_Content() {
-        displayTbProducts();
-        displayProductImages();
-        displayProductDescription1();
-        displayProductDescription2();
-        dashboardContent.style.display = "none";
-        orderContent.style.display = 'none';
-        productContent.style.display = "block";
-        proImageContent.style.display = "block";
-        proDescription1.style.display = "block";
-        proDescription2.style.display = "block";
-    }
+            function prodcut_Content() {
+                displayTbProducts();
+                displayProductImages();
+                displayProductDescription1();
+                displayProductDescription2();
+                dashboardContent.style.display = "none";
+                orderContent.style.display = 'none';
+                productContent.style.display = "block";
+                proImageContent.style.display = "block";
+                proDescription1.style.display = "block";
+                proDescription2.style.display = "block";
+            }
 
-    function displayTbProducts() {
-        var tableContainer = document.getElementById("table_product");
-        tableContainer.innerHTML = "";
+            function displayTbProducts() {
+                var tableContainer = document.getElementById("table_product");
+                tableContainer.innerHTML = "";
 
-        var tableHtml = `
+                var tableHtml = `
             <table class="table table-hover" id="product-table">
                 <thead>
                     <tr class="table-info fw-bold thead-danger">
@@ -1006,13 +1001,13 @@ $(document).ready(function () {
             </table>
         `;
 
-        tableContainer.innerHTML = tableHtml;
-        var tbody = document.getElementById("product-table-body");
+                tableContainer.innerHTML = tableHtml;
+                var tbody = document.getElementById("product-table-body");
 
-        for (var i = 0; i < productsLsGL.length; i++) {
-            var product = productsLsGL[i];
+                for (var i = 0; i < productsLsGL.length; i++) {
+                    var product = productsLsGL[i];
 
-            var rHtml = `
+                    var rHtml = `
                 <tr>
                     <td>${i + 1}</td>
                     <td>${product.product_name}</td>
@@ -1032,39 +1027,38 @@ $(document).ready(function () {
                 </tr>
             `;
 
-            tbody.innerHTML += rHtml;
-        }
+                    tbody.innerHTML += rHtml;
+                }
 
-        MyDataTable('#product-table');
+                MyDataTable('#product-table');
 
-        //$(document).on('click', '.btn-edit-product', function (e) {
-        //$(".btn-edit-product").off('click').on('click', function (e) {
-        $(document).off('click', '.btn-edit-product').on('click', '.btn-edit-product', function (e) {
-            e.stopPropagation();
-            var product_id = $(this).data("product-id");
-            updateProductDialog(product_id, productsLsGL);
-        });
+                //$(document).on('click', '.btn-edit-product', function (e) {
+                //$(".btn-edit-product").off('click').on('click', function (e) {
+                $(document).off('click', '.btn-edit-product').on('click', '.btn-edit-product', function(e) {
+                    e.stopPropagation();
+                    var product_id = $(this).data("product-id");
+                    updateProductDialog(product_id, productsLsGL);
+                });
 
-        $(document).off('click', '.btn-delete-product').on('click', '.btn-delete-product', function (e) {
-        //$(document).on('click', '.btn-delete-product', function (e) {
-        //$(".btn-delete-product").on('click', function (e) {
-            e.stopPropagation();
-            var product_id = $(this).data("product-id");
-            var product_name = $(this).data("product-name");
-            deleteProductDialog(product_id, product_name);
-        });
-    }
+                $(document).off('click', '.btn-delete-product').on('click', '.btn-delete-product', function(e) {
+                    //$(document).on('click', '.btn-delete-product', function (e) {
+                    //$(".btn-delete-product").on('click', function (e) {
+                    e.stopPropagation();
+                    var product_id = $(this).data("product-id");
+                    var product_name = $(this).data("product-name");
+                    deleteProductDialog(product_id, product_name);
+                });
+            }
 
-    function updateProductDialog(product_id, productsLsGL) {
-        let categoryOptions = categoriesLsGL.map(ct =>
-            `<option value = "${ct.category_id}" > ${ct.category_name}</option > `
-        ).join('');
+            function updateProductDialog(product_id, productsLsGL) {
+                let categoryOptions = categoriesLsGL.map(ct =>
+                    `<option value="${ct.category_id}">${ct.category_name}</option>`
+                ).join('');
 
-        MyJConfirmDialog({
-            title: '<strong>Update Product</strong',
-            confirmText: 'Update',
-            content:
-                `
+                MyJConfirmDialog({
+                            title: '<strong>Update Product</strong>',
+                            confirmText: 'Update',
+                            content: ` 
                     <form action = "" class="formName" > 
                         <div class="form-group">
                             <label>Product Name</label>
@@ -1075,31 +1069,32 @@ $(document).ready(function () {
                             <input type="number" min="0" id="productPrice" placeholder="Enter product price" class="form-control" required />
                         </div>
                         <div class="form-group">
-                            <label>Product Stock</label>
-                            <input type="number" min="0" id="productStock" placeholder="Enter Stock" class="form-control" required />
+                            <label>Product Stock (auto-calculated)</label>
+                            <input type="number" id="productStock" class="form-control" readonly />
                         </div>
                         <div class="form-group">
-                        <label>Size Options</label>
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <label>Size S Quantity</label>
-                                <input type="number" min="0" id="sizeSQty" placeholder="Enter quantity for size S" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size M Quantity</label>
-                                <input type="number" min="0" id="sizeMQty" placeholder="Enter quantity for size M" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size L Quantity</label>
-                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size L" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size XL Quantity</label>
-                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size XL" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size 2XL Quantity</label>
-                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size 2XL" class="form-control" />
+                            <label>Size Options</label>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label>Size S Quantity</label>
+                                    <input type="number" min="0" id="sizeSQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size M Quantity</label>
+                                    <input type="number" min="0" id="sizeMQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size L Quantity</label>
+                                    <input type="number" min="0" id="sizeLQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size XL Quantity</label>
+                                    <input type="number" min="0" id="sizeXLQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size 2XL Quantity</label>
+                                    <input type="number" min="0" id="size2XLQty" class="form-control size-input" />
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1109,61 +1104,17 @@ $(document).ready(function () {
                                 ${categoryOptions} 
                             </select>
                         </div>
+                        ${[...Array(11).keys()].map(i =>
+                            `<div class="form-group">
+                                <label>Description ${i + 1} (Optional)</label>
+                                <textarea id="des${i + 1}" placeholder="Enter description ${i + 1}" class="form-control"></textarea>
+                            </div>`
+                        ).join('')}
                         <div class="form-group">
-                            <label>Description 1 (Optional)</label>
-                            <textarea id="des1" placeholder="Enter description 1" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 2 (Optional)</label>
-                            <textarea id="des2" placeholder="Enter description 2" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 3 (Optional)</label>
-                            <textarea id="des3" placeholder="Enter description 3" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 4 (Optional)</label>
-                            <textarea id="des4" placeholder="Enter description 4" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 5 (Optional)</label>
-                            <textarea id="des5" placeholder="Enter description 5" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 6 (Optional)</label>
-                            <textarea id="des6" placeholder="Enter description 6" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 7 (Optional)</label>
-                            <textarea id="des7" placeholder="Enter description 7" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 8 (Optional)</label>
-                            <textarea id="des8" placeholder="Enter description 8" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 9 (Optional)</label>
-                            <textarea id="des9" placeholder="Enter description 9" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 10 (Optional)</label>
-                            <textarea id="des10" placeholder="Enter description 10" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Description 11 (Optional)</label>
-                            <textarea id="des11" placeholder="Enter description 11" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Image 1 (Optional)</label>
-                            <input type="file" id="productImage1" accept="image/*" class="form-control" />
-                            <label>Image 2 (Optional)</label>
-                            <input type="file" id="productImage2" accept="image/*" class="form-control" />
-                            <label>Image 3 (Optional)</label>
-                            <input type="file" id="productImage3" accept="image/*" class="form-control" />
-                            <label>Image 4 (Optional)</label>
-                            <input type="file" id="productImage4" accept="image/*" class="form-control" />
-                            <label>Image 5 (Optional)</label>
-                            <input type="file" id="productImage5" accept="image/*" class="form-control" />
+                            ${[1, 2, 3, 4, 5].map(i => `
+                                <label>Image ${i} (Optional)</label>
+                                <input type="file" id="productImage${i}" accept="image/*" class="form-control" />`
+                            ).join('')}
                         </div>
                     </form >
                 `,
@@ -1176,7 +1127,7 @@ $(document).ready(function () {
                     product_name: $('#productName').val(),
                     product_price: $('#productPrice').val(),
                     category_id: $('#category').val(),
-                    quantity: $('#productStock').val() ?? 0,
+                    variants: [],
                 };
 
                 for (let i = 1; i <= 11; i++) {
@@ -1186,6 +1137,18 @@ $(document).ready(function () {
                     }
                 }
 
+                const sizes = ['S', 'M', 'L', 'XL', '2XL'];
+                sizes.forEach(size => {
+                    const qty = parseInt($(`#size${size}Qty`).val());
+                    if (!isNaN(qty) && qty >= 0) {
+                        formData.variants.push({
+                            size: size,
+                            quantity: qty
+                        });
+                    }
+                });
+            
+                // Lấy ảnh nếu có
                 const imageFiles = [];
                 for (let i = 1; i <= 5; i++) {
                     let fileInput = $(`#productImage${i}`)[0].files[0];
@@ -1208,21 +1171,51 @@ $(document).ready(function () {
             },
             onOpenBefore: function () {
                 const product = productsLsGL.find(p => p.product_id === product_id);
-                //$('#productName').val(p.product_name);
-                // productsLsGL.forEach(function (p, index) {
-                    $('#productName').val(product.product_name);
-                    $('#productPrice').val(product.product_price);
-                    $('#productStock').val(product.quantity || 0);
-                    $('#category').val(product.category_id);
-
-                    if (product.descriptions) {
-                        for (let i = 1; i <= 11; i++) {
-                            const desKey = `des_${i}`;
-
-                            $(`#des${i}`).val(product.descriptions[desKey] || '');
-                        }
+            
+                $('#productName').val(product.product_name);
+                $('#productPrice').val(product.product_price);
+                $('#productStock').val(product.quantity || 0);
+                $('#category').val(product.category_id);
+            
+                if (product.descriptions) {
+                    for (let i = 1; i <= 11; i++) {
+                        const desKey = `des_${i}`;
+                        $(`#des${i}`).val(product.descriptions[desKey] || '');
                     }
-                },
+                }
+            
+                if (product.variants) {
+                    product.variants.forEach(variant => {
+                        const size = variant.size;
+                        const fieldId = `size${size}Qty`;
+                        $(`#${fieldId}`).val(variant.quantity);
+                    });
+                }
+            
+                // Tính tổng số lượng từ size
+                const updateTotalStock = () => {
+                    let total = 0;
+                    $('.size-input').each(function () {
+                        let val = parseInt($(this).val());
+                        if (!isNaN(val) && val >= 0) {
+                            total += val;
+                        }
+                    });
+                    $('#productStock').val(total);
+                };
+            
+                $('.size-input').on('input', function () {
+                    if (this.value < 0) this.value = 0;
+                    updateTotalStock();
+                });
+            
+                $('#productPrice').on('input', function () {
+                    if (this.value < 0) this.value = 0;
+                });
+            
+                // Gọi để hiển thị tổng đúng ngay khi mở
+                updateTotalStock();
+            }
         });
     }
 
@@ -1410,9 +1403,9 @@ $(document).ready(function () {
                 return;
             }
             let categoryOptions = categoriesLsGL.map(ct =>
-                `<option value = "${ct.category_id}" > ${ct.category_name}</option > `
+                `<option value="${ct.category_id}">${ct.category_name}</option>`
             ).join('');
-
+    
             $.confirm({
                 title: '<strong>Add New Product</strong>',
                 closeIcon: true,
@@ -1421,107 +1414,64 @@ $(document).ready(function () {
                 typeAnimated: true,
                 type: 'blue',
                 content: `
-                <form  class="formName"> 
-                    <div class="form-group">
-                        <label>Product Name</label>
-                        <input type="text" id="productName" placeholder="Enter product name" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Product Price</label>
-                        <input type="number" min="0" id="productPrice" placeholder="Enter product price" class="form-control" required />
-                    </div>
-                      <div class="form-group">
-                        <label>Product Stock</label>
-                        <input type="number" min="0" id="productStock" placeholder="Enter Stock" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Size Options</label>
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <label>Size S Quantity</label>
-                                <input type="number" min="0" id="sizeSQty" placeholder="Enter quantity for size S" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size M Quantity</label>
-                                <input type="number" min="0" id="sizeMQty" placeholder="Enter quantity for size M" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size L Quantity</label>
-                                <input type="number" min="0" id="sizeLQty" placeholder="Enter quantity for size L" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size XL Quantity</label>
-                                <input type="number" min="0" id="sizeXLQty" placeholder="Enter quantity for size XL" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Size 2XL Quantity</label>
-                                <input type="number" min="0" id="size2XLQty" placeholder="Enter quantity for size 2XL" class="form-control" />
+                    <form class="formName"> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="productName" placeholder="Enter product name" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Product Price</label>
+                            <input type="number" min="0" id="productPrice" placeholder="Enter product price" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Product Stock (auto-calculated)</label>
+                            <input type="number" id="productStock" class="form-control" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label>Size Options</label>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label>Size S Quantity</label>
+                                    <input type="number" min="0" id="sizeSQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size M Quantity</label>
+                                    <input type="number" min="0" id="sizeMQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size L Quantity</label>
+                                    <input type="number" min="0" id="sizeLQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size XL Quantity</label>
+                                    <input type="number" min="0" id="sizeXLQty" class="form-control size-input" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Size 2XL Quantity</label>
+                                    <input type="number" min="0" id="size2XLQty" class="form-control size-input" />
+                                </div>
                             </div>
                         </div>
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="category" class="form-control" required>
-                            <option value="">Select a category</option>
-                            ${categoryOptions} 
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 1 (Optional)</label>
-                        <textarea id="des1" placeholder="Enter description 1" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 2 (Optional)</label>
-                        <textarea id="des2" placeholder="Enter description 2" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 3 (Optional)</label>
-                        <textarea id="des3" placeholder="Enter description 3" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 4 (Optional)</label>
-                        <textarea id="des4" placeholder="Enter description 4" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 5 (Optional)</label>
-                        <textarea id="des5" placeholder="Enter description 5" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 6 (Optional)</label>
-                        <textarea id="des6" placeholder="Enter description 6" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 7 (Optional)</label>
-                        <textarea id="des7" placeholder="Enter description 7" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 8 (Optional)</label>
-                        <textarea id="des8" placeholder="Enter description 8" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 9 (Optional)</label>
-                        <textarea id="des9" placeholder="Enter description 9" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 10 (Optional)</label>
-                        <textarea id="des10" placeholder="Enter description 10" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Description 11 (Optional)</label>
-                        <textarea id="des11" placeholder="Enter description 11" class="form-control"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Image 1 (Optional)</label>
-                        <input type="file" id="productImage1" accept="image/*" class="form-control" />
-                        <label>Image 2 (Optional)</label>
-                        <input type="file" id="productImage2" accept="image/*" class="form-control" />
-                        <label>Image 3 (Optional)</label>
-                        <input type="file" id="productImage3" accept="image/*" class="form-control" />
-                        <label>Image 4 (Optional)</label>
-                        <input type="file" id="productImage4" accept="image/*" class="form-control" />
-                        <label>Image 5 (Optional)</label>
-                        <input type="file" id="productImage5" accept="image/*" class="form-control" />
-                    </div>
-                </form >
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="category" class="form-control" required>
+                                <option value="">Select a category</option>
+                                ${categoryOptions} 
+                            </select>
+                        </div>
+                        ${[...Array(11).keys()].map(i =>
+                            `<div class="form-group">
+                                <label>Description ${i + 1} (Optional)</label>
+                                <textarea id="des${i + 1}" placeholder="Enter description ${i + 1}" class="form-control"></textarea>
+                            </div>`
+                        ).join('')}
+                        <div class="form-group">
+                            ${[1, 2, 3, 4, 5].map(i => `
+                                <label>Image ${i} (Optional)</label>
+                                <input type="file" id="productImage${i}" accept="image/*" class="form-control" />`
+                            ).join('')}
+                        </div>
+                    </form>
                 `,
                 buttons: {
                     formSubmit: {
@@ -1531,15 +1481,14 @@ $(document).ready(function () {
                             var productName = $('#productName').val();
                             var productPrice = $('#productPrice').val();
                             var category = $('#category').val();
-                            var quantity = $('#productStock').val();
-
+    
                             if (!productName || !productPrice || !category) {
                                 $.alert('Please fill out the product name, product price, and category!');
                                 return false;
                             }
-
+    
                             var formData = {
-                                quantity: quantity,
+                                quantity: $('#productStock').val(),
                                 product_name: productName,
                                 product_price: productPrice,
                                 category_id: category,
@@ -1550,22 +1499,21 @@ $(document).ready(function () {
                             formData.size_l_quantity = $('#sizeLQty').val() || 0;
                             formData.size_xl_quantity = $('#sizeXLQty').val() || 0;
                             formData.size_2xl_quantity = $('#size2XLQty').val() || 0;
-
+    
                             for (let i = 1; i <= 11; i++) {
-                                let desValue = $(`#des${i} `).val();
-
+                                let desValue = $(`#des${i}`).val();
                                 if (desValue) {
-                                    formData[`des_${i} `] = desValue;
+                                    formData[`des_${i}`] = desValue;
                                 }
                             }
-
+    
                             for (let i = 1; i <= 5; i++) {
-                                let fileInput = $(`#productImage${i} `)[0].files[0];
+                                let fileInput = $(`#productImage${i}`)[0].files[0];
                                 if (fileInput) {
                                     formData.images.push(fileInput);
                                 }
                             }
-
+    
                             addProduct(formData);
                             clearInputs();
                             return false;
@@ -1574,30 +1522,37 @@ $(document).ready(function () {
                     cancel: function () { }
                 },
                 onOpenBefore: function () {
-                    document.getElementById('productPrice').addEventListener('input', function () {
-                        if (this.value < 0) {
-                            this.value = 0;
-                        }
-                    });
-
-                    document.getElementById('productStock').addEventListener('input', function () {
-                        if (this.value < 0) {
-                            this.value = 0;
-                        }
-                    });
-
                     const contentArea = this.$content;
                     contentArea.css({
-                        'max-height': '70vh', // Make the content scrollable if it's too long
-                        'overflow-y': 'auto',  // Add vertical scroll
+                        'max-height': '70vh',
+                        'overflow-y': 'auto',
+                    });
+    
+                    const updateTotalStock = () => {
+                        let total = 0;
+                        $('.size-input').each(function () {
+                            let val = parseInt($(this).val());
+                            if (!isNaN(val) && val >= 0) {
+                                total += val;
+                            }
+                        });
+                        $('#productStock').val(total);
+                    };
+    
+                    $('.size-input').on('input', function () {
+                        if (this.value < 0) this.value = 0;
+                        updateTotalStock();
+                    });
+    
+                    $('#productPrice').on('input', function () {
+                        if (this.value < 0) this.value = 0;
                     });
                 }
             });
-            // end of confirm dialog
         });
     }
-
-    btnAddProduct();
+    
+    btnAddProduct();    
 
     function clearInputs() {
         $('#productName').val('');

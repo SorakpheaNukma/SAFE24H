@@ -32,14 +32,14 @@ $(document).ready(function () {
                             product_id: p.product_id,
                             product_name: p.product_name,
                             product_price: p.product_price,
-                            sold: p.sold,
                             category_id: p.category_id,
                             category_name: p.category_name,
-                            quantity: p.quantity,
                             images: p.images && Array.isArray(p.images) ? p.images : [],
                             descriptions: p.descriptions || {},
+                            variants: p.variants || []
                         });
                     });
+                    
 
                     setTimeout(() => {
                         hideSpinner();
@@ -215,9 +215,9 @@ $(document).ready(function () {
             if (gridItem) {
                 const index = gridItem.getAttribute('data-product-index');
                 const item = filteredProducts[index];
-
-                const productDetailUrl = `/details-page?item=${JSON.stringify(item)}&img=${item.images.join(',')}`;
+                const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${item.images.join(',')}`;
                 window.location.href = productDetailUrl;
+
             }
         });
 

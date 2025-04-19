@@ -72,8 +72,8 @@ class ProductController extends Controller
     public function getAll()
     {
         try {
-            $products = Product::with(['category', 'product_image'])
-                ->orderBy('created_at', 'desc') // Sorting by 'created_at' in descending order
+            $products = Product::with(['category', 'product_image', 'product_variants'])
+                ->orderBy('created_at', 'desc')
                 ->get();
 
             $proDetail = $products->map(function ($p) {
@@ -88,14 +88,20 @@ class ProductController extends Controller
                 return [
                     'product_id' => $p->product_id,
                     'product_name' => $p->product_name,
-                    'quantity' => $p->quantity ?? 0,
-                    'sold' => $p->sold ?? 0,
                     'category_name' => $p->category->category_name,
                     'category_id' => $p->category->category_id,
                     'product_price' => number_format($p->product_price, 2),
                     'descriptions' => $descriptions,
                     'images' => $p->product_image->pluck('image_path')->toArray(),
+                    'variants' => $p->product_variants->map(function ($variant) {
+                        return [
+                            'size' => $variant->size,
+                            'quantity' => $variant->quantity,
+                            'sold' => $variant->sold
+                        ];
+                    }),
                 ];
+                
             });
 
             return response()->json([
@@ -113,12 +119,20 @@ class ProductController extends Controller
     public function getById($id)
     {
         try {
-            $product = Product::find($id);
+            $product = Product::with(['category', 'product_image', 'product_variants'])->find($id);
             if (!$product) {
                 return response()->json(['error' => 'Product not found'], 404);
             }
 
-            $product->images = ProductImages::where('product_id', $id)->get();
+            $product->images = ProductImages::where('product_id', $id)->pluck('image_path');
+            $product->variants = $product->product_variants->map(function ($variant) {
+                return [
+                    'size' => $variant->size,
+                    'quantity' => $variant->quantity,
+                    'sold' => $variant->sold
+                ];
+            });
+
             return response()->json($product, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -131,7 +145,6 @@ class ProductController extends Controller
             'product_name' => 'required|string|max:255',
             'product_price' => 'required|numeric',
             'category_id' => 'required|exists:categories,category_id',
-            'quantity' => 'required|Integer',
         ]);
 
         if ($validator->fails()) {
@@ -139,61 +152,41 @@ class ProductController extends Controller
         }
 
         try {
-            // Lấy số lượng tổng từ request
-            $totalQuantity = $request->quantity;
-
-            // Tính tổng số lượng của các size
-            $totalSizeQuantity = 0;
-            $sizes = ['S', 'M', 'L', 'XL', '2XL'];
-            foreach ($sizes as $size) {
-                $quantityField = 'size_' . strtolower($size) . '_quantity';
-                if ($request->$quantityField > 0) {
-                    $totalSizeQuantity += $request->$quantityField;
-                }
-            }
-
-            // Kiểm tra nếu tổng số lượng size không khớp với quantity
-            if ($totalSizeQuantity != $totalQuantity) {
-                return response()->json(['error' => 'Tổng số lượng các size phải khớp với số lượng tổng.'], 422);
-            }
             $product = new Product();
             $product->product_name = $request->product_name;
             $product->product_price = number_format($request->product_price, 2);
             $product->category_id = $request->category_id;
-            $product->quantity = $totalQuantity;
-
+    
+            // Mô tả sản phẩm (tối đa 11 mô tả)
             for ($i = 1; $i <= 11; $i++) {
                 $descriptionField = "des_$i";
-                $product->$descriptionField = $request->$descriptionField;
+                $product->$descriptionField = $request->$descriptionField ?? null;
             }
-
+    
             $product->save();
-            // Thêm các biến thể kích thước vào bảng product_variants
+    
+            // Lưu thông tin size vào bảng product_variants
+            $sizes = ['S', 'M', 'L', 'XL', '2XL'];
             foreach ($sizes as $size) {
                 $quantityField = 'size_' . strtolower($size) . '_quantity';
-                if ($request->$quantityField > 0) {
-                    $variant = new ProductVariant();
-                    $variant->product_id = $product->product_id;
-                    $variant->size = $size;
-                    $variant->quantity = $request->$quantityField;
-                    $variant->sold = 0; // Mặc định là 0, có thể thay đổi sau
-                    $variant->save();
+                if ($request->has($quantityField)) {
+                    $qty = (int) $request->$quantityField;
+                    if ($qty > 0) {
+                        ProductVariant::create([
+                            'product_id' => $product->product_id,
+                            'size'       => $size,
+                            'quantity'   => $qty,
+                            'sold'       => 0,
+                        ]);
+                    }
                 }
-            }foreach ($sizes as $size) {
-            $quantityField = 'size_' . strtolower($size) . '_quantity';
-            if ($request->$quantityField > 0) {
-                $variant = new ProductVariant();
-                $variant->product_id = $product->product_id;
-                $variant->size = $size;
-                $variant->quantity = $request->$quantityField;
-                $variant->sold = 0; // Mặc định là 0, có thể thay đổi sau
-                $variant->save();
             }
-        }
+    
             return response()->json([
                 'status' => 200,
                 'data' => $product
             ], 200);
+    
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 500,
@@ -246,7 +239,9 @@ class ProductController extends Controller
             'product_price' => 'required|numeric',
             'product_name' => 'required|string',
             'category_id' => 'required|exists:categories,category_id',
-            'quantity' => 'required|Integer',
+            'variants' => 'required|array',
+            'variants.*.size' => 'required|string|in:S,M,L,XL,2XL',
+            'variants.*.quantity' => 'required|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -258,31 +253,13 @@ class ProductController extends Controller
             if (!$product) {
                 return response()->json(['error' => 'Product not found'], 404);
             }
-            // Lấy số lượng tổng từ request
-            $totalQuantity = $request->quantity;
-
-            // Tính tổng số lượng của các size
-            $totalSizeQuantity = 0;
-            $sizes = ['S', 'M', 'L', 'XL', '2XL'];
-            foreach ($sizes as $size) {
-                $quantityField = 'size_' . strtolower($size) . '_quantity';
-                if ($request->$quantityField > 0) {
-                    $totalSizeQuantity += $request->$quantityField;
-                }
-            }
-
-            if ($totalSizeQuantity != $totalQuantity) {
-                return response()->json(['error' => 'NO.'], 402);
-            }
 
             $product->product_name = $request->product_name;
             $product->category_id = $request->category_id;
             $product->product_price = number_format($request->product_price, 2);
-            $product->quantity = $totalQuantity;
-
+            
             for ($i = 1; $i <= 11; $i++) {
                 $descriptionField = "des_$i";
-
                 if ($request->has($descriptionField)) {
                     $product->$descriptionField = $request->$descriptionField;
                 }
@@ -290,35 +267,31 @@ class ProductController extends Controller
 
             $product->save();
             // Cập nhật các biến thể kích thước
-            $sizes = ['S', 'M', 'L', 'XL', '2XL'];
-            foreach ($sizes as $size) {
-                $quantityField = 'size_' . strtolower($size) . '_quantity';
-                $variant = ProductVariant::where('product_id', $product->product_id)
-                    ->where('size', $size)
-                    ->first();
+            $existingVariants = ProductVariant::where('product_id', $product->product_id)->get()->keyBy('size');
 
-                if ($request->$quantityField > 0) {
-                    // Nếu biến thể kích thước đã tồn tại, cập nhật lại số lượng
-                    if ($variant) {
-                        $variant->quantity = $request->$quantityField;
+            foreach ($request->variants as $variantData) {
+                $size = $variantData['size'];
+                $quantity = $variantData['quantity'];
+
+                if (isset($existingVariants[$size])) {
+                    $variant = $existingVariants[$size];
+                    if ($quantity > 0) {
+                        $variant->quantity = $quantity;
                         $variant->save();
                     } else {
-                        // Nếu biến thể chưa tồn tại, tạo mới
-                        $variant = new ProductVariant();
-                        $variant->product_id = $product->product_id;
-                        $variant->size = $size;
-                        $variant->quantity = $request->$quantityField;
-                        $variant->sold = 0; // Mặc định là 0
-                        $variant->save();
+                        $variant->delete();
                     }
                 } else {
-                    // Nếu số lượng size = 0, xóa biến thể
-                    if ($variant) {
-                        $variant->delete();
+                    if ($quantity > 0) {
+                        ProductVariant::create([
+                            'product_id' => $product->product_id,
+                            'size' => $size,
+                            'quantity' => $quantity,
+                            'sold' => 0,
+                        ]);
                     }
                 }
             }
-
             return response()->json([
                 'status' => 200,
                 'data' => $product,
@@ -340,38 +313,23 @@ class ProductController extends Controller
         }
 
         try {
-            if ($request->hasFile('images')) {
-                $productImg = ProductImages::find($request->product_id);
-
-                if (!$productImg) {
-                    foreach ($request->file('images') as $image) {
-                        $productImg = new ProductImages();
-                        $productImg->product_id = $request->product_id;
-
-                        $uniqueName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
-                        $destinationPath = public_path('/uploads/products');
-
-                        $image->move($destinationPath, $uniqueName);
-                        $productImg->image_path = $uniqueName;
-                        $productImg->save();
-                    }
-                }
-
-                if ($productImg->image_path) {
+            if ($request->hasFile('images') && count($request->file('images')) > 0) {
+                $productImages = ProductImages::where('product_id', $request->product_id)->get();
+                foreach ($productImages as $productImg) {
                     $oldImagePath = public_path($productImg->image_path);
-
                     if (file_exists($oldImagePath)) {
-                        @unlink($oldImagePath);
+                        @unlink($oldImagePath);  // Xóa ảnh cũ
                     }
+                    $productImg->delete();  // Xóa ảnh khỏi database
                 }
 
                 foreach ($request->file('images') as $image) {
                     $productImg = new ProductImages();
                     $productImg->product_id = $request->product_id;
-
+    
                     $uniqueName = Str::uuid()->toString() . '.' . $image->getClientOriginalExtension();
                     $destinationPath = public_path('/uploads/products');
-
+    
                     $image->move($destinationPath, $uniqueName);
                     $productImg->image_path = $uniqueName;
                     $productImg->save();
