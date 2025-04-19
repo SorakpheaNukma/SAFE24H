@@ -7,7 +7,8 @@ use App\Models\Product;
 use App\Models\ProductImages;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use App\Models\ProductVariant;
+use App\Models\ProductVariants;
+
 
 
 use Illuminate\Support\Str;
@@ -84,6 +85,7 @@ class ProductController extends Controller
                         $descriptions[$descriptionField] = $p->$descriptionField;
                     }
                 }
+                $totalQuantity = $p->product_variants->sum('quantity'); // ✅ Tính tổng số lượng
 
                 return [
                     'product_id' => $p->product_id,
@@ -93,6 +95,7 @@ class ProductController extends Controller
                     'product_price' => number_format($p->product_price, 2),
                     'descriptions' => $descriptions,
                     'images' => $p->product_image->pluck('image_path')->toArray(),
+                    'quantity' => $totalQuantity, // ✅ Thêm vào đây
                     'variants' => $p->product_variants->map(function ($variant) {
                         return [
                             'size' => $variant->size,
@@ -172,7 +175,7 @@ class ProductController extends Controller
                 if ($request->has($quantityField)) {
                     $qty = (int) $request->$quantityField;
                     if ($qty > 0) {
-                        ProductVariant::create([
+                        ProductVariants::create([
                             'product_id' => $product->product_id,
                             'size'       => $size,
                             'quantity'   => $qty,
@@ -267,7 +270,7 @@ class ProductController extends Controller
 
             $product->save();
             // Cập nhật các biến thể kích thước
-            $existingVariants = ProductVariant::where('product_id', $product->product_id)->get()->keyBy('size');
+            $existingVariants = ProductVariants::where('product_id', $product->product_id)->get()->keyBy('size');
 
             foreach ($request->variants as $variantData) {
                 $size = $variantData['size'];
@@ -283,7 +286,7 @@ class ProductController extends Controller
                     }
                 } else {
                     if ($quantity > 0) {
-                        ProductVariant::create([
+                        ProductVariants::create([
                             'product_id' => $product->product_id,
                             'size' => $size,
                             'quantity' => $quantity,

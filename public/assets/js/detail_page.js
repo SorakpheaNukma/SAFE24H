@@ -185,11 +185,7 @@ function btnBuyNow(quantityStock) {
         }
 
         if (quantityStock === 0) {
-<<<<<<< HEAD
-            alert('This product is out of stock'); //bookmark
-=======
             alert('អធ្យាស្រ័យទំនិញអស់ស្តុក');
->>>>>>> ea3c6813ef6795847a930c099273c6c655180075
             return;
         }
 

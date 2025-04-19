@@ -217,7 +217,7 @@ $(document).ready(function() {
                                     product_price: p.product_price || 0,
                                     category_id: p.category_id || 0,
                                     category_name: p.category_name || 'N/A',
-                                    quantity: p.quantity || 'Out of stock', //sửa lại đoạn này bookmark
+                                    quantity: p.quantity || 'Out of stock', //đã fix
                                     images: p.images && Array.isArray(p.images) ? p.images : [],
                                     descriptions: p.descriptions || {},
                                     variants: p.variants || [],

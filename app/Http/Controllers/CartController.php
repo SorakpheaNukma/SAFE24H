@@ -45,6 +45,7 @@ class CartController extends Controller
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|exists:users,user_id',
                 'product_id' => 'required|exists:products,product_id',
+                'variant_id' => 'required|exists:product_variants,id', // 👈 validate variant_id luôn
                 'quantity' => 'required|integer',
             ]);
 

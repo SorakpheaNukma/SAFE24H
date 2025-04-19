@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Models\ProductVariants;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -121,7 +121,7 @@ public function addSoldProduct($product_id, $variant_id)
         }
         // Nếu có `variant_id`, tìm biến thể sản phẩm
         if ($variant_id) {
-            $productVariant = ProductVariant::find($variant_id);
+            $productVariant = ProductVariants::find($variant_id);
             if ($productVariant) {
                 $productVariant->sold += 1;
                 $productVariant->save();

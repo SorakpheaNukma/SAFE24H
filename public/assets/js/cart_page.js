@@ -82,9 +82,7 @@ $(document).ready(function () {
                         <div class="d-flex align-items-center">
                             <h7>ចំនួន</h7>
                             <div class="d-flex align-items-center mx-2">
-                                <button class="btn btn-secondary btn-sm minus-btn" data-index="${index}">-</button>
-                                <input type="number" class="form-control mx-2 quantity-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 60px;">
-                                <button class="btn btn-secondary btn-sm plus-btn" data-index="${index}">+</button>
+                                <span class="form-control text-center" style="width: 60px; background-color: #f8f9fa;">${item.quantity}</span>
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
@@ -140,7 +138,7 @@ $(document).ready(function () {
         cartsItemsGL.forEach((item, index) => {
             const checkbox = document.getElementById(`item${index}`);
             if (checkbox.checked) {
-                const quantity = parseInt(document.querySelector(`.quantity-input[data-index="${index}"]`).value);
+                const quantity = item.quantity;
                 const price = parseFloat(item.product.product_price);
                 totalPrice += quantity * price;
             }

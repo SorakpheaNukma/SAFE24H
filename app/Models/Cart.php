@@ -24,4 +24,9 @@ class Cart extends Model
         // return $this->belongsTo(Product::class, foreignKey: 'product_id', 'product_id')
         return $this->belongsTo(Product::class, 'product_id')->with('product_image');
     }
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariants::class, 'variant_id');
+    }
+
 }
