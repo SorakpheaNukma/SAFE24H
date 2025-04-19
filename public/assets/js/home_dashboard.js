@@ -739,6 +739,7 @@ $(document).ready(function() {
                     </h5>
                     <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
                     <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                     <p style="margin: 0; color: #888;">📦 Size: ${item.size}</p>
                 </div>
             </div>
         `).join('');
@@ -747,6 +748,10 @@ $(document).ready(function() {
                     title: `<strong>👁️ View Order</strong>`,
                     content: `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        ${orderItemsHTML}
+                    </div>    
                     <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
                     <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
                     <p><strong>🔄 Status:</strong> ${orderData.status}</p>
@@ -763,10 +768,7 @@ $(document).ready(function() {
                     
                     <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
                     
-                    <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
-                    <div style="max-height: 200px; overflow-y: auto;">
-                        ${orderItemsHTML}
-                    </div>
+                    
                 </div>`,
                     columnClass: 'm',
                     type: 'blue',

@@ -180,18 +180,22 @@ function btnBuyNow(quantityStock) {
         e.preventDefault();
 
         if (quantityInputGL === 0) {
-            alert('Please add quantity before buying!');
+            alert('សូមធ្វើការបញ្ជូលចំនួនទំនិញមុនការបញ្ជាទិញ!');
             return;
         }
 
         if (quantityStock === 0) {
+<<<<<<< HEAD
             alert('This product is out of stock'); //bookmark
+=======
+            alert('អធ្យាស្រ័យទំនិញអស់ស្តុក');
+>>>>>>> ea3c6813ef6795847a930c099273c6c655180075
             return;
         }
 
         const selectedSize = $('#id-sizeSelect').val();
         if (!selectedSize) {
-            alert('Please add size before buying!');
+            alert('សូមធ្វើការជ្រើសរើសទំហំទំនិញមុនការបញ្ជាទិញ!');
             return;
         }
         // First, check if the user has an address
@@ -213,7 +217,7 @@ function btnBuyNow(quantityStock) {
                 //
                 $.confirm({
                     title: '<strong>Warning!</strong>',
-                    content: 'You don\'t have an address yet. Would you like to go to set up an address?',
+                    content: 'អ្នកមិនទាន់ទីតាំងទទួល. សូមធ្វើការបញ្ជាក់ទីតាំង?',
                     draggable: true,
                     columnClass: 'm',
                     typeAnimated: true,
@@ -369,7 +373,7 @@ $(document).ready(function () {
             e.preventDefault();
 
             if (quantityStock === 0) {
-                alert('This product is out of stock');
+                alert('អធ្យាស្រ័យទំនិញអស់ស្តុក');
                 return;
             }
             // const selectedSize = $('#id-sizeSelect').val();
