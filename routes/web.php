@@ -86,7 +86,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::delete('/delete-order', [OrderController::class, 'deleteOrder']);
 
     Route::get('/getall-order-items', [OrderItemController::class, 'getAllOrderItems']);
-    Route::post('/save-order-items', [OrderItemController::class, 'addOrderItem']);
+    Route::post('/save-order-items', [OrderItemController::class, 'addOrderItem']); //book
     Route::put('/edit-order-items', [OrderItemController::class, 'updateOrderItem']);
     Route::delete('/delete-order-items', [OrderItemController::class, 'deleteOrderItem']);
 
