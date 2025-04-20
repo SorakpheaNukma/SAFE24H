@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\ProductVariants;
 
 class CartController extends Controller
 {
@@ -23,7 +24,7 @@ class CartController extends Controller
             }
 
             // Fetch cart items for the logged-in user
-            $cartItems = Cart::with('product')
+            $cartItems = Cart::with('variant.product')
                 ->where('user_id', $user->user_id)
                 ->get();
 
@@ -45,12 +46,22 @@ class CartController extends Controller
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|exists:users,user_id',
                 'product_id' => 'required|exists:products,product_id',
-                'variant_id' => 'required|exists:product_variants,id', // 👈 validate variant_id luôn
+                'size' => 'required|string',
                 'quantity' => 'required|integer',
             ]);
 
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
+            }
+
+            $variant = ProductVariants::where('product_id', $request->product_id)
+                                             ->where('size', $request->size)
+                                             ->first();
+
+            if (!$variant) {
+                return response()->json([
+                    'error' => ['size' => ['Sản phẩm với kích cỡ này không tồn tại.']]
+                ], 422);
             }
 
             // Check if the product is already in the cart for the same user
@@ -67,7 +78,7 @@ class CartController extends Controller
 
             $cartItem = Cart::create([
                 'user_id' => $request->user_id,
-                'product_id' => $request->product_id,
+                'variant_id' => $variant->id,
                 'quantity' => $request->quantity,
             ]);
 

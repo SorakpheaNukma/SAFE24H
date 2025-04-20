@@ -275,6 +275,7 @@ $(document).ready(function () {
             orderItems = ProductsLsGL.map(item => ({
                 order_id: orderId,
                 product_id: item.product_id,
+                variant_id: item.product.variant_id,
                 quantity: item.quantity,
                 price: item.product_price
             }));
@@ -287,9 +288,14 @@ $(document).ready(function () {
             }));
         }
 
-        $.ajax({
+        $.ajax({ //book
             url: '/save-order-items',
             method: 'POST',
+            // data: {
+            //     _token: $('meta[name="csrf-token"]').attr('content'),
+            //     order_id: orderId,
+            //     items: orderItems
+            // },
             data: JSON.stringify({ items: orderItems }),
             contentType: 'application/json',
             headers: {
@@ -323,8 +329,8 @@ $(document).ready(function () {
             },
             error: function (res) {
                 if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
+                    let error = res.responseJSON.errors;
+                    let firstError = Object.values(errors)[0][0];
                     showError(firstError);
                 } else if (res.status === 500) {
                     showError('An error occurred. Please try again later.');

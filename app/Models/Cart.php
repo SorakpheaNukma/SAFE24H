@@ -9,7 +9,7 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'product_id', 'quantity'];
+    protected $fillable = ['user_id', 'variant_id', 'quantity'];
 
     // Define the relationship back to the User model
     // belongsTO means current model is child of parent
@@ -21,8 +21,7 @@ class Cart extends Model
     // Optionally, you might want to define a relationship to Product model as well
     public function product()
     {
-        // return $this->belongsTo(Product::class, foreignKey: 'product_id', 'product_id')
-        return $this->belongsTo(Product::class, 'product_id')->with('product_image');
+        return $this->belongsToThrough(Product::class, ProductVariants::class); // Liên kết thông qua ProductVariant
     }
     public function variant()
     {

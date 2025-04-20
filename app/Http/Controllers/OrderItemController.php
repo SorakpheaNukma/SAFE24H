@@ -12,19 +12,22 @@ use Illuminate\Support\Facades\Validator;
 class OrderItemController extends Controller
 {
 
+    //sua
     public function getAllOrderItems()
     {
-        $OrderItem = OrderItem::with(['product', 'order', 'product.product_image'])->get();
+        $orderItems = OrderItem::with([
+            'variant.product.product_image',
+            'variant.product.category'
+        ])->get();
 
         return response()->json([
             'status' => 200,
-            'data' => $OrderItem
+            'data' => $orderItems // ← Dùng đúng tên biến
         ]);
     }
-
     public function getAllOrderUser()
     {
-        $OrderItem = OrderItem::with(['product', 'order',])->get();
+        $OrderItem = OrderItem::with(['variant.product.product_image', 'order',])->get();
 
         return response()->json([
             'status' => 200,
@@ -48,21 +51,21 @@ class OrderItemController extends Controller
         $items = $request->input('items');
         $createdItems = [];
 
-        foreach ($items as $index => $item) {
+        foreach ($items as $index => $item) { //sua 
             $validatedData = Validator::make($item, [
                 'order_id' => 'required|exists:orders,order_id',
-                'product_id' => 'required|exists:products,product_id',
+                'variant_id' => 'required|exists:product_variants,id',
                 'quantity' => 'required|integer|min:1',
                 'price' => 'required',
-                'variant_id' => 'nullable|exists:product_variants,variant_id', // Thêm validation cho variant_id
+                //'variant_id' => 'nullable|exists:product_variants,variant_id', // Thêm validation cho variant_id
        
             ])->validate();
 
             $createdItem = OrderItem::create($validatedData);
 
-            // Load the product relation and only get the product name
-            $createdItem->load('product');
-            $productName = $createdItem->product->product_name;
+            // Load the product relation and only get the product name (sua)
+            $createdItem->load('variant.product');
+            $productName = optional($createdItem->variant->product)->product_name;
 
             $createdItems[] = [
                 'order_item' => $createdItem,
@@ -96,11 +99,25 @@ class OrderItemController extends Controller
 {
     try {
         $product = Product::find($product_id);
-        if (!$product) {
-            return response()->json(['error' => 'Product not found'], 404);
+        if ($variant_id) {
+            $variant = ProductVariants::find($variant_id);
+            if ($variant) {
+                $variant->quantity -= 1;
+                $variant->save();
+            }
+        } else {
+            $product = Product::find($product_id);
+            if ($product) {
+                $product->quantity -= 1;
+                $product->save();
+            }
         }
-        $product->quantity = $product->quantity - 1;
-        $product->save();
+        
+        // if (!$product) {
+        //     return response()->json(['error' => 'Product not found'], 404);
+        // }
+        // $product->quantity = $product->quantity - 1;
+        // $product->save();
 
         return response()->json([
             'status' => 200,
@@ -111,21 +128,28 @@ class OrderItemController extends Controller
         return response()->json(['error' => 'Failed to update stock' . $e->getMessage()], 500);
     }
 }
-
-public function addSoldProduct($product_id, $variant_id)
+//sua
+public function addSoldProduct($product_id, $variant_id) 
 {
     try {
         $product = Product::find($product_id);
         if (!$product) {
             return response()->json(['error' => 'Product not found'], 404);
         }
-        // Nếu có `variant_id`, tìm biến thể sản phẩm
+        // Nếu có `variant_id`, tìm biến thể sản phẩm (sua)
         if ($variant_id) {
             $productVariant = ProductVariants::find($variant_id);
-            if ($productVariant) {
-                $productVariant->sold += 1;
-                $productVariant->save();
+            if ($variant_id) {
+                $productVariant = ProductVariants::find($variant_id);
+                if ($productVariant) {
+                    $productVariant->sold += 1;
+                    $productVariant->save();
+                }
+            } else {
+                $product->sold += 1;
+                $product->save();
             }
+            
         } else {
             // Nếu không có `variant_id`, cập nhật số lượng đã bán cho sản phẩm chính
             $product->sold += 1;
