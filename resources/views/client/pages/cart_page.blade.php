@@ -8,7 +8,8 @@
     <div class="container_back" style="display: flex; align-items: center; padding-left: 12px; gap: 8px;">
         <div class="d-flex justify-content-center align-items-center rounded-circle"
             style="width: 40px; height: 40px; background-color: #F3F3F3;">
-            <a onclick="goBackHome()" style="cursor: pointer" class="text-blue text-decoration-none d-flex align-items-center justify-content-center">
+            <a onclick="goBackHome()" style="cursor: pointer"
+                class="text-blue text-decoration-none d-flex align-items-center justify-content-center">
                 <i class="fa-solid fa-arrow-left fa-lg"></i>
             </a>
         </div>
@@ -16,9 +17,9 @@
         <span class="text" style="font-size: 16px;">ត្រឡប់ក្រោយ</span>
     </div>
     <script>
-        function goBackHome() {
-            window.history.back();
-        }
+    function goBackHome() {
+        window.history.back();
+    }
     </script>
 
 
@@ -28,11 +29,11 @@
         <div class="row align-items-center mb-3 bottom-border">
             <div class="col-12">
                 <div class="form-check">
-                <div class="text-center">
-                    <p class="fw-semibold fs-4 p-0 m-0">បញ្ជីទំនិញក្នុងកន្ត្រកស្តុក</p>
-                </div>
+                    <div class="text-center">
+                        <p class="fw-semibold fs-4 p-0 m-0">បញ្ជីទំនិញក្នុងកន្ត្រកស្តុក</p>
+                    </div>
                     <input class="form-check-input" type="checkbox" id="selectAll" />
-                    <label class="form-check-label" for="selectAll" style="color: blue;">ជ្រើសរើសយកទាំងអស់</label>
+                    <label class="form-check-label" for="selectAll" style="color: blue;">ជ្រើសរើសយកទាំងអasdasdស់</label>
 
                     <!--btn delete
                     <label id="deleteSelectedAllItems" class="form-check-label ms-3" for="item1">
@@ -45,26 +46,21 @@
 
     <!-- Cart Items -->
     <div class="container" id="cartItemsContainer">
+        cart ở đây
     </div>
     <!--End Cart Items -->
 
-            <!-- Wrapper: căn giữa và nằm ngang -->
-        <div class="container mt-4 d-flex justify-content-center align-items-center gap-4 flex-wrap">
-            
-            <!-- Tổng tiền -->
-            <div id="totalPriceContainer" class="mb-0" style="color:blue"></div>
-
-            <!-- Nút thanh toán -->
-            <div id="id-check-out" class="">
-                <button id="id-btn-checkout" class="btn btn-primary" style="width: 226px; height: 49px;">
-                    ទិញឥឡូវនេះ
-                </button>
-            </div>
-
-</div>
-
-    
-
+    <!-- Wrapper: căn giữa và nằm ngang -->
+    <div class="container mt-4 d-flex justify-content-center align-items-center gap-4 flex-wrap">
+        <!-- Tổng tiền -->
+        <div id="totalPriceContainer" class="mb-0" style="color:blue"></div>
+        <!-- Nút thanh toán -->
+        <div id="id-check-out" class="">
+            <button id="id-btn-checkout" class="btn btn-primary" style="width: 226px; height: 49px;">
+                ទិញឥឡូវនេះ
+            </button>
+        </div>
+    </div>
 </main>
 
 

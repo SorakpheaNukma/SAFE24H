@@ -24,7 +24,7 @@ class CartController extends Controller
             }
 
             // Fetch cart items for the logged-in user
-            $cartItems = Cart::with('variant.product')
+            $cartItems = Cart::with('variant.product.product_image') // Tải quan hệ với product_image
                 ->where('user_id', $user->user_id)
                 ->get();
 
@@ -66,9 +66,9 @@ class CartController extends Controller
 
             // Check if the product is already in the cart for the same user
             $existingCartItem = Cart::where('user_id', $request->user_id)
-                ->where('product_id', $request->product_id)
+                ->where('variant_id', $variant->id)
                 ->first();
-
+        
             if ($existingCartItem) {
                 return response()->json([
                     'status' => 200,
@@ -88,7 +88,7 @@ class CartController extends Controller
                 'cart_item' => $cartItem
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while processing your request.'], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 

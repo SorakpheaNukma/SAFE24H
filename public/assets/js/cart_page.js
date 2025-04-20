@@ -11,7 +11,7 @@ $(document).ready(function () {
                 hideSpinner();
                 if (res.status === 200 && res.data && res.data.length > 0) {
                     cartsItemsGL = res.data;
-                    //console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
+                    // console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
 
                     // Render items if available
                     renderCartItems(cartsItemsGL);
@@ -48,8 +48,13 @@ $(document).ready(function () {
     // Function to create HTML for each cart item
     function createCartItem(item, index) {
         const dmain = window.location.origin;
-        const imagePath = item.product.product_image.length > 0 ? item.product.product_image[0].image_path : 'default.jpg';
+        // console.log(item);
+        const imagePath = item.variant && item.variant.product && item.variant.product.product_image && item.variant.product.product_image.length > 0 
+        ? item.variant.product.product_image[0].image_path 
+        : 'default.jpg';
     
+        const product = item.variant.product;
+        const size = item.variant.size;
         return `
             <div class="row align-items-center mb-4">
                 <div class="col-1">
@@ -59,25 +64,25 @@ $(document).ready(function () {
                     </label>
                 </div>
                 <div class="col-4 col-md-2">
-                    <img width="100px" src="${dmain}/uploads/products/${imagePath}" alt="${item.product.product_name}">
+                    <img width="100px" src="${dmain}/uploads/products/${imagePath}" alt="${product.product_name}">
                 </div>
                 <div id="idInfoProduct${index}" class="col-7 col-md-9">
                     <div class="product-description mb-0 p-0">
                         <div class="row">
                             <div class="col-12 d-flex flex-column flex-md-row justify-content-between">
                                 <div>
-                                    <h5>${item.product.product_name}</h5>
-                                    <div><small>ទំហំ: <strong>${item.selectedSize || 'N/A'}</strong></small></div>
+                                    <h5>${product.product_name}</h5>
+                                    <div><small>ទំហំ: <strong>${size}</strong></small></div>
                                 </div>
                                 <div class="d-flex">
                                     <p class="mb-0">តម្លៃ:</p>
-                                    <p class="mb-0 ms-2">$${item.product.product_price}</p>
+                                    <p class="mb-0 ms-2">$${product.product_price}</p>
                                 </div>
                             </div>
                         </div>
-                        <p>${item.product.des_1}</p>
+                        <p>${product.des_1}</p>
                     </div>
-                    <p class="text-primary g-0 p-0 m-0">${item.product.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
+                    <p class="text-primary g-0 p-0 m-0">${item.variant.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
                     <div class="quantity-container mb-2">
                         <div class="d-flex align-items-center">
                             <h7>ចំនួន</h7>
@@ -87,7 +92,7 @@ $(document).ready(function () {
                         </div>
                         <div class="d-flex align-items-center">
                             <h7>សរុបរង:</h7>
-                            <span class="text-success subtotal" id="subtotal${index}">$${(item.product.product_price * item.quantity).toFixed(2)}</span>
+                            <span class="text-success subtotal" id="subtotal${index}">$${(product.product_price * item.quantity).toFixed(2)}</span>
                         </div>
                     </div>
                 </div>
@@ -99,7 +104,14 @@ $(document).ready(function () {
     // Function to render all cart items
     function renderCartItems(items) {
         const cartItemsContainer = document.getElementById('cartItemsContainer');
-        cartItemsContainer.innerHTML = items.map((item, index) => createCartItem(item, index)).join('');
+        cartItemsContainer.innerHTML = items.map((item, index) => {
+            // Kiểm tra nếu có ảnh sản phẩm và lấy ảnh đầu tiên
+            const imagePath = item.variant.product.product_image && item.variant.product.product_image.length > 0
+                ? item.variant.product.product_image[0].image_path // Lấy ảnh đầu tiên
+                : 'default.jpg'; // Nếu không có ảnh, sử dụng ảnh mặc định
+    
+            return createCartItem(item, index, imagePath);
+        }).join('');
 
         // Add event listeners for the quantity buttons and checkboxes
         document.querySelectorAll('.minus-btn').forEach(btn => btn.addEventListener('click', handleQuantityChange));
@@ -139,7 +151,7 @@ $(document).ready(function () {
             const checkbox = document.getElementById(`item${index}`);
             if (checkbox.checked) {
                 const quantity = item.quantity;
-                const price = parseFloat(item.product.product_price);
+                const price = parseFloat(item.variant.product.product_price);
                 totalPrice += quantity * price;
             }
         });
