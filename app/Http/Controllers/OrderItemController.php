@@ -37,7 +37,7 @@ class OrderItemController extends Controller
 
     public function getItemsByOrderId($orderId)
     {
-        $orderItems = OrderItem::where('order_id', $orderId)->with('product')->get();
+        $orderItems = OrderItem::where('order_id', $orderId)->with('variant.product')->get();
 
         return response()->json([
             'status' => 200,
@@ -71,18 +71,13 @@ class OrderItemController extends Controller
                 'order_item' => $createdItem,
                 'product_name' => $productName,
             ];
-            // Kiểm tra và gọi hàm MinusStockProduct
-            $variant_id = $item['variant_id'] ?? null; // Lấy variant_id nếu có
-            $this->MinusStockProduct($createdItem->product_id, $variant_id); // Truyền cả product_id và variant_id
+                $variant_id = $item['variant_id'];
+                $variant = ProductVariants::find($variant_id);
+                $product_id = $variant ? $variant->product_id : null;
 
-            // Cập nhật số lượng đã bán cho sản phẩm chính
-            $this->addSoldProduct($createdItem->product_id, $variant_id);
+                $this->MinusStockProduct($product_id, $variant_id);
+                $this->addSoldProduct($product_id, $variant_id);
 
-            // // MinusStockProduct and add sold for the first product only
-            // if ($index == 0) {
-            //     $this->MinusStockProduct($createdItem->product_id);
-            //     $this->addSoldProduct($createdItem->product_id);
-            // }
         }
 
 
@@ -95,20 +90,20 @@ class OrderItemController extends Controller
     }
 
 
-    public function MinusStockProduct($product_id, $variant_id)
+    public function MinusStockProduct($product_id, $variant_id, $quantity)
 {
     try {
         $product = Product::find($product_id);
         if ($variant_id) {
             $variant = ProductVariants::find($variant_id);
             if ($variant) {
-                $variant->quantity -= 1;
+                $variant->quantity -= $quantity;
                 $variant->save();
             }
         } else {
             $product = Product::find($product_id);
             if ($product) {
-                $product->quantity -= 1;
+                $product->quantity -= $quantity;
                 $product->save();
             }
         }
@@ -129,43 +124,32 @@ class OrderItemController extends Controller
     }
 }
 //sua
-public function addSoldProduct($product_id, $variant_id) 
+public function addSoldProduct($product_id, $variant_id, $quantity)
 {
     try {
         $product = Product::find($product_id);
         if (!$product) {
             return response()->json(['error' => 'Product not found'], 404);
         }
-        // Nếu có `variant_id`, tìm biến thể sản phẩm (sua)
+
         if ($variant_id) {
             $productVariant = ProductVariants::find($variant_id);
-            if ($variant_id) {
-                $productVariant = ProductVariants::find($variant_id);
-                if ($productVariant) {
-                    $productVariant->sold += 1;
-                    $productVariant->save();
-                }
-            } else {
-                $product->sold += 1;
-                $product->save();
+            if ($productVariant) {
+                $productVariant->sold += $quantity;
+                $productVariant->save();
             }
-            
-        } else {
-            // Nếu không có `variant_id`, cập nhật số lượng đã bán cho sản phẩm chính
-            $product->sold += 1;
-            $product->save();
         }
 
-        $product->sold = $product->sold + 1;
+        $product->sold += $quantity;
         $product->save();
 
         return response()->json([
             'status' => 200,
-            'message' => 'sold updated successfully',
+            'message' => 'Sold updated successfully',
             'data' => $product
         ], 200);
     } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to update sold product:' . $e->getMessage()], 500);
+        return response()->json(['error' => 'Failed to update sold product: ' . $e->getMessage()], 500);
     }
 }
 
