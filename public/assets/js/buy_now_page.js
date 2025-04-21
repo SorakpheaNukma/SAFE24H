@@ -292,55 +292,20 @@ $(document).ready(function () {
             }));
         }
 
-        $.ajax({ //book
+        $.ajax({
             url: '/save-order-items',
-            method: 'POST',
-            // data: {
-            //     _token: $('meta[name="csrf-token"]').attr('content'),
-            //     order_id: orderId,
-            //     items: orderItems
-            // },
-            data: JSON.stringify({ items: orderItems }),
-            contentType: 'application/json',
+            type: 'POST',
+            data: {
+                items: JSON.stringify(orderItems)
+            },
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // đừng quên token nhé
             },
-            success: function (res) {
-                if (res.status === 200) {
-                    const dmain = window.location.origin;
-
-                    var title = "🛒 New Order Received!";
-                    var url = `${dmain}/home-dashboard`;
-                    var body = `👤 Client: `;
-
-                    UserDataGL.forEach(u => {
-                        body += `${u.username}\n`;
-                    });
-
-                    body += "🛍️ Ordered Items:\n";
-
-                    res.data.forEach(item => {
-                        // console.log('item: ' + JSON.stringify(item.order_item.quantity));
-                        body += `• ${item.product_name} -- Quantity:${item.order_item.quantity}\n`;
-                    });
-
-                    sendNotification(title, body, url);
-
-                    window.location.href = `/order-success?Total_Price=${totalPrice.toFixed(2)}&Order_Id=${orderId}`;
-                } else {
-                    alert('Failed to place the order items.');
-                }
+            success: function (response) {
+                console.log("Lưu item thành công!", response);
             },
-            error: function (res) {
-                if (res.status === 422) {
-                    let error = res.responseJSON.errors;
-                    let firstError = Object.values(errors)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong!');
-                }
+            error: function (error) {
+                cconsole.error("Lỗi khi lưu items:", error);
             }
         });
     }
