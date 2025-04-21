@@ -272,7 +272,7 @@ $(document).ready(function () {
     }
 
 
-    function saveOrderItems(orderId) {
+    function saveOrderItems(product) {
         var orderItems = [];
 
         if (detailParam === 'true') {
@@ -296,16 +296,14 @@ $(document).ready(function () {
             url: '/save-order-items',
             type: 'POST',
             data: {
-                items: JSON.stringify(orderItems)
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // đừng quên token nhé
+                variant_id: product.variant_id,
+                quantity: product.quantity,
             },
             success: function (response) {
                 console.log("Lưu item thành công!", response);
             },
-            error: function (error) {
-                cconsole.error("Lỗi khi lưu items:", error);
+            error: function (xhr){
+                console.error('Error:', xhr.responseJSON);
             }
         });
     }
