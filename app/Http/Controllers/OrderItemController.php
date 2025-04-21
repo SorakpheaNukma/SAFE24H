@@ -48,38 +48,45 @@ class OrderItemController extends Controller
     // Add a new order item
     public function addOrderItem(Request $request)
     {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.order_id' => 'required|exists:orders,order_id',
+            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric',
+        ]);
         $items = $request->input('items');
         $createdItems = [];
-
-        foreach ($items as $index => $item) { //sua 
-            $validatedData = Validator::make($item, [
-                'order_id' => 'required|exists:orders,order_id',
-                'variant_id' => 'required|exists:product_variants,id',
-                'quantity' => 'required|integer|min:1',
-                'price' => 'required',
-                //'variant_id' => 'nullable|exists:product_variants,variant_id', // Thêm validation cho variant_id
-       
-            ])->validate();
-
-            $createdItem = OrderItem::create($validatedData);
-
-            // Load the product relation and only get the product name (sua)
+    
+        foreach ($items as $item) {
+            // No need to re-validate inside loop; already done above ✅
+    
+            // Create the order item
+            $createdItem = OrderItem::create([
+                'order_id' => $item['order_id'],
+                'variant_id' => $item['variant_id'],
+                'quantity' => $item['quantity'],
+                'price' => $item['price']
+            ]);
+    
+            // Load related product name
             $createdItem->load('variant.product');
             $productName = optional($createdItem->variant->product)->product_name;
-
+    
             $createdItems[] = [
                 'order_item' => $createdItem,
                 'product_name' => $productName,
             ];
-                $variant_id = $item['variant_id'];
-                $variant = ProductVariants::find($variant_id);
-                $product_id = $variant ? $variant->product_id : null;
-
-                $this->MinusStockProduct($product_id, $variant_id);
-                $this->addSoldProduct($product_id, $variant_id);
-
+    
+            // Fix: use the correct product_id from variant
+            $variant = ProductVariants::find($item['variant_id']);
+            $product_id = $variant ? $variant->product_id : null;
+    
+            if ($product_id) {
+                $this->MinusStockProduct($product_id, $item['variant_id'], $item['quantity']);
+                $this->addSoldProduct($product_id, $item['variant_id'], $item['quantity']);
+            }
         }
-
 
 
         return response()->json([
@@ -90,7 +97,7 @@ class OrderItemController extends Controller
     }
 
 
-    public function MinusStockProduct($product_id, $variant_id, $quantity)
+    public function MinusStockProduct($product_id, $variant_id, $quantity=1 )
 {
     try {
         $product = Product::find($product_id);
@@ -124,7 +131,7 @@ class OrderItemController extends Controller
     }
 }
 //sua
-public function addSoldProduct($product_id, $variant_id, $quantity)
+public function addSoldProduct($product_id, $variant_id, $quantity=1 )
 {
     try {
         $product = Product::find($product_id);
