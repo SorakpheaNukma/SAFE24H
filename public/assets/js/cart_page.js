@@ -308,8 +308,10 @@ $(document).ready(function () {
             });
 
             // Check for out-of-stock items in the selected list
-            const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => cartItem.product.quantity === 0);
-
+            const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => {
+                return cartItem.product && cartItem.product.quantity === 0;
+            });
+            
             if (outOfStockItems.length > 0) {
                 const dmain = window.location.origin;
 

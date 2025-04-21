@@ -178,6 +178,7 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.status === 200) {
+
                     const filteredItems = res.data.filter(item => orderIds.includes(item.order_id));
 
                     callback(filteredItems);

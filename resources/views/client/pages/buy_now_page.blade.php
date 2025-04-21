@@ -1,5 +1,6 @@
 @extends('client.layouts.app')
 <meta name="user_id" content="{{ Auth::user()->user_id }}">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 @section('content')
     @include('client.layouts.nav_bar')

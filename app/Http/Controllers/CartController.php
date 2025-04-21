@@ -160,4 +160,5 @@ class CartController extends Controller
             return response()->json(['message' => 'An error occurre:' . $e->getMessage()], 500);
         }
     }
+
 }

@@ -86,6 +86,10 @@ $(document).ready(function () {
 
     // Function to dynamically add product items
     function addProductItem(product) {
+        if (!product || !product.product) {
+            console.warn('Product data invalid or incomplete:', product);
+            return;
+        }
         const productName = product.product.product_name;
         const quantity = product.quantity;
         const price = product.product.product_price;
@@ -96,7 +100,7 @@ $(document).ready(function () {
         totalPrice += price * quantity;
         itemCount++;
 
-        const productId = `product-${product.product.product_id}`;
+        const productId = `product-${product.variant.product.product_id}`;
 
         const productHTML = `
         <div id="${productId}" class="container m-2 product-item">
@@ -233,8 +237,8 @@ $(document).ready(function () {
             },
             error: function (res) {
                 if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
+                    let errors = res.responseJSON.errors;
+                    let firstError = Object.values(errors)[0][0];
                     showError(firstError);
                 } else if (res.status === 500) {
                     showError('An error occurred. Please try again later.');
@@ -350,6 +354,7 @@ $(document).ready(function () {
                     showError('Something went wrong!');
                 }
                 hideSpinner(); // hide trong mọi trường hợp lỗi
+
             }
         });
     }    
