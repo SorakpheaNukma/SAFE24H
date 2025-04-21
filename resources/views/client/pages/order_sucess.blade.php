@@ -16,10 +16,10 @@
             <p class="lead">Thank you for your purchase. Your order has been placed successfully.</p>
 
             <!-- Order Details -->
-            <div class="order-details">
+            <!-- cap nhat them code de lay thong tin -->
+            <div class="order-details"> 
                 <h5>Order Number: <span class="fw-bold" id="order-number">#</span></h5>
                 <h5>Total Amount: <span class="fw-bold" id="total-amount">$0.00</span></h5>
-
             </div>
 
             <!-- Action Buttons -->

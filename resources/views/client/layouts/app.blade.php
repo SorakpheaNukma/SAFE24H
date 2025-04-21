@@ -28,7 +28,6 @@
 
     <script src="{{ asset('assets/lib/jquery.min.js') }}"></script>
 </head>
-
 <body>
     <!-- -->
     <div id="spinner"

@@ -200,12 +200,21 @@ function btnBuyNow(quantityStock) {
                 // If user has an address, proceed to "Buy Now" page
                 var { productData, images } = getItemDataFromUrl();
                 var firstImage = images.length > 0 ? images[0] : 'default.jpg';  // default.jpg nếu không có ảnh
+
+                let variantId = null;
+                if (productData.variants && Array.isArray(productData.variants)) {
+                    const matchedVariant = productData.variants.find(v => v.size === selectedSize);
+                    if (matchedVariant) {
+                        variantId = matchedVariant.variant_id;
+                    }
+                }
                 var newProduct = {
                     product_id: productData.product_id,
                     product_name: productData.product_name,
                     product_price: productData.product_price,
                     quantity: quantityInputGL,
-                    size: selectedSize
+                    size: selectedSize,
+                    variant_id: variantId
                 };
                 const productStr = encodeURIComponent(JSON.stringify(newProduct));
                 window.location.href = `/buy-now-page?detail=true&items=${productStr}&images=${encodeURIComponent(firstImage)}`;

@@ -20,7 +20,8 @@ $(document).ready(function () {
         let itemListHTML = '';
 
         order.order_items.forEach(item => {
-            const imagePath = item.product.product_image[0]?.image_path || 'default.jpg';
+            const imagePath = item.product.product_image[0]?.image_path || 'default.jpg'; //bookmark
+
             itemListHTML += `
                 <div class="order-item d-flex align-items-center mb-2">
                     <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
@@ -68,7 +69,7 @@ $(document).ready(function () {
                     // Process and append orders to the correct sections
                     let hasProcessing = false, hasShipped = false, hasDelivered = false;
 
-                    processingCount = 0;
+                    processingCount = 1;
                     toShipCount = 0;
 
                     res.data.forEach(order => {

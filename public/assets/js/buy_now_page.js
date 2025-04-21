@@ -34,7 +34,8 @@ $(document).ready(function () {
             product_price: productData.product_price,
             image_path: images,
             quantity: productData.quantity,
-            size: productData.size
+            size: productData.size,
+            variant_id: productData.variant_id // 👈 đừng quên dòng này nhé!
         });
     } else {
         ProductsLsGL = productData;
@@ -268,68 +269,79 @@ $(document).ready(function () {
     }
 
 
-    function saveOrderItems(orderId) {
+    function saveOrderItems(orderId, callback) {
         var orderItems = [];
-
+    
         if (detailParam === 'true') {
             orderItems = ProductsLsGL.map(item => ({
                 order_id: orderId,
                 product_id: item.product_id,
-                variant_id: item.product.variant_id,
+                variant_id: item.variant_id,
                 quantity: item.quantity,
                 price: item.product_price
             }));
         } else {
             orderItems = ProductsLsGL.map(item => ({
                 order_id: orderId,
-                product_id: item.product.product_id,
+                product_id: item.product_id,
+                variant_id: item.variant_id, // 👈 dùng trực tiếp ở đây
                 quantity: item.quantity,
-                price: item.product.product_price
+                price: item.product_price
             }));
         }
-
-        $.ajax({ //book
+    
+        $.ajax({
             url: '/save-order-items',
             method: 'POST',
-            // data: {
-            //     _token: $('meta[name="csrf-token"]').attr('content'),
-            //     order_id: orderId,
-            //     items: orderItems
-            // },
             data: JSON.stringify({ items: orderItems }),
             contentType: 'application/json',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (res) {
-                if (res.status === 200) {
+                console.log('Response:', res);
+                if (res.status === 200 || res.status === 201) {
                     const dmain = window.location.origin;
-
-                    var title = "🛒 New Order Received!";
-                    var url = `${dmain}/home-dashboard`;
-                    var body = `👤 Client: `;
-
+    
+                    let title = "🛒 New Order Received!";
+                    let url = `${dmain}/home-dashboard`;
+                    let body = `👤 Client: `;
+    
                     UserDataGL.forEach(u => {
                         body += `${u.username}\n`;
                     });
-
+    
                     body += "🛍️ Ordered Items:\n";
-
-                    res.data.forEach(item => {
-                        // console.log('item: ' + JSON.stringify(item.order_item.quantity));
-                        body += `• ${item.product_name} -- Quantity:${item.order_item.quantity}\n`;
-                    });
-
-                    sendNotification(title, body, url);
-
-                    window.location.href = `/order-success?Total_Price=${totalPrice.toFixed(2)}&Order_Id=${orderId}`;
+    
+                    if (Array.isArray(res.data)) {
+                        res.data.forEach(item => {
+                            body += `• ${item.product_name} -- Quantity: ${item.order_item.quantity}\n`;
+                        });
+                    } else {
+                        body += `• Order ID: ${res.data.order_id} -- Amount: ${res.data.total_amount}\n`;
+                    }
+    
+                    try {
+                        sendNotification(title, body, url);
+                    } catch (e) {
+                        console.error('Notification error:', e);
+                    }
+    
+                    // Gọi callback sau khi hoàn tất logic
+                    if (typeof callback === 'function') callback();
+                    hideSpinner();
+                    setTimeout(function() {
+                        // Điều hướng sang trang thành công
+                        window.location.href = `/order-success?Total_Price=${totalPrice.toFixed(2)}&Order_Id=${orderId}`;
+                    }, 300); // 300ms delay
                 } else {
-                    alert('Failed to place the order items.');
+                    showError('Failed to save order items.');
+                    hideSpinner();
                 }
             },
             error: function (res) {
                 if (res.status === 422) {
-                    let error = res.responseJSON.errors;
+                    let errors = res.responseJSON.errors;
                     let firstError = Object.values(errors)[0][0];
                     showError(firstError);
                 } else if (res.status === 500) {
@@ -337,33 +349,31 @@ $(document).ready(function () {
                 } else {
                     showError('Something went wrong!');
                 }
+                hideSpinner(); // hide trong mọi trường hợp lỗi
             }
         });
-    }
-
+    }    
 
     $('#id-btn-order').on('click', function (e) {
         e.preventDefault();
         showSpinner();
-
-        // Check if the payment method checkbox is checked
+    
         if (!$('#id-payment-method').is(':checked')) {
             hideSpinner();
             alert('Please select a payment method.');
             return false;
         }
-
+    
         if (totalPrice === 0) {
             hideSpinner();
             alert('We don\'t have an order now. Total Price is zero.');
             return false;
         }
-
-        // Save the order and then save order items using the callback
+    
         saveOrder(function (orderId) {
-            saveOrderItems(orderId);
-            hideSpinner();
-        });
-    });
-
+            saveOrderItems(orderId, function () {
+                hideSpinner(); // chỉ được gọi sau khi saveOrderItems xong
+            });
+        });        
+    });     
 });

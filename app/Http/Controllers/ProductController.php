@@ -98,6 +98,7 @@ class ProductController extends Controller
                     'quantity' => $totalQuantity, // ✅ Thêm vào đây
                     'variants' => $p->product_variants->map(function ($variant) {
                         return [
+                            'variant_id' => $variant->id,
                             'size' => $variant->size,
                             'quantity' => $variant->quantity,
                             'sold' => $variant->sold

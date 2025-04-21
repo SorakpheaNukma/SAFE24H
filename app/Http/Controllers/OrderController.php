@@ -39,7 +39,7 @@ class OrderController extends Controller
             $orders = Order::with(['payment', 'orderItems.product.product_image'])
                 ->where('user_id', $user->user_id)
                 ->get();
-
+                
             return response()->json([
                 'status' => 200,
                 'data' => $orders
