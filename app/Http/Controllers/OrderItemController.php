@@ -37,7 +37,9 @@ class OrderItemController extends Controller
 
     public function getItemsByOrderId($orderId)
     {
-        $orderItems = OrderItem::where('order_id', $orderId)->with('variant.product')->get();
+        $orderItems = OrderItem::where('order_id', $orderId)
+        ->with('variant.product','order')
+        ->get();
 
         return response()->json([
             'status' => 200,
@@ -169,7 +171,7 @@ public function addSoldProduct($product_id, $variant_id, $quantity=1 )
             'quantity' => 'nullable|integer|min:1',
             'price' => 'nullable|numeric|min:0',
             'variant_id' => 'nullable|exists:product_variants,id',
-            'id' => 'required',
+            'id' => 'required|exists:order_items,id',
         ]);
 
         $orderItem = OrderItem::findOrFail($request->id);
