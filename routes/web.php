@@ -90,8 +90,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::put('/edit-order-items', [OrderItemController::class, 'updateOrderItem']);
     Route::delete('/delete-order-items', [OrderItemController::class, 'deleteOrderItem']);
 
-    Route::get('/address-page', action: [MapController::class, 'index']);
-    Route::put('/update-address', action: [LoginController::class, 'updateUserAdress']);
+    Route::get('/address-page', [MapController::class, 'index']);
+    Route::put('/update-address', [LoginController::class, 'updateUserAddress']);
     Route::get('/me-info', [LoginController::class, 'me']);
 
     // push notifications 
