@@ -727,62 +727,53 @@ $(document).ready(function() {
             }
 
             function viewOrderDialog(orderData) {
-                const dmain = window.location.origin;
+                $.ajax({
+                    url: `/api/get-order-details/${orderId}`,
+                    method: 'GET',
+                    success: function(res) {
+                        console.log("Order Data:", res); // Kiểm tra dữ liệu trả về
+                        if (res.status === 200) {
+                            const orderData = res.data;
+            
+                            // Tạo HTML cho danh sách sản phẩm
+                            const orderItemsHTML = orderData.order_items.map(item => `
+                                <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
+                                    <img src="${item.product.product_image[0]?.image_path}" 
+                                         style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                                    <div>
+                                        <h5 style="margin: 0; font-weight: bold;">🛒 ${item.product.product_name}</h5>
+                                        <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
+                                        <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                                        <p style="margin: 0; color: #888;">📏 Size: ${item.variant_id}</p>
+                                    </div>
+                                </div>
+                            `).join('');
 
-                const orderItemsHTML = orderData.order_items.map(item => `
-            <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
-                <img src="${dmain}/uploads/products/${item.product.product_image[0]?.image_path}" 
-                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
-                <div>
-                    <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center;">
-                        🛒 ${item.product.product_name}
-                    </h5>
-                    <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
-                    <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
-                     <p style="margin: 0; color: #888;">📦 Size: ${item.size}</p>
-                </div>
-            </div>
-        `).join('');
-
-                MyJConfirmDialog({
-                    title: `<strong>👁️ View Order</strong>`,
-                    content: `
-                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                    <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
-                    <div style="max-height: 200px; overflow-y: auto;">
-                        ${orderItemsHTML}
-                    </div>    
-                    <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
-                    <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
-                    <p><strong>🔄 Status:</strong> ${orderData.status}</p>
-                    <p><strong>💰 Total Amount:</strong> $${orderData.total_amount}</p>
-                    <p><strong>📅 Order Date:</strong> ${formatDate(orderData.order_date)}</p>
-                    
-                    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
-                    
-                    <h4 style="color: #333; margin-bottom: 10px;">👤 User Info</h4>
-                    <p><strong>📛 Name:</strong> ${orderData.users.username}</p>
-                    <p><strong>✉️ Email:</strong> ${orderData.users.email}</p>
-                    <p><strong>📞 Phone:</strong> ${orderData.users.phone_number}</p>
-                    <p><strong>🏠 Address:</strong> ${orderData.users.address}</p>
-                    
-                    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
-                    
-                    
-                </div>`,
-                    columnClass: 'm',
-                    type: 'blue',
-                    cancelText: 'Close',
-                    onCancel: function() {
-
+                            MyJConfirmDialog({
+                                title: `<strong>👁️ View Order #${orderId}</strong>`,
+                                content: `
+                                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                                        <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
+                                        <div style="max-height: 200px; overflow-y: auto;">
+                                            ${orderItemsHTML}
+                                        </div>
+                                    </div>
+                                `,
+                                columnClass: 'm',
+                                type: 'blue',
+                                cancelText: 'Close',
+                                onCancel: function() {}
+                            });
+                        } else {
+                            alert('Failed to fetch order details.');
+                        }
                     },
-                    // confirmBtnClass: 'btn-warning',
-                    // confirmText: 'Save To Excel',
-                    onConfirm: function() {}
+                    error: function(err) {
+                        console.error('Error fetching order details:', err);
+                        alert('An error occurred while fetching order details.');
+                    }
                 });
             }
-
-
             function editOrderDialog(orderId, status) {
                 MyJConfirmDialog({
                     title: '<strong><i class="fas fa-sync-alt" style="color: orange; margin-right: 5px;"></i> Update Order</strong>',
