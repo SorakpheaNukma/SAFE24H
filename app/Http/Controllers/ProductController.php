@@ -19,22 +19,23 @@ class ProductController extends Controller
     public function getRecommendedProducts(Request $request)
     {
         try {
-            // Find the current product
+            // Tìm sản phẩm hiện tại
             $currentProduct = Product::with('category')->find($request->product_id);
 
-            // If the product is not found, return a 404 response
+            // Nếu không tìm thấy sản phẩm, trả về lỗi 404
             if (!$currentProduct) {
                 return response()->json(['error' => 'Product not found'], 404);
             }
 
-            $recommendedProducts = Product::with(['category', 'product_image'])
+            // Lấy danh sách sản phẩm được đề xuất
+            $recommendedProducts = Product::with(['category', 'product_images'])
                 ->where('category_id', $currentProduct->category_id)
                 ->where('product_id', '!=', $request->product_id)
-                ->orderBy('created_at', 'desc') // Optional: Sort by latest
-                ->take(5) // Optional: Limit the number of recommendations
+                ->orderBy('created_at', 'desc') // Sắp xếp theo ngày tạo mới nhất
+                ->take(5) // Giới hạn số lượng sản phẩm đề xuất
                 ->get();
 
-            // Map the products to the desired format
+            // Xử lý dữ liệu sản phẩm đề xuất
             $recommendations = $recommendedProducts->map(function ($p) {
                 $descriptions = [];
                 for ($i = 1; $i <= 11; $i++) {
@@ -43,16 +44,20 @@ class ProductController extends Controller
                         $descriptions[$descriptionField] = $p->$descriptionField;
                     }
                 }
+
+                // Kiểm tra null trước khi gọi pluck()
+                $images = $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [];
+
                 return [
                     'product_id' => $p->product_id,
                     'product_name' => $p->product_name,
                     'quantity' => $p->quantity ?? 0,
                     'sold' => $p->sold ?? 0,
-                    'category_name' => $p->category->category_name,
-                    'category_id' => $p->category->category_id,
+                    'category_name' => $p->category->category_name ?? 'N/A', // Kiểm tra null
+                    'category_id' => $p->category->category_id ?? null, // Kiểm tra null
                     'product_price' => number_format($p->product_price, 2),
                     'descriptions' => $descriptions,
-                    'images' => $p->product_image->pluck('image_path')->toArray(),
+                    'images' => $images,
                 ];
             });
 
@@ -61,7 +66,6 @@ class ProductController extends Controller
                 'data' => $recommendations
             ], 200);
         } catch (\Exception $e) {
-
             return response()->json([
                 'status' => 500,
                 'error' => $e->getMessage()
@@ -73,10 +77,12 @@ class ProductController extends Controller
     public function getAll()
     {
         try {
+            // Lấy danh sách sản phẩm cùng với các quan hệ
             $products = Product::with(['category', 'product_images', 'product_variants'])
                 ->orderBy('created_at', 'desc')
                 ->get();
-
+    
+            // Xử lý dữ liệu sản phẩm
             $proDetail = $products->map(function ($p) {
                 $descriptions = [];
                 for ($i = 1; $i <= 11; $i++) {
@@ -85,29 +91,36 @@ class ProductController extends Controller
                         $descriptions[$descriptionField] = $p->$descriptionField;
                     }
                 }
-                $totalQuantity = $p->product_variants->sum('quantity'); // ✅ Tính tổng số lượng
-
+    
+                // Tính tổng số lượng từ product_variants
+                $totalQuantity = $p->product_variants ? $p->product_variants->sum('quantity') : 0;
+    
+                // Lấy danh sách hình ảnh
+                $images = $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [];
+    
+                // Lấy danh sách các biến thể
+                $variants = $p->product_variants ? $p->product_variants->map(function ($variant) {
+                    return [
+                        'variant_id' => $variant->id,
+                        'size' => $variant->size,
+                        'quantity' => $variant->quantity,
+                        'sold' => $variant->sold
+                    ];
+                }) : [];
+    
                 return [
                     'product_id' => $p->product_id,
                     'product_name' => $p->product_name,
-                    'category_name' => $p->category->category_name,
-                    'category_id' => $p->category->category_id,
+                    'category_name' => $p->category->category_name ?? 'N/A', // Kiểm tra null
+                    'category_id' => $p->category->category_id ?? null, // Kiểm tra null
                     'product_price' => number_format($p->product_price, 2),
                     'descriptions' => $descriptions,
-                    'images' => $p->product_image->pluck('image_path')->toArray(),
-                    'quantity' => $totalQuantity, // ✅ Thêm vào đây
-                    'variants' => $p->product_variants->map(function ($variant) {
-                        return [
-                            'variant_id' => $variant->id,
-                            'size' => $variant->size,
-                            'quantity' => $variant->quantity,
-                            'sold' => $variant->sold
-                        ];
-                    }),
+                    'images' => $images,
+                    'quantity' => $totalQuantity,
+                    'variants' => $variants,
                 ];
-                
             });
-
+    
             return response()->json([
                 'status' => 200,
                 'data' => $proDetail
@@ -119,7 +132,6 @@ class ProductController extends Controller
             ], 500);
         }
     }
-
     public function getById($id)
     {
         try {

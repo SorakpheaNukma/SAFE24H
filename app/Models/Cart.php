@@ -21,7 +21,7 @@ class Cart extends Model
     // Optionally, you might want to define a relationship to Product model as well
     public function product()
     {
-        return $this->belongsToThrough(Product::class, ProductVariants::class); // Liên kết thông qua ProductVariant
+        return $this->belongsTo(Product::class, ProductVariants::class); // Liên kết thông qua ProductVariant
     }
     public function variant()
     {

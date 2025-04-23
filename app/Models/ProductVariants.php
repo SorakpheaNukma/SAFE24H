@@ -24,9 +24,8 @@ class ProductVariants extends Model
     {
         return $this->hasMany(OrderItem::class, 'variant_id');   
     }
-    public function product_image()
+    public function product_images()
     {
-        return $this->hasMany(ProductImages::class, 'product_id', 'product_id')
-        ->withDefault(); // Tránh lỗi nếu không có hình ảnh
+        return $this->hasMany(ProductImages::class, 'product_id', 'product_id');
     }
 }

@@ -19,24 +19,43 @@ class CartController extends Controller
         try {
             $user = auth()->user();
 
+
             if (!$user) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
-            // Fetch cart items for the logged-in user
-            $cartItems = Cart::with('variant.product.product_image') // Tải quan hệ với product_image
+            // Lấy danh sách các item trong giỏ hàng
+            $cartItems = Cart::with('variant.product.product_images')
                 ->where('user_id', $user->user_id)
                 ->get();
+
             if ($cartItems->isEmpty()) {
                 return response()->json(['message' => 'No cart items found.'], 404);
             }
 
+            // Xử lý dữ liệu và kiểm tra null
+            $cartDetails = $cartItems->map(function ($item) {
+                $variant = $item->variant;
+                $product = $variant ? $variant->product : null;
+                $images = $product ? $product->product_images : collect([]);
+
+                return [
+                    'cart_id' => $item->id,
+                    'variant_id' => $item->variant_id,
+                    'product_name' => $product->product_name ?? 'N/A',
+                    'quantity' => $item->quantity,
+                    'price' => $product->product_price ?? 0,
+                    'images' => $images->pluck('image_path')->toArray(),
+                ];
+            });
+
             return response()->json([
                 'status' => 200,
-                'data' => $cartItems
+                'data' => $cartDetails
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
+                'status' => 500,
                 'message' => 'An error occurred while processing your request.',
                 'error' => $e->getMessage()
             ], 500);
@@ -115,6 +134,9 @@ class CartController extends Controller
         $cartItem->update([
             'quantity' => $request->quantity,
         ]);
+        // if ($request->quantity <= 0) {
+        //     return response()->json(['message' => 'Quantity must be greater than 0.'], 422);
+        // }
 
         return response()->json([
             'status' => 200,
