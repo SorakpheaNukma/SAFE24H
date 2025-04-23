@@ -36,7 +36,7 @@ class OrderController extends Controller
             }
 
             // Fetch all orders related to the authenticated user
-            $orders = Order::with(['payment', 'orderItems.product.product_image'])
+            $orders = Order::with(['orderItems.product_variants.product.product_images'])
                 ->where('user_id', $user->user_id)
                 ->get();
                 

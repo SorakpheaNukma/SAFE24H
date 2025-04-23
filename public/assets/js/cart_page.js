@@ -47,14 +47,11 @@ $(document).ready(function () {
 
     // Function to create HTML for each cart item
     function createCartItem(item, index) {
+       
         const dmain = window.location.origin;
-        // console.log(item);
-        const imagePath = item.variant && item.variant.product && item.variant.product.product_image && item.variant.product.product_image.length > 0 
-        ? item.variant.product.product_image[0].image_path 
-        : 'default.jpg';
-    
-        const product = item.variant.product;
-        const size = item.variant.size;
+        const imagePath = item.variant?.product?.product_images?.[0]?.image_path || 'default.jpg';
+        const product = item.variant?.product;
+        const size = item.variant?.size;
         return `
             <div class="row align-items-center mb-4">
                 <div class="col-1">
@@ -64,25 +61,13 @@ $(document).ready(function () {
                     </label>
                 </div>
                 <div class="col-4 col-md-2">
-                    <img width="100px" src="${dmain}/uploads/products/${imagePath}" alt="${product.product_name}">
-                </div>
-                <div id="idInfoProduct${index}" class="col-7 col-md-9">
-                    <div class="product-description mb-0 p-0">
-                        <div class="row">
-                            <div class="col-12 d-flex flex-column flex-md-row justify-content-between">
-                                <div>
-                                    <h5>${product.product_name}</h5>
-                                    <div><small>ទំហំ: <strong>${size}</strong></small></div>
-                                </div>
-                                <div class="d-flex">
-                                    <p class="mb-0">តម្លៃ:</p>
-                                    <p class="mb-0 ms-2">$${product.product_price}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <p>${product.des_1}</p>
+                    <img width="100px" src="${dmain}/uploads/products/${imagePath}" alt="${product?.product_name}">
+                    <h5>${product?.product_name}</h5>
+                    <div><small>ទំហំ: <strong>${size}</strong></small></div>
+                    <p class="mb-0 ms-2">$${product?.product_price}</p>
+                    <p>${product?.des_1}</p>
                     </div>
-                    <p class="text-primary g-0 p-0 m-0">${item.variant.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
+                    <p class="text-primary g-0 p-0 m-0">${item.variant?.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
                     <div class="quantity-container mb-2">
                         <div class="d-flex align-items-center">
                             <h7>ចំនួន</h7>
@@ -136,7 +121,8 @@ $(document).ready(function () {
         if (quantity < 1) quantity = 1; // Ensure at least 1 item
         quantityInput.value = quantity;
 
-        const price = parseFloat(cartsItemsGL[index].product.product_price);
+        // const price = parseFloat(cartsItemsGL[index].product.product_price);
+        const price = parseFloat(item.variant?.product?.product_price);
         const subtotal = document.getElementById(`subtotal${index}`);
         subtotal.textContent = `$${(quantity * price).toFixed(2)}`;
 
@@ -308,8 +294,11 @@ $(document).ready(function () {
             });
 
             // Check for out-of-stock items in the selected list
+            // const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => {
+            //     return cartItem.product && cartItem.product.quantity === 0;
+            // });
             const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => {
-                return cartItem.product && cartItem.product.quantity === 0;
+                return cartItem.variant?.quantity === 0;
             });
             
             if (outOfStockItems.length > 0) {
@@ -318,17 +307,15 @@ $(document).ready(function () {
                 const titleDialog = '<strong>These Products Are Out of Stock</strong>';
 
                 const contentDialog = outOfStockItems.map(item => {
-                    const productName = item.product.product_name;
-
-                    const imagePath = item.product.product_image.length > 0
-                        ? `${dmain}/uploads/products/${item.product.product_image[0].image_path}`
+                    const productName = item.variant?.product?.product_name;
+                    const imagePath = item.variant?.product?.product_images?.[0]?.image_path
+                        ? `${dmain}/uploads/products/${item.variant.product.product_images[0].image_path}`
                         : 'https://via.placeholder.com/100?text=No+Image';
 
                     return `
-                         <div style="font-size: 14px; color: #555; margin-bottom: 10px;">
+                        <div style="font-size: 14px; color: #555; margin-bottom: 10px;">
                             Please deselect products that are out of stock:
                         </div>
-
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
                             <img width="100px" style="border-radius: 8px; margin-right: 10px;" src="${imagePath}" alt="${productName}">
                             <span style="font-size: 16px; font-weight: bold;">${productName}</span>
@@ -342,9 +329,7 @@ $(document).ready(function () {
                     content: contentDialog,
                     autoClose: 'Cancel|30000',
                     type: 'red',
-                    onConfirm: function () {
-
-                    },
+                    onConfirm: function () { },
                     cancelText: 'Cancel',
                     onCancel: function () {
 

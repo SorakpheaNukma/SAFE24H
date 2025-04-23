@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    hideSpinner();
+    // hideSpinner();
     function getQueryParams() {
         const params = new URLSearchParams(window.location.search);
         const totalPrice = params.get('Total_Price');

@@ -44,17 +44,13 @@ class Product extends Model
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function product_image()
-    {
-        return $this->hasMany(ProductImages::class, 'product_id');
-    }
 
     // Define relationship with OrderItem
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'product_id', 'product_id');
     }
-    public function product_variants()
+    public function variant()
     {
         return $this->hasMany(ProductVariants::class, 'product_id', 'product_id');
     }
