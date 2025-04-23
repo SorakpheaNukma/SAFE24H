@@ -73,7 +73,7 @@ class ProductController extends Controller
     public function getAll()
     {
         try {
-            $products = Product::with(['category', 'product_image', 'product_variants'])
+            $products = Product::with(['category', 'product_images', 'product_variants'])
                 ->orderBy('created_at', 'desc')
                 ->get();
 
