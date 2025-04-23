@@ -18,10 +18,15 @@ class ProductVariants extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id', 'product_id');
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
     public function orderItems()
     {
-        return $this->hasMany(OrderItem::class, 'variant_id');
+        return $this->hasMany(OrderItem::class, 'variant_id');   
+    }
+    public function product_image()
+    {
+        return $this->hasMany(ProductImages::class, 'product_id', 'product_id')
+        ->withDefault(); // Tránh lỗi nếu không có hình ảnh
     }
 }

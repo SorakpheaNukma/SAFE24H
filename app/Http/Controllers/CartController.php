@@ -27,6 +27,9 @@ class CartController extends Controller
             $cartItems = Cart::with('variant.product.product_image') // Tải quan hệ với product_image
                 ->where('user_id', $user->user_id)
                 ->get();
+            if ($cartItems->isEmpty()) {
+                return response()->json(['message' => 'No cart items found.'], 404);
+            }
 
             return response()->json([
                 'status' => 200,
