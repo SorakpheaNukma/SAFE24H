@@ -13,7 +13,7 @@ class OrderController extends Controller
 {
     public function getAllOrders()
     {
-        try {
+        try { 
             // Fetch all orders with related data
             $orders = Order::with(['users', 'payment', 'orderItems.product.product_image', 'orderItems.product.category'])->get();
 
