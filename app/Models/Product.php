@@ -35,7 +35,7 @@ class Product extends Model
      */
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id', 'category_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
 
@@ -50,7 +50,7 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class, 'product_id', 'product_id');
     }
-    public function variant()
+    public function variants()
     {
         return $this->hasMany(ProductVariants::class, 'product_id', 'product_id');
     }

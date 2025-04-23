@@ -2077,7 +2077,7 @@ $(document).ready(function() {
         // Process orders to calculate sales per category
         LsOrderDataGl.forEach(order => {
             order.order_items.forEach(item => {
-                const { category_name } = item.product.category;
+                const { category_name } = item.product.category; 
                 const sold = item.product.sold;
 
                 // Add sales to the respective category
