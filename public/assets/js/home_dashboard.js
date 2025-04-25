@@ -731,6 +731,7 @@ $(document).ready(function() {
             
                 const orderItemsHTML = orderData.order_items.map(item => {
                     if (!item.product) {
+                
                         return `
                             <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
                                 <img src="https://via.placeholder.com/50x50?text=No+Image" 
