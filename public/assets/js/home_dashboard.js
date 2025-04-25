@@ -741,7 +741,6 @@ $(document).ready(function() {
                     const imagePath = (product.product_images && product.product_images.length > 0)
                         ? `${dmain}/uploads/products/${product.product_images[0].image_path}`
                         : `https://via.placeholder.com/50x50?text=No+Image`;
-            
                         return `
                             <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
                                 <img src="${imagePath}" 
