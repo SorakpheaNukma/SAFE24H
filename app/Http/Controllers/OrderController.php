@@ -13,23 +13,48 @@ class OrderController extends Controller
 {
     public function getAllOrders()
     {
-        try { 
+        try {
             $orders = Order::with([
                 'users', 
                 'payment', 
-                'orderItems.product.product_images', 
-                'orderItems.variant',
-                'orderItems.product.category'
+                'orderItems.variant.product.product_images',
+                'orderItems.variant.product.category'
             ])->get();
 
+            $orders->each(function ($order) {
+                // Kiểm tra nếu có order_items
+                if ($order->order_items) {
+                    $order->order_items->each(function ($item) {
+                        // Lấy thông tin sản phẩm và ảnh của sản phẩm
+                        $variant = $item->variant;
+                        $product = $variant && $variant->product ? $variant->product : null;
+    
+                        // Thêm trường product_name và product_image vào mỗi item
+                        $item->product_name = $product ? $product->product_name : null;
+                        $item->product_image = $product && $product->product_images->isNotEmpty()
+                            ? $product->product_images->first()->image_path
+                            : null;
+                        
+                        
+                        $item->category_name = $product && $product->category ? $product->category->category_name : null;
+                        // Loại bỏ quan hệ 'product' khỏi biến variant
+                        if ($variant) {
+                            $variant->setRelation('product', null);
+                        }
+                    });
+                }
+            });
             return response()->json([
                 'status' => 200,
                 'data' => $orders
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to get orders: ' . $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Failed to get orders: ' . $e->getMessage()
+            ], 500);
         }
     }
+
 
     public function getOrdersCurrentLogin()
     {
@@ -112,6 +137,117 @@ class OrderController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to get order details: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function createOrders(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,user_id',
+            'total_amount' => 'required|numeric',
+            'status' => 'required|string|in:processing,shipped,delivered',
+            'order_date' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $order = new Order();
+            $order->user_id = $request->user_id;
+            $order->total_amount = $request->total_amount;
+            $order->status = $request->status;
+            $order->order_date = $request->order_date;
+            $order->save();
+
+            $user = User::find($request->user_id);
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+
+            $msg = [
+                'users' => $user,
+                'order' => $order,
+            ];
+
+            // Broadcast the message to Pusher
+            broadcast(new MessageSent($msg));
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Order created successfully',
+                'users' => $user,
+                'data' => $order,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create order' . $e->getMessage()], 500);
+        }
+    }
+
+    public function getOrderById($id)
+    {
+        try {
+            $order = Order::findOrFail($id);
+            return response()->json([
+                'status' => 200,
+                'data' => $order
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+    }
+
+    // Update an existing order
+    public function updateOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'nullable|string',
+            'order_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $order = Order::findOrFail($request->order_id);
+            $order->total_amount = $request->total_amount ?? $order->total_amount;
+            $order->status = $request->status ?? $order->status;
+            $order->order_date = $request->order_date ?? $order->order_date;
+            $order->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Order updated successfully',
+                'data' => $order
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update order' . $e->getMessage()], 500);
+        }
+    }
+
+    // Delete an order
+    public function deleteOrder(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'order_id' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $order = Order::findOrFail($request->order_id);
+            $order->delete();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Order deleted successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete order' . $e->getMessage()], 500);
         }
     }
 }

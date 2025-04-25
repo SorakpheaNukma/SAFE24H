@@ -730,55 +730,75 @@ $(document).ready(function() {
                 console.log("Order Data:", orderData);  // Kiểm tra dữ liệu đã có
             
                 const orderItemsHTML = orderData.order_items.map(item => {
-                    if (!item.product) {
+                    const variant = item.variant || {};
+                    const product = variant.product || {};
+                    const productName = product.product_name || 'No name';
+                    const size = variant.size || 'N/A';
+                    const price = item.price ?? '0.00';
+                    const quantity = item.quantity ?? 0;
+                    const dmain = window.location.origin;
+            
+                    const imagePath = (product.product_images && product.product_images.length > 0)
+                        ? `${dmain}/uploads/products/${product.product_images[0].image_path}`
+                        : `https://via.placeholder.com/50x50?text=No+Image`;
+            
                         return `
                             <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
-                                <img src="https://via.placeholder.com/50x50?text=No+Image" 
-                                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                                <img src="${imagePath}" 
+                                    style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
                                 <div>
-                                    <h5 style="margin: 0; font-weight: bold;">🛒 Unknown Product</h5>
-                                    <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
-                                    <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
-                                    <p style="margin: 0; color: #888;">📏 Size: ${item.variant?.size || 'N/A'}</p>
+                                    <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center;">
+                                        🛒 ${productName}
+                                    </h5>
+                                    <p style="margin: 0; color: #888;">💲 Price: $${price}</p>
+                                    <p style="margin: 0; color: #888;">📦 Quantity: ${quantity}</p>
+                                    <p style="margin: 0; color: #888;">📏 Size: ${size}</p>
                                 </div>
                             </div>
                         `;
-                    }
-            
-                    const productName = item.product.product_name || 'No name';
-                    const size = item.variant?.size || 'N/A';
-                    const imagePath = item.product?.product_images?.[0]?.image_path
-                        ? `${window.location.origin}/uploads/products/${item.product.product_images[0].image_path}`
-                        : `https://via.placeholder.com/50x50?text=No+Image`;
-            
-                    return `
-                        <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
-                            <img src="${imagePath}" 
-                                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
-                            <div>
-                                <h5 style="margin: 0; font-weight: bold;">🛒 ${productName}</h5>
-                                <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
-                                <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
-                                <p style="margin: 0; color: #888;">📏 Size: ${size}</p>
-                            </div>
-                        </div>
-                    `;
                 }).join('');
-            
+
+                const user = orderData.users || {};
+                const username = user.username || 'Unknown';
+                const email = user.email || 'N/A';
+                const phone = user.phone_number || 'N/A';
+                const address = user.address || 'N/A';
+                const country = user.country || '';
+                const status = orderData.status || 'Pending';
+                const totalAmount = orderData.total_amount ?? '0.00';
+                const orderDate = orderData.order_date ? formatDate(orderData.order_date) : 'N/A';
+
                 MyJConfirmDialog({
                     title: `<strong>👁️ View Order #${orderData.order_id}</strong>`,
                     content: `
                         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                            <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
+                            <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
+                            <p><strong>🔄 Status:</strong> ${status}</p>
+                            <p><strong>💰 Total Amount:</strong> $${totalAmount}</p>
+                            <p><strong>📅 Order Date:</strong> ${orderDate}</p>
+            
+                            <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+            
+                            <h4 style="color: #333; margin-bottom: 10px;">👤 Customer Info</h4>
+                            <p><strong>📛 Name:</strong> ${username}</p>
+                            <p><strong>✉️ Email:</strong> ${email}</p>
+                            <p><strong>📞 Phone:</strong> ${phone}</p>
+                            <p><strong>🏠 Address:</strong> ${address}${country ? ', ' + country : ''}</p>
+            
+                            <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+            
                             <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
                             <div style="max-height: 200px; overflow-y: auto;">
                                 ${orderItemsHTML}
                             </div>
                         </div>
                     `,
-                    columnClass: 'm',
-                    type: 'blue',
-                    cancelText: 'Close',
-                    onCancel: function() {}
+                    confirmText: "Close",
+                    confirmBtnClass: "btn-info",
+                    columnClass: "m",
+                    type: "blue",
+                    onConfirm: function () { /* Đóng dialog */ }
                 });
             }
             
@@ -846,20 +866,21 @@ $(document).ready(function() {
             }
 
             function deleteOrderDialog(orderData) {
+                console.log("open delete dialog");
                 const { order_id, total_amount, status, order_date, order_items, users } = orderData;
                 const { username, email, phone_number, address, country } = users;
 
                 // Create HTML for order items (products with their images, names, and quantities)
                 const orderItemsHTML = order_items.map(item => `
-            <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0;">
-                <img src="${window.location.origin}/uploads/products/${item.product.product_image[0]?.image_path}" 
-                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
-                <div>
-                    <h5 style="margin: 0; font-weight: bold;">🛒 ${item.product.product_name}</h5>
-                    <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
-                </div>
-            </div>
-        `).join('');
+                    <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0;">
+                        <img src="${window.location.origin}/uploads/products/${item.variant.product.product_images[0]?.image_path}" 
+                            style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                        <div>
+                            <h5 style="margin: 0; font-weight: bold;">🛒 ${item.variant.product.product_name}</h5>
+                            <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                        </div>
+                    </div>
+                `).join('');
 
                 // Confirm Dialog for Deleting Order
                 MyJConfirmDialog({
@@ -899,13 +920,13 @@ $(document).ready(function() {
                     <i class="fas fa-exclamation-triangle" style="color: orange; font-size: 40px; margin-top: 15px;"></i>
                 </div>
             `,
-                    confirmText: 'Delete Order',
                     confirmBtnClass: 'btn-danger',
                     cancelBtnClass: 'btn-secondary',
                     autoClose: 'Cancel|50000',
                     columnClass: 'm',
                     type: 'red',
                     onConfirm: function() {
+                        console.log("Confirm delete for order:", order_id);
                         deleteOrder(order_id); // Function to delete the order
                     },
                     cancelText: 'Cancel',
@@ -2043,14 +2064,15 @@ $(document).ready(function() {
 
                 const orderItemsHTML = orderData.order_items.map(item => `
                     <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
-                        <img src="${dmain}/uploads/products/${item.product.product_image[0]?.image_path}" 
+                        <img src="${dmain}/uploads/products/${item.variant.product.product_images[0]?.image_path || 'default.jpg'}"
                              style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
                         <div>
                             <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center;">
-                                🛒 ${item.product.product_name}
+                                🛒 ${item.variant.product.product_name}
                             </h5>
                             <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
                             <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                            <p style="margin: 0; color: #888;">👕 Size: ${item.variant.size}</p>
                         </div>
                     </div>
                 `).join('');
@@ -2100,9 +2122,9 @@ $(document).ready(function() {
         // Process orders to calculate sales per category
         LsOrderDataGl.forEach(order => {
             order.order_items.forEach(item => {
-                const { category_name } = item.product.category; 
-                const sold = item.product.sold;
-
+                const category_name = item.variant.product.category.category_name;
+            
+                const sold = item.variant?.sold || 0;
                 // Add sales to the respective category
                 categorySales[category_name] = (categorySales[category_name] || 0) + sold;
             });
