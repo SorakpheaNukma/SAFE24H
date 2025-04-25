@@ -728,21 +728,43 @@ $(document).ready(function() {
 
             function viewOrderDialog(orderData) {
                 console.log("Order Data:", orderData);  // Kiểm tra dữ liệu đã có
-
-                // Tạo HTML cho danh sách sản phẩm
-                const orderItemsHTML = orderData.order_items.map(item => `
-                    <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
-                        <img src="${item.product.product_image[0]?.image_path}" 
-                            style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
-                        <div>
-                            <h5 style="margin: 0; font-weight: bold;">🛒 ${item.product.product_name}</h5>
-                            <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
-                            <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
-                            <p style="margin: 0; color: #888;">📏 Size: ${item.variant_id}</p>
+            
+                const orderItemsHTML = orderData.order_items.map(item => {
+                    if (!item.product) {
+                        return `
+                            <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
+                                <img src="https://via.placeholder.com/50x50?text=No+Image" 
+                                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                                <div>
+                                    <h5 style="margin: 0; font-weight: bold;">🛒 Unknown Product</h5>
+                                    <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
+                                    <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                                    <p style="margin: 0; color: #888;">📏 Size: ${item.variant?.size || 'N/A'}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+            
+                    const productName = item.product.product_name || 'No name';
+                    const size = item.variant?.size || 'N/A';
+                    const imagePath = item.product?.product_images?.[0]?.image_path
+                        ? `${window.location.origin}/uploads/products/${item.product.product_images[0].image_path}`
+                        : `https://via.placeholder.com/50x50?text=No+Image`;
+            
+                    return `
+                        <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
+                            <img src="${imagePath}" 
+                                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                            <div>
+                                <h5 style="margin: 0; font-weight: bold;">🛒 ${productName}</h5>
+                                <p style="margin: 0; color: #888;">💲 Price: $${item.price}</p>
+                                <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
+                                <p style="margin: 0; color: #888;">📏 Size: ${size}</p>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
-
+                    `;
+                }).join('');
+            
                 MyJConfirmDialog({
                     title: `<strong>👁️ View Order #${orderData.order_id}</strong>`,
                     content: `
@@ -759,6 +781,7 @@ $(document).ready(function() {
                     onCancel: function() {}
                 });
             }
+            
             function editOrderDialog(orderId, status) {
                 MyJConfirmDialog({
                     title: '<strong><i class="fas fa-sync-alt" style="color: orange; margin-right: 5px;"></i> Update Order</strong>',

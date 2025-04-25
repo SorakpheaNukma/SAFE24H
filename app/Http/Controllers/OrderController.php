@@ -14,15 +14,20 @@ class OrderController extends Controller
     public function getAllOrders()
     {
         try { 
-            // Fetch all orders with related data
-            $orders = Order::with(['users', 'payment', 'orderItems.product.product_image', 'orderItems.product.category'])->get();
+            $orders = Order::with([
+                'users', 
+                'payment', 
+                'orderItems.product.product_images', 
+                'orderItems.variant',
+                'orderItems.product.category'
+            ])->get();
 
             return response()->json([
                 'status' => 200,
                 'data' => $orders
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to get orders' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to get orders: ' . $e->getMessage()], 500);
         }
     }
 
@@ -35,11 +40,36 @@ class OrderController extends Controller
                 return response()->json(['error' => 'User not authenticated'], 401);
             }
 
-            // Fetch all orders related to the authenticated user
-            $orders = Order::with(['orderItems.variant.product.product_images'])
-                ->where('user_id', $user->user_id)
-                ->get();
-                
+            $orders = Order::with([
+                'orderItems.variant',
+                'orderItems.product.product_images',
+                'users'
+            ])->where('user_id', $user->user_id)->get();
+
+            $orders = $orders->map(function ($order) {
+                $orderItems = $order->orderItems->map(function ($item) {
+                    $product = $item->product;
+                    $productImage = $product && $product->product_images->isNotEmpty()
+                        ? url('/uploads/products/' . $product->product_images->first()->image_path)
+                        : url('/default.jpg');
+
+                    return [
+                        'product_name' => $product->product_name ?? 'No name',
+                        'image_path' => $productImage,
+                        'price' => $item->price,
+                        'quantity' => $item->quantity,
+                    ];
+                });
+
+                return [
+                    'order_id' => $order->order_id,
+                    'order_date' => $order->order_date,
+                    'total_amount' => $order->total_amount,
+                    'status' => $order->status,
+                    'order_items' => $orderItems,
+                ];
+            });
+
             return response()->json([
                 'status' => 200,
                 'data' => $orders
@@ -49,115 +79,39 @@ class OrderController extends Controller
         }
     }
 
-
-    public function createOrders(Request $request)
+    public function getOrderDetails($orderId)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|integer|exists:users,user_id',
-            'total_amount' => 'required|numeric',
-            'status' => 'required|string|in:processing,shipped,delivered',
-            'order_date' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         try {
-            $order = new Order();
-            $order->user_id = $request->user_id;
-            $order->total_amount = $request->total_amount;
-            $order->status = $request->status;
-            $order->order_date = $request->order_date;
-            $order->save();
+            $order = Order::with(['orderItems.product.product_images'])
+                ->where('order_id', $orderId)
+                ->firstOrFail();
 
-            $user = User::find($request->user_id);
-            if (!$user) {
-                return response()->json(['error' => 'User not found'], 404);
-            }
+            $orderItems = $order->orderItems->map(function ($item) {
+                $product = $item->product;
+                $productImage = $product && $product->product_images->isNotEmpty()
+                    ? url('/uploads/products/' . $product->product_images->first()->image_path)
+                    : url('/default.jpg');
 
-            $msg = [
-                'users' => $user,
-                'order' => $order,
-            ];
-
-            // Broadcast the message to Pusher
-            broadcast(new MessageSent($msg));
+                return [
+                    'product_name' => $product->product_name ?? 'No name',
+                    'image_path' => $productImage,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                ];
+            });
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Order created successfully',
-                'users' => $user,
-                'data' => $order,
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to create order' . $e->getMessage()], 500);
-        }
-    }
-
-    public function getOrderById($id)
-    {
-        try {
-            $order = Order::findOrFail($id);
-            return response()->json([
-                'status' => 200,
-                'data' => $order
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Order not found'], 404);
-        }
-    }
-
-    // Update an existing order
-    public function updateOrder(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'status' => 'nullable|string',
-            'order_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        try {
-            $order = Order::findOrFail($request->order_id);
-            $order->total_amount = $request->total_amount ?? $order->total_amount;
-            $order->status = $request->status ?? $order->status;
-            $order->order_date = $request->order_date ?? $order->order_date;
-            $order->save();
-
-            return response()->json([
-                'status' => 200,
-                'message' => 'Order updated successfully',
-                'data' => $order
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to update order' . $e->getMessage()], 500);
-        }
-    }
-
-    // Delete an order
-    public function deleteOrder(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'order_id' => 'required',
+                'data' => [
+                    'order_id' => $order->order_id,
+                    'order_date' => $order->order_date,
+                    'total_amount' => $order->total_amount,
+                    'status' => $order->status,
+                    'order_items' => $orderItems,
+                ],
             ]);
-
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            $order = Order::findOrFail($request->order_id);
-            $order->delete();
-
-            return response()->json([
-                'status' => 200,
-                'message' => 'Order deleted successfully',
-            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to delete order' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to get order details: ' . $e->getMessage()], 500);
         }
     }
 }

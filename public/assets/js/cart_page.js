@@ -11,16 +11,18 @@ $(document).ready(function () {
                 hideSpinner();
                 if (res.status === 200 && res.data && res.data.length > 0) {
                     cartsItemsGL = res.data;
-                    // console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
 
                     // Render items if available
                     renderCartItems(cartsItemsGL);
                 } else {
                     console.log('No items in cart');
+                    $('#cartItemsContainer').html('<p>Your cart is empty</p>'); // Hiển thị thông báo giỏ hàng trống
+            
                 }
             },
             error: function () {
                 hideSpinner();
+                console.error('Error fetching cart items:', xhr.responseText);
                 showError('Something went wrong!!');
             }
         });
@@ -49,7 +51,10 @@ $(document).ready(function () {
     function createCartItem(item, index) {
        
         const dmain = window.location.origin;
-        const imagePath = item.variant?.product?.product_images?.[0]?.image_path || 'default.jpg';
+        const imagePath = item.variant?.product?.product_images?.[0]?.image_path         
+        ? `${dmain}/uploads/products/${item.variant.product.product_images[0].image_path}`
+        : `${dmain}/uploads/products/default.jpg`;
+        
         const product = item.variant?.product;
         const size = item.variant?.size;
         return `
@@ -61,26 +66,13 @@ $(document).ready(function () {
                     </label>
                 </div>
                 <div class="col-4 col-md-2">
-                    <img width="100px" src="${dmain}/uploads/products/${imagePath}" alt="${product?.product_name}">
-                    <h5>${product?.product_name}</h5>
-                    <div><small>ទំហំ: <strong>${size}</strong></small></div>
-                    <p class="mb-0 ms-2">$${product?.product_price}</p>
-                    <p>${product?.des_1}</p>
-                    </div>
-                    <p class="text-primary g-0 p-0 m-0">${item.variant?.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
-                    <div class="quantity-container mb-2">
-                        <div class="d-flex align-items-center">
-                            <h7>ចំនួន</h7>
-                            <div class="d-flex align-items-center mx-2">
-                                <span class="form-control text-center" style="width: 60px; background-color: #f8f9fa;">${item.quantity}</span>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <h7>សរុបរង:</h7>
-                            <span class="text-success subtotal" id="subtotal${index}">$${(product.product_price * item.quantity).toFixed(2)}</span>
-                        </div>
-                    </div>
+                    <img width="100px" src="${imagePath}" alt="${product?.product_name || 'No Name'}">
+                    <h5>${product?.product_name || 'No Name'}</h5>
+                    <div><small>ទំហំ: <strong>${size || 'N/A'}</strong></small></div>
+                    <p class="mb-0 ms-2">$${product?.product_price || 0}</p>
+                    <p>${product?.des_1 || ''}</p>
                 </div>
+                <p class="text-primary g-0 p-0 m-0">${item.variant?.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
             </div>
         `;
     }
@@ -89,24 +81,24 @@ $(document).ready(function () {
     // Function to render all cart items
     function renderCartItems(items) {
         const cartItemsContainer = document.getElementById('cartItemsContainer');
-        cartItemsContainer.innerHTML = items.map((item, index) => {
-            // Kiểm tra nếu có ảnh sản phẩm và lấy ảnh đầu tiên
-            const imagePath = item.variant.product.product_image && item.variant.product.product_image.length > 0
-                ? item.variant.product.product_image[0].image_path // Lấy ảnh đầu tiên
-                : 'default.jpg'; // Nếu không có ảnh, sử dụng ảnh mặc định
+        if (!items || items.length === 0) {
+            cartItemsContainer.innerHTML = '<p>Your cart is empty</p>';
+            return;
+        }
     
+        cartItemsContainer.innerHTML = items.map((item, index) => {
+            const imagePath = item.variant?.product?.product_images?.[0]?.image_path || 'default.jpg';
             return createCartItem(item, index, imagePath);
         }).join('');
-
+    
         // Add event listeners for the quantity buttons and checkboxes
         document.querySelectorAll('.minus-btn').forEach(btn => btn.addEventListener('click', handleQuantityChange));
         document.querySelectorAll('.plus-btn').forEach(btn => btn.addEventListener('click', handleQuantityChange));
         document.querySelectorAll('.item-checkbox').forEach(checkbox => checkbox.addEventListener('change', updateTotalPrice));
         document.querySelectorAll('.delete-icon').forEach(icon => icon.addEventListener('click', deleteSingleItem));
-
+    
         updateTotalPrice(); // Initialize total price
     }
-
     // Handle quantity change
     function handleQuantityChange(e) {
         const index = e.target.dataset.index;
@@ -120,33 +112,31 @@ $(document).ready(function () {
         let quantity = parseInt(quantityInput.value) + change;
         if (quantity < 1) quantity = 1; // Ensure at least 1 item
         quantityInput.value = quantity;
-
-        // const price = parseFloat(cartsItemsGL[index].product.product_price);
-        const price = parseFloat(item.variant?.product?.product_price);
+    
+        const price = parseFloat(cartsItemsGL[index]?.variant?.product?.product_price || 0);
         const subtotal = document.getElementById(`subtotal${index}`);
         subtotal.textContent = `$${(quantity * price).toFixed(2)}`;
-
+    
         updateTotalPrice();
     }
 
     // Function to update the total price of selected items
     function updateTotalPrice() {
         let totalPrice = 0;
-
+    
         cartsItemsGL.forEach((item, index) => {
             const checkbox = document.getElementById(`item${index}`);
-            if (checkbox.checked) {
-                const quantity = item.quantity;
-                const price = parseFloat(item.variant.product.product_price);
+            if (checkbox && checkbox.checked) {
+                const quantity = item.quantity || 0;
+                const price = parseFloat(item.variant?.product?.product_price || 0);
                 totalPrice += quantity * price;
             }
         });
-
+    
         document.getElementById('totalPriceContainer').innerHTML = `
-            <h5 class="fw-bold" style="font-size: 24px; color:blue;">តម្លៃទំនិញសរុប: <span class="text-primary" >$${totalPrice.toFixed(2)}</span></h5>
+            <h5 class="fw-bold" style="font-size: 24px; color:blue;">Total Price: <span class="text-primary">$${totalPrice.toFixed(2)}</span></h5>
         `;
     }
-
     // Handle "Select All" functionality
     document.getElementById('selectAll').addEventListener('change', function () {
         const isChecked = this.checked;
