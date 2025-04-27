@@ -33,7 +33,7 @@
                         <p class="fw-semibold fs-4 p-0 m-0">បញ្ជីទំនិញក្នុងកន្ត្រកស្តុក</p>
                     </div>
                     <input class="form-check-input" type="checkbox" id="selectAll" />
-                    <label class="form-check-label" for="selectAll" style="color: blue;">ជ្រើសរើសយកទាំងអasdasdស់</label>
+                    <label class="form-check-label" for="selectAll" style="color: blue;">ជ្រើសរើសយកទាំងអស់</label>
 
                     <!--btn delete
                     <label id="deleteSelectedAllItems" class="form-check-label ms-3" for="item1">

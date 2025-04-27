@@ -21,13 +21,8 @@ $(document).ready(function () {
 
         order.order_items.forEach(item => {
 
-
-            // console.log('item:', item);
-            // console.log('item.product:', item.product);
-            //const imagePath = item.product.product_image[0]?.image_path || 'default.jpg'; //bookmark
             const imagePath = item.variant?.product?.product_images?.[0]?.image_path|| 'default.jpg';
-            
-            const productName = item.product_variants?.product?.product_name || 'No name';
+            const productName = item.variant?.product?.product_name || 'No name';
             // Lấy size an toàn (nếu size nằm trong variant thì sửa lại cho đúng)
             const size = item.variant?.size || '';
             itemListHTML += `
