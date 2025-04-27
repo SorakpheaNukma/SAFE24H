@@ -51,7 +51,7 @@ $(document).ready(function () {
     function createCartItem(item, index) {
        
         const dmain = window.location.origin;
-        const imagePath = item.variant?.product?.product_images?.[0]?.image_path         
+        const imagePath = item.variant?.product?.product_images?.[0]?.image_path
         ? `${dmain}/uploads/products/${item.variant.product.product_images[0].image_path}`
         : `${dmain}/uploads/products/default.jpg`;
         

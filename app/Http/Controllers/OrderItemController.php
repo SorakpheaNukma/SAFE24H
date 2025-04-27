@@ -16,7 +16,7 @@ class OrderItemController extends Controller
     public function getAllOrderItems()
     {
         $orderItems = OrderItem::with([
-            'variant.product.product_image',
+            'variant.product.product_images',
             'variant.product.category'
         ])->get();
 
@@ -27,7 +27,7 @@ class OrderItemController extends Controller
     }
     public function getAllOrderUser()
     {
-        $OrderItem = OrderItem::with(['variant.product.product_image', 'order',])->get();
+        $OrderItem = OrderItem::with(['variant.product.product_images', 'order',])->get();
 
         return response()->json([
             'status' => 200,

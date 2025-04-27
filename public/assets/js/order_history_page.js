@@ -25,11 +25,11 @@ $(document).ready(function () {
             // console.log('item:', item);
             // console.log('item.product:', item.product);
             //const imagePath = item.product.product_image[0]?.image_path || 'default.jpg'; //bookmark
-            const imagePath = item.product_variants?.product?.product_images?.[0]?.image_path|| 'default.jpg';
+            const imagePath = item.variant?.product?.product_images?.[0]?.image_path|| 'default.jpg';
             
             const productName = item.product_variants?.product?.product_name || 'No name';
             // Lấy size an toàn (nếu size nằm trong variant thì sửa lại cho đúng)
-            const size = item.product_variants?.size || '';
+            const size = item.variant?.size || '';
             itemListHTML += `
                 <div class="order-item d-flex align-items-center mb-2">
                     <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">

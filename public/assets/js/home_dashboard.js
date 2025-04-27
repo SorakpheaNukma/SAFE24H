@@ -781,7 +781,6 @@ $(document).ready(function() {
             
                             <h4 style="color: #333; margin-bottom: 10px;">👤 Customer Info</h4>
                             <p><strong>📛 Name:</strong> ${username}</p>
-                            <p><strong>✉️ Email:</strong> ${email}</p>
                             <p><strong>📞 Phone:</strong> ${phone}</p>
                             <p><strong>🏠 Address:</strong> ${address}${country ? ', ' + country : ''}</p>
             
@@ -2091,7 +2090,6 @@ $(document).ready(function() {
                             
                             <h4 style="color: #333; margin-bottom: 10px;">👤 User Info</h4>
                             <p><strong>📛 Name:</strong> ${orderData.users.username}</p>
-                            <p><strong>✉️ Email:</strong> ${orderData.users.email}</p>
                             <p><strong>📞 Phone:</strong> ${orderData.users.phone_number}</p>
                             <p><strong>🏠 Address:</strong> ${orderData.users.address}</p>
                             
