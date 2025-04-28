@@ -21,14 +21,13 @@ $(document).ready(function () {
 
         order.order_items.forEach(item => {
 
-            const imagePath = item.variant?.product?.product_images?.[0]?.image_path|| 'default.jpg';
-            const productName = item.variant?.product?.product_name || 'No name';
-            // Lấy size an toàn (nếu size nằm trong variant thì sửa lại cho đúng)
-            const size = item.variant?.size || '';
+            const imagePath = item.image_path || 'default.jpg';
+            const productName = item.product_name || 'No name';
+            const size = item.size || '';
             itemListHTML += `
                 <div class="order-item d-flex align-items-center mb-2">
-                    <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
-                    <div>
+                    <img src="${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
+                <div>
                         <p class="mb-1 fw-bold">${productName}</p>
                         <p class="text-muted mb-0">ចំនួន: ${item.quantity}</p>
                         <p class="text-muted mb-0">ទំហំ: ${size || ''}</p>

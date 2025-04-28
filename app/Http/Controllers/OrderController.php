@@ -66,23 +66,25 @@ class OrderController extends Controller
             }
 
             $orders = Order::with([
-                'orderItems.variant',
-                'orderItems.product.product_images',
+                // 'orderItems.variant',
+                'orderItems.variant.product.product_images',
                 'users'
             ])->where('user_id', $user->user_id)->get();
 
             $orders = $orders->map(function ($order) {
                 $orderItems = $order->orderItems->map(function ($item) {
-                    $product = $item->product;
+                    $variant = $item->variant; // ✅ trước tiên lấy variant
+                    $product = $variant ? $variant->product : null; // ✅ sau đó lấy product từ variant
                     $productImage = $product && $product->product_images->isNotEmpty()
-                        ? url('/uploads/products/' . $product->product_images->first()->image_path)
-                        : url('/default.jpg');
+                            ? url('/uploads/products/' . $product->product_images->first()->image_path)
+                            : url('/default.jpg');
 
                     return [
                         'product_name' => $product->product_name ?? 'No name',
                         'image_path' => $productImage,
                         'price' => $item->price,
                         'quantity' => $item->quantity,
+                        'size' => $variant->size ?? '', // 👈 thêm size vào đây luôn
                     ];
                 });
 
