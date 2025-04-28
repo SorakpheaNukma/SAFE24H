@@ -38,14 +38,17 @@ class CartController extends Controller
                 $variant = $item->variant;
                 $product = $variant ? $variant->product : null;
                 $images = $product ? $product->product_images : collect([]);
-
+                $imagePath = $images->isNotEmpty()
+                    ? url('/uploads/products/' . $images->first()->image_path)
+                    : url('/uploads/products/default.jpg');
                 return [
                     'cart_id' => $item->id,
                     'variant_id' => $item->variant_id,
                     'product_name' => $product->product_name ?? 'N/A',
                     'quantity' => $item->quantity,
                     'price' => $product->product_price ?? 0,
-                    'images' => $images->pluck('image_path')->toArray(),
+                    'size' => $variant ? $variant->size : 'N/A', // ✨ thêm dòng này
+                    'images' => $imagePath,
                 ];
             });
 

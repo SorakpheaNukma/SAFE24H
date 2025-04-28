@@ -116,12 +116,7 @@ class OrderItemController extends Controller
                 $product->save();
             }
         }
-        
-        // if (!$product) {
-        //     return response()->json(['error' => 'Product not found'], 404);
-        // }
-        // $product->quantity = $product->quantity - 1;
-        // $product->save();
+
 
         return response()->json([
             'status' => 200,

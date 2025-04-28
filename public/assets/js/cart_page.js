@@ -11,16 +11,13 @@ $(document).ready(function () {
                 hideSpinner();
                 if (res.status === 200 && res.data && res.data.length > 0) {
                     cartsItemsGL = res.data;
-
-                    // Render items if available
                     renderCartItems(cartsItemsGL);
                 } else {
-                    console.log('No items in cart');
-                    $('#cartItemsContainer').html('<p>Your cart is empty</p>'); // Hiển thị thông báo giỏ hàng trống
-            
+                    console.warn('No items in cart or invalid response:', res);
+                    $('#cartItemsContainer').html('<p>Your cart is empty</p>');
                 }
             },
-            error: function () {
+            error: function (xhr) {
                 hideSpinner();
                 console.error('Error fetching cart items:', xhr.responseText);
                 showError('Something went wrong!!');
@@ -49,31 +46,42 @@ $(document).ready(function () {
 
     // Function to create HTML for each cart item
     function createCartItem(item, index) {
-       
         const dmain = window.location.origin;
-        const imagePath =  item.variant.product.product_image.length > 0 ? item.product.product_image[0].image_path : 'default.jpg';
-        
-        const product = item.variant?.product;
-        const size = item.variant?.size;
+        const imagePath = item.images || `${dmain}/uploads/products/default.jpg`;
+    
         return `
             <div class="row align-items-center mb-4">
-                <div class="col-1">
+                   <div class="col-1">
                     <input class="form-check-input item-checkbox" type="checkbox" id="item${index}" />
                     <label class="form-check-label ms-0 ms-md-2 delete-icon" data-index="${index}">
                         <i class="fa-solid fa-trash-can" style="cursor: pointer;"></i>
                     </label>
                 </div>
-                <div class="col-4 col-md-2">
-                    <img width="100px" src="${imagePath}" alt="${product?.product_name || 'No Name'}">
-                    <h5>${product?.product_name || 'No Name'}</h5>
-                    <div><small>ទំហំ: <strong>${size || 'N/A'}</strong></small></div>
-                    <p class="mb-0 ms-2">$${product?.product_price || 0}</p>
-                    <p>${product?.des_1 || ''}</p>
+                <div class="col-11 col-md-11 d-flex align-items-center">
+                    <div style="flex-shrink: 0;">
+                        <img width="100px" src="${imagePath}" alt="${item.product_name || 'No Name'}" onerror="this.onerror=null;this.src='${dmain}/uploads/products/default.jpg';">
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-1">${item.product_name || 'No Name'}</h5>
+                        <p class="mb-1" style="font-weight: bold; font-size: 16px; color: red;">$${item.price || 0}</p>
+                        <p class="mb-0">Size: ${item.size || 'N/A'}</p>
+                        <p class="text-primary g-0 p-0 m-0">${item.quantity === 0 ? 'Out Stock' : 'In Stock'}</p>
+                        <div class="quantity-container mb-2">
+                            <div class="d-flex align-items-center">
+                                <h7>Quantity</h7>
+                                <div class="d-flex align-items-center mx-2">
+                                    <button class="btn btn-secondary btn-sm minus-btn" data-index="${index}">-</button>
+                                    <input type="number" class="form-control mx-2 quantity-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 60px;">
+                                    <button class="btn btn-secondary btn-sm plus-btn" data-index="${index}">+</button>
+                                </div>
+                            </div>
+                    </div>
                 </div>
-                <p class="text-primary g-0 p-0 m-0">${item.variant?.quantity === 0 ? 'គ្មានក្នុងស្តុក' : 'មានក្នុងស្តុក'}</p>
             </div>
         `;
     }
+    
+    
     
 
     // Function to render all cart items
@@ -85,8 +93,7 @@ $(document).ready(function () {
         }
     
         cartItemsContainer.innerHTML = items.map((item, index) => {
-            const imagePath = item.variant?.product?.product_images?.[0]?.image_path || 'default.jpg';
-            return createCartItem(item, index, imagePath);
+            return createCartItem(item, index);
         }).join('');
     
         // Add event listeners for the quantity buttons and checkboxes
@@ -124,9 +131,9 @@ $(document).ready(function () {
     
         cartsItemsGL.forEach((item, index) => {
             const checkbox = document.getElementById(`item${index}`);
-            if (checkbox && checkbox.checked) {
-                const quantity = item.quantity || 0;
-                const price = parseFloat(item.variant?.product?.product_price || 0);
+            if (checkbox.checked) {
+                const quantity = parseInt(document.querySelector(`.quantity-input[data-index="${index}"]`).value);
+                const price = parseFloat(item.variant.product.product_price);
                 totalPrice += quantity * price;
             }
         });
@@ -180,45 +187,6 @@ $(document).ready(function () {
         });
     }
 
-
-    // Function to delete selected items (bulk delete)
-    // document.getElementById('deleteSelectedAllItems').addEventListener('click', function () {
-    //     const selectedItems = cartsItemsGL.filter((item, index) => document.getElementById(`item${index}`).checked);
-    //     const selectedItemIds = selectedItems.map(item => item.id);
-
-    //     if (selectedItemIds.length > 0) {
-    //         $.ajax({
-    //             url: '/delete-multiple-from-cart',
-    //             method: 'DELETE',
-    //             data: {
-    //                 'ids': selectedItemIds,
-    //             },
-    //             headers: {
-    //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //             },
-    //             success: function (res) {
-    //                 if (res.status === 200) {
-    //                     // Remove selected items from the global array based on selected IDs
-    //                     cartsItemsGL = cartsItemsGL.filter(item => !selectedItemIds.includes(item.id));
-
-    //                     // Re-render the cart and update the total price
-    //                     renderCartItems(cartsItemsGL);
-    //                     updateTotalPrice();
-
-    //                     // call from other js
-    //                     getAllCartItems();
-
-    //                     showSuccess('deleted cart successfully🎉');
-    //                 } else {
-    //                     showError('Failed to delete selected items.');
-    //                 }
-    //             },
-    //             error: function () {
-    //                 showError('Error deleting the selected items.');
-    //             }
-    //         });
-    //     }
-    // });
 
     function MyJConfirmDialog(options) {
         let config = {
