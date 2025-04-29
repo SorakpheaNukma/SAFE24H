@@ -211,7 +211,7 @@ function btnBuyNow(quantityStock) {
                 var newProduct = {
                     product_id: productData.product_id,
                     product_name: productData.product_name,
-                    product_price: productData.product_price,
+                    price: productData.product_price,
                     quantity: quantityInputGL,
                     size: selectedSize,
                     variant_id: variantId

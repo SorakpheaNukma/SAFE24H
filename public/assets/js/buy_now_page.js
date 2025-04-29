@@ -33,7 +33,7 @@ $(document).ready(function () {
                 ProductsLsGL.push({
                     product_id: product.product_id,
                     product_name: product.product_name,
-                    product_price: product.product_price, // 👈 dùng key 'price'
+                    product_price: product.price,
                     image_path: product.images,
                     quantity: product.quantity,
                     size: product.size,
@@ -45,7 +45,7 @@ $(document).ready(function () {
             ProductsLsGL.push({
                 product_id: productData.product_id,
                 product_name: productData.product_name,
-                product_price: productData.product_price,
+                price: productData.price,
                 image_path: productData.images || images,
                 quantity: productData.quantity,
                 size: productData.size,
@@ -62,7 +62,7 @@ $(document).ready(function () {
     function addSingleProductItem(product) {
         const productName = product.product_name;
         const quantity = product.quantity;
-        const price = product.product_price;
+        const price = product.price;
         const dmain = window.location.origin;
         const imagePath = product.image_path ? product.image_path : 'default.jpg';
         const size = product.size;
@@ -227,10 +227,10 @@ $(document).ready(function () {
 
         const orderData = {
             user_id: user_idGL,
-            total_amount: totalPrice.toFixed(2),
+            total_amount: parseFloat(totalPrice.toFixed(2)),
             status: 'processing',
             order_date: orderDate,
-        };
+        };        
 
         $.ajax({
             url: '/save-order',
