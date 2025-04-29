@@ -28,21 +28,34 @@ $(document).ready(function () {
     var { productData, detailParam, images } = getItemDataFromUrl();
 
     if (detailParam === 'true') {
-        productData.forEach(product => {
-            ProductsLsGL.push({
-                product_id: product.product_id,
-                product_name: product.product_name,
-                product_price: product.price, // 👈 sửa lại đúng key là `price`
-                image_path: product.images,
-                quantity: product.quantity,
-                size: product.size,
-                variant_id: product.variant_id
+        if (Array.isArray(productData)) {
+            productData.forEach(product => {
+                ProductsLsGL.push({
+                    product_id: product.product_id,
+                    product_name: product.product_name,
+                    product_price: product.product_price, // 👈 dùng key 'price'
+                    image_path: product.images,
+                    quantity: product.quantity,
+                    size: product.size,
+                    variant_id: product.variant_id
+                });
             });
-        });
-        console.log("Loaded ProductsLsGL:", ProductsLsGL);
+        } else {
+            // Trường hợp chỉ có 1 sản phẩm, là object
+            ProductsLsGL.push({
+                product_id: productData.product_id,
+                product_name: productData.product_name,
+                product_price: productData.product_price,
+                image_path: productData.images || images,
+                quantity: productData.quantity,
+                size: productData.size,
+                variant_id: productData.variant_id
+            });
+        }
+        console.log("Loaded ProductsLsGL (detail):", ProductsLsGL);
     } else {
-        ProductsLsGL = productData;
-        console.log("Loaded ProductsLsGL:", ProductsLsGL);
+        ProductsLsGL = Array.isArray(productData) ? productData : [productData];
+        console.log("Loaded ProductsLsGL (bulk):", ProductsLsGL);
     }
 
     // Function to dynamically add a single product when detailParam is true
@@ -58,26 +71,18 @@ $(document).ready(function () {
         itemCount++;
 
         const productHTML = `
-    <div class="container m-2 product-item">
-        <div class="row d-flex align-items-center flex-column flex-md-row">
-            <div class="col-12 col-md-2 mb-3 mb-md-0">
-                <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
+        <div class="container m-2 product-item">
+            <div class="row d-flex align-items-center flex-column flex-md-row">
+                <div class="col-12 col-md-2 mb-3 mb-md-0">
+                    <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
+                </div>
+                <div class="col-12 col-md-8 d-flex flex-column">
+                    <h6 class="fw-semibold"> ${productName}</h6>
+                    <p class="mb-0">ចំនួន: ${quantity}</p>
+                    <p class="mb-0">Size: ${size}</p>
+                </div>
             </div>
-            <div class="col-12 col-md-8 d-flex flex-column">
-                <h6 class="fw-semibold"> ${productName}</h6>
-                <p class="mb-0">ចំនួន: ${quantity}</p>
-                <p class="mb-0">Size: ${size}</p>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div>
-                <h6>តម្លៃ</h6>
-            </div>
-            <div class="col-6 text-end">
-                <h6 class="fw-bold">$${price}</h6>
-            </div>
-        </div>
-    </div>`;
+        </div>`;
 
         // Insert the new product item before the "Order Total" section
         const productList = document.getElementById('product-list');
