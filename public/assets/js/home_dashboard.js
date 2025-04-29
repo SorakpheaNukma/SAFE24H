@@ -1990,8 +1990,8 @@ $(document).ready(function() {
             <div class="row">
                 <div class="col-12 slide-in-left">
                     <div class="table-responsive mt-4">
-                    <!--order summary and export -->
-                       <div class="container my-4">
+                        <!-- Order summary and export -->
+                        <div class="container my-4">
                             <div class="row align-items-center">
                                 <!-- Orders Summary Header -->
                                 <div class="col-12 col-md-8 text-center text-md-start">
@@ -2009,12 +2009,11 @@ $(document).ready(function() {
                         <table class="table" id="table-show-order-dashboard">
                             <thead>
                                 <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer</th>
+                                    <th>#</th>
+                                    <th>Customer Name</th>
+                                    <th>Total Orders</th>
+                                    <th>Total Products</th>
                                     <th>Total Amount</th>
-                                    <th>Status</th>
-                                    <th>Order Date</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-table-body">
@@ -2023,34 +2022,73 @@ $(document).ready(function() {
                         </table>
                     </div>
                 </div>
-            </div>    
+            </div>
         `;
 
-        dataExportToExcelGl.push({
-            'today_sale': todayAmountGl,
-            'total_sales': totalAmountGl,
-            'total_users': countUsersGl,
-            'total_orders': OrdersLsGL.length,
-            'total_products': productsLsGL.length,
+        // dataExportToExcelGl.push({
+        //     'today_sale': todayAmountGl,
+        //     'total_sales': totalAmountGl,
+        //     'total_users': countUsersGl,
+        //     'total_orders': OrdersLsGL.length,
+        //     'total_products': productsLsGL.length,
+        // });
+
+        // // Populate Orders Table with "View Details" button and attach event listener
+        // const ordersTableBody = document.getElementById("orders-table-body");
+        // OrdersLsGL.forEach((order, index) => {
+        //     const row = document.createElement("tr");
+        //     row.innerHTML = `
+        //         <td>${order.order_id}</td>
+        //         <td>${order.users.username}</td>
+        //         <td>$${order.total_amount.toFixed(2)}</td>
+        //         <td><span class="badge ${order.status === 'processing' ? 'bg-warning' : 'bg-success'}">${order.status}</span></td>
+        //         <td>${formatDate(order.order_date)}</td>
+        //         <td>
+        //             <button class="btn btn-sm btn-info view-details-btn" data-index="${index}">View Details</button>
+        //         </td>
+        //     `;
+        //     ordersTableBody.appendChild(row);
+        // });
+
+
+        //asssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        const customerSummaryMap = {};
+
+        // Tạo bảng tóm tắt cho từng khách hàng
+        OrdersLsGL.forEach(order => {
+            const username = order.users.username;
+            if (!customerSummaryMap[username]) {
+                customerSummaryMap[username] = {
+                    totalOrders: 0,
+                    totalProducts: 0,
+                    totalAmount: 0
+                };
+            }
+
+            customerSummaryMap[username].totalOrders += 1;
+            customerSummaryMap[username].totalProducts += order.order_items?.length || 0;
+            customerSummaryMap[username].totalAmount += order.total_amount || 0;
         });
 
-        // Populate Orders Table with "View Details" button and attach event listener
+        // Đổ dữ liệu vào bảng
         const ordersTableBody = document.getElementById("orders-table-body");
-        OrdersLsGL.forEach((order, index) => {
+        ordersTableBody.innerHTML = ''; // Xoá dữ liệu cũ nếu có
+
+        let index = 1;
+        for (const customerName in customerSummaryMap) {
+            const summary = customerSummaryMap[customerName];
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${order.order_id}</td>
-                <td>${order.users.username}</td>
-                <td>$${order.total_amount.toFixed(2)}</td>
-                <td><span class="badge ${order.status === 'processing' ? 'bg-warning' : 'bg-success'}">${order.status}</span></td>
-                <td>${formatDate(order.order_date)}</td>
-                <td>
-                    <button class="btn btn-sm btn-info view-details-btn" data-index="${index}">View Details</button>
-                </td>
+                <td>${index}</td>
+                <td>${customerName}</td>
+                <td>${summary.totalOrders}</td>
+                <td>${summary.totalProducts}</td>
+                <td>$${summary.totalAmount.toFixed(2)}</td>
             `;
             ordersTableBody.appendChild(row);
-        });
-
+            index++;
+        }
+        //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         MyDataTable('#table-show-order-dashboard');
 
         // Attach event listeners to each "View Details" button
