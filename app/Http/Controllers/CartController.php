@@ -30,7 +30,11 @@ class CartController extends Controller
                 ->get();
 
             if ($cartItems->isEmpty()) {
-                return response()->json(['message' => 'No cart items found.'], 404);
+                return response()->json([
+                    'status' => 204,
+                    'message' => 'Cart is empty.',
+                    'data' => []
+                ], 200); // HTTP 200 OK nhưng thông điệp rõ ràng là không có dữ liệu
             }
 
             // Xử lý dữ liệu và kiểm tra null

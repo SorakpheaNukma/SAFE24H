@@ -12,11 +12,13 @@ $(document).ready(function () {
                 if (res.status === 200 && res.data && res.data.length > 0) {
                     cartsItemsGL = res.data;
                     renderCartItems(cartsItemsGL);
-                } else {
-                    console.warn('No items in cart or invalid response:', res);
+                } else if (res.status === 204 || (res.data && res.data.length === 0)) {
                     $('#cartItemsContainer').html('<p>Your cart is empty</p>');
+                } else {
+                    console.warn('Unexpected response:', res);
+                    showError('Unable to load cart data');
                 }
-            },
+            },            
             error: function (xhr) {
                 hideSpinner();
                 console.error('Error fetching cart items:', xhr.responseText);
@@ -51,7 +53,7 @@ $(document).ready(function () {
     
         return `
             <div class="row align-items-center mb-4">
-                   <div class="col-1">
+                <div class="col-1">
                     <input class="form-check-input item-checkbox" type="checkbox" id="item${index}" />
                     <label class="form-check-label ms-0 ms-md-2 delete-icon" data-index="${index}">
                         <i class="fa-solid fa-trash-can" style="cursor: pointer;"></i>
@@ -59,7 +61,8 @@ $(document).ready(function () {
                 </div>
                 <div class="col-11 col-md-11 d-flex align-items-center">
                     <div style="flex-shrink: 0;">
-                        <img width="100px" src="${imagePath}" alt="${item.product_name || 'No Name'}" onerror="this.onerror=null;this.src='${dmain}/uploads/products/default.jpg';">
+                        <img width="100px" src="${imagePath}" alt="${item.product_name || 'No Name'}"
+                             onerror="this.onerror=null;this.src='${dmain}/uploads/products/default.jpg';">
                     </div>
                     <div class="ms-3">
                         <h5 class="mb-1">${item.product_name || 'No Name'}</h5>
@@ -68,13 +71,14 @@ $(document).ready(function () {
                         <p class="text-primary g-0 p-0 m-0">${item.quantity === 0 ? 'Out Stock' : 'In Stock'}</p>
                         <div class="quantity-container mb-2">
                             <div class="d-flex align-items-center">
-                                <h7>Quantity</h7>
+                                <span class="me-2">Quantity</span>
                                 <div class="d-flex align-items-center mx-2">
                                     <button class="btn btn-secondary btn-sm minus-btn" data-index="${index}">-</button>
                                     <input type="number" class="form-control mx-2 quantity-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 60px;">
                                     <button class="btn btn-secondary btn-sm plus-btn" data-index="${index}">+</button>
                                 </div>
                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -82,8 +86,6 @@ $(document).ready(function () {
     }
     
     
-    
-
     // Function to render all cart items
     function renderCartItems(items) {
         const cartItemsContainer = document.getElementById('cartItemsContainer');
@@ -113,12 +115,13 @@ $(document).ready(function () {
 
     // Function to update the quantity and subtotal
     function updateQuantity(index, change) {
+        const item = cartsItemsGL[index];
         const quantityInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
         let quantity = parseInt(quantityInput.value) + change;
         if (quantity < 1) quantity = 1; // Ensure at least 1 item
         quantityInput.value = quantity;
     
-        const price = parseFloat(cartsItemsGL[index]?.variant?.product?.product_price || 0);
+        const price = parseFloat(item?.variant?.product?.product_price || 0);
         const subtotal = document.getElementById(`subtotal${index}`);
         subtotal.textContent = `$${(quantity * price).toFixed(2)}`;
     
@@ -131,15 +134,22 @@ $(document).ready(function () {
     
         cartsItemsGL.forEach((item, index) => {
             const checkbox = document.getElementById(`item${index}`);
-            if (checkbox.checked) {
-                const quantity = parseInt(document.querySelector(`.quantity-input[data-index="${index}"]`).value);
-                const price = parseFloat(item.variant.product.product_price);
+            if (checkbox && checkbox.checked) {
+                const quantity = parseInt(document.querySelector(`.quantity-input[data-index="${index}"]`)?.value || 1);
+                const price = parseFloat(
+                    item?.variant?.product?.product_price ??
+                    item?.product?.product_price ??
+                    item?.price ??
+                    0
+                );
                 totalPrice += quantity * price;
             }
         });
     
         document.getElementById('totalPriceContainer').innerHTML = `
-            <h5 class="fw-bold" style="font-size: 24px; color:blue;">Total Price: <span class="text-primary">$${totalPrice.toFixed(2)}</span></h5>
+            <h5 class="fw-bold" style="font-size: 24px; color:blue;">
+                Total Price: <span class="text-primary">$${totalPrice.toFixed(2)}</span>
+            </h5>
         `;
     }
     // Handle "Select All" functionality

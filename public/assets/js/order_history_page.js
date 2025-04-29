@@ -71,7 +71,7 @@ $(document).ready(function () {
                     // Process and append orders to the correct sections
                     let hasProcessing = false, hasShipped = false, hasDelivered = false;
 
-                    processingCount = 1;
+                    processingCount = 0;
                     toShipCount = 0;
 
                     res.data.forEach(order => {

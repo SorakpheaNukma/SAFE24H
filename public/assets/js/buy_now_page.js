@@ -28,17 +28,21 @@ $(document).ready(function () {
     var { productData, detailParam, images } = getItemDataFromUrl();
 
     if (detailParam === 'true') {
-        ProductsLsGL.push({
-            product_id: productData.product_id,
-            product_name: productData.product_name,
-            product_price: productData.product_price,
-            image_path: images,
-            quantity: productData.quantity,
-            size: productData.size,
-            variant_id: productData.variant_id // 👈 đừng quên dòng này nhé!
+        productData.forEach(product => {
+            ProductsLsGL.push({
+                product_id: product.product_id,
+                product_name: product.product_name,
+                product_price: product.price, // 👈 sửa lại đúng key là `price`
+                image_path: product.images,
+                quantity: product.quantity,
+                size: product.size,
+                variant_id: product.variant_id
+            });
         });
+        console.log("Loaded ProductsLsGL:", ProductsLsGL);
     } else {
         ProductsLsGL = productData;
+        console.log("Loaded ProductsLsGL:", ProductsLsGL);
     }
 
     // Function to dynamically add a single product when detailParam is true
@@ -64,10 +68,9 @@ $(document).ready(function () {
                 <p class="mb-0">ចំនួន: ${quantity}</p>
                 <p class="mb-0">Size: ${size}</p>
             </div>
-           
         </div>
         <div class="row mt-2">
-            <div class="col-6">
+            <div>
                 <h6>តម្លៃ</h6>
             </div>
             <div class="col-6 text-end">
@@ -86,52 +89,57 @@ $(document).ready(function () {
 
     // Function to dynamically add product items
     function addProductItem(product) {
-        if (!product || !product.product) {
+        if (!product || !product.product_name || !product.price) {
             console.warn('Product data invalid or incomplete:', product);
             return;
         }
-        const productName = product.product.product_name;
+    
+        const productName = product.product_name;
         const quantity = product.quantity;
-        const price = product.product.product_price;
-        const dmain = window.location.origin;
-        const imagePath = product.product.product_image.length > 0 ? product.product.product_image[0].image_path : 'default.jpg';
+        const price = product.price;
         const size = product.size;
-
+        const imagePath = product.images || 'default.jpg';
+        const dmain = window.location.origin;
+    
         totalPrice += price * quantity;
         itemCount++;
-
-        const productId = `product-${product.variant.product.product_id}`;
-
+    
+        const productId = `product-${product.variant_id || Date.now()}`;
+    
         const productHTML = `
-        <div id="${productId}" class="container m-2 product-item">
-            <div class="row d-flex align-items-center flex-column flex-md-row">
-                <div class="col-12 col-md-2 mb-3 mb-md-0">
-                <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
-        </div>
-            <div class="col-12 col-md-8 d-flex flex-column">
-                <h6 class="fw-semibold"> ${productName}</h6>
-                <p class="mb-0">ចំនួន: ${quantity}</p>
-                <p class="mb-0">Size: ${size}</p>
+            <div id="${productId}" class="product-item" style="border: 1px solid #ccc; padding: 12px; margin: 12px 0; border-radius: 8px;">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+                    <div style="flex: 0 0 100px;">
+                        <img src="${imagePath}" alt="Product Image" style="width: 100px; height: auto; object-fit: cover; border-radius: 4px;" />
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h6 style="margin: 0; font-weight: 600;">${productName}</h6>
+                                <p style="margin: 2px 0;">ចំនួន: ${quantity}</p>
+                                <p style="margin: 2px 0;">Size: ${size}</p>
+                            </div>
+                            <div>
+                                <h6 class="remove-item" data-product-id="${productId}" data-price="${price * quantity}" data-quantity="${quantity}" 
+                                    style="color: #007bff; cursor: pointer; margin: 0;">
+                                    Remove
+                                </h6>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h6 style="margin: 0;">តម្លៃ</h6>
+                            <h6 style="margin: 0; font-weight: bold;">$${price.toFixed(2)}</h6>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 col-md-2 text-md-end mt-3 mt-md-0">
-                <h6 class="text-primary remove-item" data-product-id="${productId}" data-price="${price * quantity}" data-quantity="${quantity}">Remove</h6>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-6">
-                <h6>តម្លៃ</h6>
-            </div>
-            <div class="col-6 text-end">
-                <h6 class="fw-bold">$${price.toFixed(2)}</h6>
-            </div>
-        </div>
-    </div>`;
-
+        `;
         const productList = document.getElementById('product-list');
         productList.insertAdjacentHTML('beforeend', productHTML);
-
+    
         updateOrderTotal();
     }
+    
 
     // Function to update the order total display
     function updateOrderTotal() {
@@ -276,23 +284,13 @@ $(document).ready(function () {
     function saveOrderItems(orderId, callback) {
         var orderItems = [];
     
-        if (detailParam === 'true') {
-            orderItems = ProductsLsGL.map(item => ({
-                order_id: orderId,
-                product_id: item.product_id,
-                variant_id: item.variant_id,
-                quantity: item.quantity,
-                price: item.product_price
-            }));
-        } else {
-            orderItems = ProductsLsGL.map(item => ({
-                order_id: orderId,
-                product_id: item.product_id,
-                variant_id: item.variant_id, // 👈 dùng trực tiếp ở đây
-                quantity: item.quantity,
-                price: item.product_price
-            }));
-        }
+        orderItems = ProductsLsGL.map(item => ({
+            order_id: orderId,
+            product_id: item.product_id || null, // 👈 nếu không có thì backend phải xử lý null
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+            price: item.price // 👈 sửa lại cho đúng key
+        }));
     
         $.ajax({
             url: '/save-order-items',
