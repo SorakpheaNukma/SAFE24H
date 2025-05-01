@@ -38,8 +38,9 @@ $(document).ready(function () {
             buttons: {
                 yes: {
                     text: '​យល់ព្រម',
+                    btnClass: 'btn-blue',
                     action: function () {
-                        alert('we\'re in development !!');
+                        // alert('we\'re in development !!');
                         var name = this.$content.find('#name').val();
                         var phone = this.$content.find('#phone').val();
                         var email = this.$content.find('#email').val();
@@ -65,19 +66,21 @@ $(document).ready(function () {
                             formData.append('email', email);
                             formData.append('profile-image', profileImage);
 
-                            // Example AJAX submission
-                            /*
+
                             $.ajax({
                                 url: '/update-info',
                                 type: 'POST',
                                 data: formData,
                                 contentType: false,
                                 processData: false,
-                                success: function(response) {
-                                    // Handle response
+                                success: function (response) {
+                                    $.alert('បានរក្សាទុកព័ត៌មានដោយជោគជ័យ!');
+                                    // Có thể cập nhật giao diện ở đây nếu cần
+                                },
+                                error: function (xhr) {
+                                    $.alert('មានបញ្ហា ខណៈពេលកំពុងរក្សាទុកព័ត៌មាន!');
                                 }
                             });
-                            */
                         }
                     }
                 },
