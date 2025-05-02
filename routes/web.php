@@ -15,6 +15,7 @@ use App\Http\Controllers\SignUpController;
 use App\Http\Controllers\ForgetController;
 use App\Http\Controllers\OTPController;
 use App\Http\Controllers\BannerImageController;
+use App\Http\Controllers\ProfileController;
 
 
 
@@ -140,6 +141,7 @@ Route::middleware('MyUserMiddleWare')->group(function () {
     Route::get('/details-page', function () {
         return view('client.pages.detail_page');
     });
+    Route::post('/update-info', [ProfileController::class, 'updateInfo'])->middleware('auth');
     
 });
 

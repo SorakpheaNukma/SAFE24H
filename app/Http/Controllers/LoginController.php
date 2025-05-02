@@ -295,7 +295,7 @@ class LoginController extends Controller
         }
     }
 
-    public function updateUserAdress(Request $request)
+    public function updateUserAddress(Request $request)
     {
         try {
             $token = session('token');

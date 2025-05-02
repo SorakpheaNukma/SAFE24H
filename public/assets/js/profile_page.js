@@ -1,4 +1,9 @@
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     const usernameGL = document.querySelector('meta[name="username"]').content;
     const phoneNumberGL = document.querySelector('meta[name="phone_number"]').content;
     const emailGL = document.querySelector('meta[name="email"]').content;
@@ -40,48 +45,42 @@ $(document).ready(function () {
                     text: '​យល់ព្រម',
                     btnClass: 'btn-blue',
                     action: function () {
-                        // alert('we\'re in development !!');
-                        var name = this.$content.find('#name').val();
-                        var phone = this.$content.find('#phone').val();
-                        var email = this.$content.find('#email').val();
-                        var profileImage = this.$content.find('#profile-image')[0].files[0];
+                        const name = this.$content.find('#name').val();
+                        const phone = this.$content.find('#phone').val();
+                        const email = this.$content.find('#email').val();
+                        const profileImage = this.$content.find('#profile-image')[0].files[0];
 
                         if (!name || !phone || !email) {
                             $.alert('សូមបំពេញព័ត៌មានរបស់អ្នក');
                             return false;
                         }
 
-                        // Handle submission logic here
-                        console.log("Name:", name);
-                        console.log("Phone:", phone);
-                        console.log("Email:", email);
-
-                        // Handle profile image upload if necessary
+                        const formData = new FormData();
+                        formData.append('name', name);
+                        formData.append('phone', phone);
+                        formData.append('email', email);
                         if (profileImage) {
-                            console.log("Profile Image:", profileImage.name);
-                            // Optionally, create a FormData object for AJAX submission
-                            const formData = new FormData();
-                            formData.append('name', name);
-                            formData.append('phone', phone);
-                            formData.append('email', email);
                             formData.append('profile-image', profileImage);
-
-
-                            $.ajax({
-                                url: '/update-info',
-                                type: 'POST',
-                                data: formData,
-                                contentType: false,
-                                processData: false,
-                                success: function (response) {
-                                    $.alert('បានរក្សាទុកព័ត៌មានដោយជោគជ័យ!');
-                                    // Có thể cập nhật giao diện ở đây nếu cần
-                                },
-                                error: function (xhr) {
-                                    $.alert('មានបញ្ហា ខណៈពេលកំពុងរក្សាទុកព័ត៌មាន!');
-                                }
-                            });
                         }
+
+                        $.ajax({
+                            url: '/update-info',
+                            type: 'POST',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: function (response) {
+                                $.alert('បានរក្សាទុកព័ត៌មានដោយជោគជ័យ!');
+
+                                // Cập nhật giao diện UI
+                                $('#profile_name').text(name);
+                                $('#profile_phone').text(phone);
+                                $('#profile_email').text(email);
+                            },
+                            error: function () {
+                                $.alert('មានបញ្ហា ខណៈពេលកំពុងរក្សាទុកព័ត៌មាន!');
+                            }
+                        });
                     }
                 },
                 no: {

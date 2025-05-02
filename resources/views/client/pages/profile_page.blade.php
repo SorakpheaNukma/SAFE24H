@@ -10,6 +10,7 @@
 <meta name="phone_number" content="{{ Auth::user()->phone_number }}">
 <meta name="email" content="{{ Auth::user()->email }}">
 
+
 <main class="mx-2">
     <div class="container d-flex justify-content-start align-items-center mb-3" style="margin-left: 0;">
         <div class="d-flex justify-content-center align-items-center rounded-circle"

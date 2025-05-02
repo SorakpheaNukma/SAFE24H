@@ -110,21 +110,25 @@ $(document).ready(function () {
     }
 
     window.getAllCartItems = function getAllCartItems() {
+        
         $.ajax({
             url: '/get-all-cart-items',
             method: 'GET',
             success: function (res) {
-                if (res.status == 200) {
-                    if (res.data !== null) {
-                        badgeNumberGL = res.data.length;
-
-                        updateBadgeNumber(badgeNumberGL);
-                    }
+                // console.log("Success Response:", res); // Thêm dòng này
+                // Nếu có dữ liệu trong giỏ hàng
+                if (Array.isArray(res.data) && res.data.length > 0) {
+                    badgeNumberGL = res.data.length;
+                    updateBadgeNumber(badgeNumberGL);
                 } else {
-                    showError('Fails to get Cart Items.');
+                    // Giỏ hàng trống - cập nhật badge = 0, không báo lỗi
+                    badgeNumberGL = 0;
+                    updateBadgeNumber(badgeNumberGL);
+                    // Không hiển thị lỗi vì đây là trường hợp hợp lệ
                 }
             },
             error: function (res) {
+                console.log("Error Response:", res); // Thêm dòng này
                 if (res.status === 422) {
                     let error = res.responseJSON.error;
                     let firstError = Object.values(error)[0][0];
