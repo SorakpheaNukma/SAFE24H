@@ -18,7 +18,15 @@ $(document).ready(function () {
         // console.log("size:", item.size); 
         const dmain = window.location.origin;
         let itemListHTML = '';
-
+        
+        let ratingButtonHTML = '';
+        if (order.status === 'delivered') {
+            ratingButtonHTML = `
+                <div class="text-end mt-3">
+                    <button class="btn btn-sm btn-outline-primary rate-btn" data-order-id="${order.order_id}">Đánh giá và phản hồi</button>
+                </div>
+            `;
+        }
         order.order_items.forEach(item => {
 
             const imagePath = item.image_path || 'default.jpg';
@@ -34,6 +42,7 @@ $(document).ready(function () {
                     </div>
                 </div>
             `;
+
         });
 
         // Build the order card
@@ -49,6 +58,7 @@ $(document).ready(function () {
                     <div class="order-items mt-3">
                         ${itemListHTML}
                     </div>
+                    ${ratingButtonHTML}
                 </div>
             </div>`;
     }
@@ -124,4 +134,12 @@ $(document).ready(function () {
     // Initialize spinner and fetch orders
     $('#loading-spinner').addClass('d-none');
     getCompletedOrders();
+    
+    $(document).on('click', '.rate-btn', function () {
+        const orderId = $(this).data('order-id');
+    
+        // Hiển thị modal (hoặc form đánh giá)
+        $('#ratingModal').data('order-id', orderId).modal('show');
+    });
+    
 });
