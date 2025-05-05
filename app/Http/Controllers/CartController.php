@@ -153,25 +153,37 @@ class CartController extends Controller
     }
 
     public function destroy(Request $request)
-    {
-        try {
-            // Find the cart item
-            $cartItem = Cart::find($request->id);
+{
+    try {
+        // Tìm sản phẩm trong giỏ hàng và kiểm tra quyền sở hữu
+        $cartItem = Cart::where('id', $request->input('id'))
+                        ->where('user_id', auth()->id()) // Kiểm tra quyền sở hữu
+                        ->first();
 
-            if (!$cartItem) {
-                return response()->json(['message' => 'Cart item not found.'], 404);
-            }
-
-            $cartItem->delete();
-
-            return response()->json([
-                'status' => 200,
-                'message' => 'Cart item removed successfully.'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while processing your request.'], 500);
+        if (!$cartItem) {
+            return response()->json(['message' => 'Cart item not found or unauthorized.'], 404);
         }
+
+        // Xóa sản phẩm
+        $cartItem->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Cart item removed successfully.'
+        ], 200);
+    } catch (\Exception $e) {
+        // Ghi log lỗi để debug
+        \Log::error('Error removing cart item:', [
+            'error' => $e->getMessage(),
+            'request' => $request->all()
+        ]);
+
+        return response()->json([
+            'message' => 'An error occurred while processing your request.',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function deleteMultiple(Request $request)
     {

@@ -162,28 +162,30 @@ $(document).ready(function () {
     // Function to delete a single cart item
     function deleteSingleItem(e) {
         const index = e.currentTarget.dataset.index;
+    
         if (!cartsItemsGL[index]) {
             console.error(`Cart item at index ${index} does not exist`);
             return;
         }
-        // Assuming each cart item has an ID
-        const itemId = cartsItemsGL[index].id;
-
+    
+        const itemId = cartsItemsGL[index].cart_id;
+    
         $.ajax({
             url: `/remove-from-cart`,
-            method: 'DELETE',
+            method: 'POST', // Sử dụng POST thay vì DELETE để đảm bảo dữ liệu được gửi
             data: {
-                'id': itemId
+                _method: 'DELETE', // Laravel hỗ trợ ghi đè phương thức HTTP
+                id: itemId
             },
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Gửi CSRF token
             },
             success: function (res) {
                 if (res.status === 200) {
                     showSuccess('Deleted cart item successfully 🎉');
-                    cartsItemsGL.splice(index, 1);
-                    renderCartItems(cartsItemsGL);
-                    updateTotalPrice();
+                    cartsItemsGL.splice(index, 1); // Xóa sản phẩm khỏi mảng
+                    renderCartItems(cartsItemsGL); // Render lại giỏ hàng
+                    updateTotalPrice(); // Cập nhật tổng giá
                 } else {
                     showError('Failed to delete item.');
                 }
