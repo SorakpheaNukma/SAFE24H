@@ -73,7 +73,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::get('/get-all-cart-items', [CartController::class, 'getAllCartItems']);
     Route::post('/add-to-cart', [CartController::class, 'store']);
     Route::put('/update-cart', [CartController::class, 'update']);
-    Route::delete('/remove-from-cart', [CartController::class, 'destroy']);
+    Route::delete('/remove-from-cart', [CartController::class, 'destroy'])->name('cart.remove');
     Route::delete('/delete-multiple-from-cart', [CartController::class, 'deleteMultiple']);
 
 

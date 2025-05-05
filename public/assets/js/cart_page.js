@@ -162,7 +162,10 @@ $(document).ready(function () {
     // Function to delete a single cart item
     function deleteSingleItem(e) {
         const index = e.currentTarget.dataset.index;
-
+        if (!cartsItemsGL[index]) {
+            console.error(`Cart item at index ${index} does not exist`);
+            return;
+        }
         // Assuming each cart item has an ID
         const itemId = cartsItemsGL[index].id;
 
@@ -177,21 +180,16 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.status === 200) {
-                    showSuccess('deleted cart successfully🎉');
-
-                    // call from other js
-                    getAllCartItems();
-
-                    // Remove the item from the global array and re-render the cart
+                    showSuccess('Deleted cart item successfully 🎉');
                     cartsItemsGL.splice(index, 1);
-
                     renderCartItems(cartsItemsGL);
                     updateTotalPrice();
                 } else {
                     showError('Failed to delete item.');
                 }
             },
-            error: function () {
+            error: function (xhr) {
+                console.error('Error deleting the item:', xhr.responseText);
                 showError('Error deleting the item.');
             }
         });

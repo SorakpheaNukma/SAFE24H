@@ -38,7 +38,7 @@
                     <div class="input-group">
                             <select class=" form-select" id="categoryDropdown">
                         </select>
-                        <input type="text" class="form-control" placeholder="Search...">
+                        <input type="text" class="form-control" placeholder="ស្វែងរក...">
                         <button id="id-btn-search" class="btn btn-primary" type="button">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
