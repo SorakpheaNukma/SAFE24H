@@ -33,3 +33,14 @@
     display: flex;
     align-items: center;
 }
+@font-face {
+    font-family: 'Khmer OS';
+    src: url('/assets/fonts/KhmerOS.ttf') format('truetype'); /* Đường dẫn tới file font */
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Áp dụng font Khmer OS cho toàn bộ website */
+body {
+    font-family: 'Khmer OS', Arial, sans-serif;
+}
