@@ -1865,6 +1865,7 @@ $(document).ready(function() {
                 method: 'GET',
                 success: function (res) {
                     hideLoading();
+                    localStorage.removeItem('is_logged_in');
                     window.location.href = res.redirect_url;
                 },
                 error: function (res) {

@@ -1,6 +1,23 @@
 $(document).ready(function () {
     var badgeNumberGL = 0;
 
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+
+    if (token && username) {
+        // Đăng nhập => Hiện profile
+        $('#profile').removeClass('d-none');
+        $('#auth-buttons').addClass('d-none');
+        $('#id-username').text(username);
+        $('#id-cart').removeClass("d-none");
+    } else {
+        // Chưa đăng nhập => Hiện login/register
+        $('#auth-buttons').removeClass('d-none');
+        $('#profile').addClass('d-none');
+        $('#id-cart').addClass("d-none");
+    }
+
+
     function ProfileSettings() {
         $('#id-profile').on('click', function (e) {
             e.preventDefault();

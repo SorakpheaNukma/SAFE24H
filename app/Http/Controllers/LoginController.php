@@ -58,7 +58,7 @@ class LoginController extends Controller
             }
 
             $user = Auth::user();
-
+            Auth::login($user);
             session()->forget('token');
             session(['token' => $token]);
 

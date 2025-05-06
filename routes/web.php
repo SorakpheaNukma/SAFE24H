@@ -52,13 +52,14 @@ Route::middleware('MyMiddlewareNavigation')->group(function () {
 Route::middleware('MyMiddleWareAuth')->group(function () {
     //Banner Image
     Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
-
+    Route::get('/getAllProducts', [ProductController::class, 'getAll']);
+    Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
     Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);
     Route::post('/add-category', [CategoryController::class, 'createCategory']);
     Route::put('/edit-category', [CategoryController::class, 'updateCategory']);
     Route::delete('/delete-category', [CategoryController::class, 'deleteCategory']);
 
-    Route::get('/getAllProducts', [ProductController::class, 'getAll']);
+    
     Route::post('/add-product', [ProductController::class, 'addProduct']);
     Route::put('/edit-product', [ProductController::class, 'updateProduct']);
     Route::delete('/delete-product', [ProductController::class, 'deleteProduct']);
@@ -78,7 +79,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
 
 
     //
-    Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
+    
 
     Route::get('/getall-order', [OrderController::class, 'getAllOrders']);
     Route::get('/get-order-current-login', [OrderController::class, 'getOrdersCurrentLogin']);
@@ -108,11 +109,24 @@ Route::middleware('MyAdminMiddleware')->group(function () {
     Route::get('/home-dashboard', [Home_dashBoard::class, 'index'])->name('admin.home_dashboard');
 });
 
+
+//client
+Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
+Route::get('/getAllProducts', [ProductController::class, 'getAll']);
+Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
+Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);
+Route::get('/home-page', function () {
+    
+    return view('client.pages.home_page');
+})->name('client.home_page');
+Route::get('/details-page', function () {
+    return view('client.pages.detail_page');
+});
 // user
 Route::middleware('MyUserMiddleWare')->group(function () {
-    Route::get('/home-page', function () {
-        return view('client.pages.home_page');
-    })->name('client.home_page');
+    // Route::get('/home-page', function () {
+    //     return view('client.pages.home_page');
+    // })->name('client.home_page');
 
 
     Route::get('/cart-page', [CartController::class, 'index']);
@@ -138,9 +152,7 @@ Route::middleware('MyUserMiddleWare')->group(function () {
         return view('client.pages.order_history_page');
     });
 
-    Route::get('/details-page', function () {
-        return view('client.pages.detail_page');
-    });
+
     Route::post('/update-info', [ProfileController::class, 'updateInfo'])->middleware('auth');
     
 });

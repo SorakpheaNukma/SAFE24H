@@ -1,6 +1,8 @@
 @extends('client.layouts.app')
 
-<meta name="user_id" content="{{ Auth::user()->user_id }}">
+<meta name="user_id" content="{{ Auth::check() ? Auth::user()->user_id : '' }}">
+<meta name="is_logged_in" content="{{ Auth::check() ? 'true' : 'false' }}">
+
 
 @section('content')
 @include('client.layouts.nav_bar')

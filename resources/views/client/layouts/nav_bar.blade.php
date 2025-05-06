@@ -65,7 +65,7 @@
 
 
                     <!-- Profile Section -->
-                    <div class="ms-2 nav-item dropdown">
+                    <div id="profile" class="ms-2 nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                             <img class="rounded-circle me-lg-2" src="assets/images/profile.png" alt="Profile Picture"
                                 style="width: 40px; height: 40px;">
@@ -78,6 +78,13 @@
                         </div>
                     </div>
 
+                    <!-- Login/Sign Up Section -->
+                    <div id="auth-buttons" class="ms-2 d-flex d-none">
+                        <a href="/login" class="btn btn-outline-primary me-2">Đăng nhập</a>
+                        <a href="/sign-up" class="btn btn-outline-secondary">Đăng ký</a>
+                    </div>
+
+
                 </div>
             </div>
 
@@ -86,12 +93,3 @@
     </div>
 </nav>
 <!-- -->
-
-<script>
-    $(document).ready(function () {
-    let username = "{{ Auth::user()->username }}";  
-    if (username) {
-        $('#id-username').text(username);
-    }
-});
-</script>

@@ -3,6 +3,8 @@ let currentIndex = 0;
 const itemsPerPage = 10;
 var quantityInputGL = 0;
 const user_idGL = document.querySelector('meta[name="user_id"]').content;
+const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+
 
 function loadItemsRecommend(items) {
     const itemsGrid = document.getElementById('recommend-items-grid');
@@ -178,7 +180,12 @@ function checkAddress(callback) {
 function btnBuyNow(quantityStock) {
     $('#id-btn-buy-now').on('click', function (e) {
         e.preventDefault();
-
+        if (!isLoggedIn) {
+            e.preventDefault();
+            alert("សូមចូលគណនីដើម្បីទិញផលិតផលនេះ។");
+            window.location.href = "/login";
+            return;
+        }
         if (quantityInputGL === 0) {
             alert('សូមធ្វើការបញ្ជូលចំនួនទំនិញមុនការបញ្ជាទិញ!');
             return;
@@ -314,7 +321,6 @@ function displayProductImages(ProductsImages) {
 
 
 $(document).ready(function () {
-
     var { productData, images } = getItemDataFromUrl();
 
     $('#id-sizeSelect').on('change', function () {
@@ -376,7 +382,12 @@ $(document).ready(function () {
     function btnAddToCart(quantityStock) {
         $('#id-btn-add-to-cart').on('click', function (e) {
             e.preventDefault();
-
+            if (!isLoggedIn) {
+                e.preventDefault();
+                alert("សូមចូលគណនីដើម្បីទិញផលិតផលនេះ។");
+                window.location.href = "/login";
+                return;
+            }
             const selectedSize = $('#id-sizeSelect').val();
             
             if (!selectedSize) {
