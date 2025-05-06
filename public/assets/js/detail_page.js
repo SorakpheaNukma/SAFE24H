@@ -346,7 +346,7 @@ $(document).ready(function () {
         }
     });
 
-    function addItemToCarts(user_id, product_id, quantity, size) { //bookmark 
+    function addItemToCarts(user_id, product_id, quantity, size) {  
         $.ajax({
             url: '/add-to-cart',
             method: 'POST',

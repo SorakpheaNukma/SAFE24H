@@ -700,7 +700,7 @@ $(document).ready(function() {
 
                 MyDataTable('#ordersTable', 15);
 
-                $(".btn-edit-order").on('click', function(e) {
+                $("#ordersTableBody").on('click', '.btn-edit-order', function(e) {
                     e.stopPropagation();
                     var order_id = $(this).data("order-id");
                     var order_status = $(this).data("order-status");
@@ -708,7 +708,7 @@ $(document).ready(function() {
                     editOrderDialog(order_id, order_status);
                 });
 
-                $(".btn-delete-order").on('click', function(e) {
+                $("#ordersTableBody").on('click', '.btn-delete-order', function(e) {
                     e.stopPropagation();
                     var orderData = $(this).closest("td").find(".order-data").val();
                     orderData = JSON.parse(orderData);
@@ -716,7 +716,7 @@ $(document).ready(function() {
                     deleteOrderDialog(orderData);
                 });
 
-                $('.btn-view-order').on('click', function(e) {
+                $("#ordersTableBody").on('click', '.btn-view-order', function(e) {
                     e.stopPropagation();
                     var orderData = $(this).closest("td").find(".order-data").val();
                     //console.log("orderData: " + orderData);
