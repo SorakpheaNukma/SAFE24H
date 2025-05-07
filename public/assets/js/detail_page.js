@@ -128,7 +128,9 @@ function btnMinusQuantityProduct() {
     document.getElementById('minusBtn').addEventListener('click', function () {
         let input = document.getElementById('id-quantityInput');
         let value = parseInt(input.value);
-        if (value >= 1) {
+        let min = parseInt(input.min) || 0;
+
+        if (value > min) {
             input.value = value - 1;
         }
 
@@ -140,11 +142,16 @@ function btnAddQuantityProduct() {
     document.getElementById('plusBtn').addEventListener('click', function () {
         let input = document.getElementById('id-quantityInput');
         let value = parseInt(input.value);
-        input.value = value + 1;
+        let max = parseInt(input.max);
+
+        if (!isNaN(max) && value < max) {
+            input.value = value + 1;
+        }
 
         quantityInputGL = $('#id-quantityInput').val();
     });
 }
+
 
 function checkAddress(callback) {
     $.ajax({
@@ -336,7 +343,9 @@ $(document).ready(function () {
         if (variant) {
             $('#id-sold').text(`${variant.sold} Sold`);
             $('#id-stock').text(`${variant.quantity} In Stock`);
-            $('#id-quantityInput').attr('max', variant.quantity);
+            $('#id-quantityInput')
+                .val(0) // 👈 Reset về 0 mỗi lần chọn size mới
+                .attr('max', variant.quantity);
         }
     });
 
