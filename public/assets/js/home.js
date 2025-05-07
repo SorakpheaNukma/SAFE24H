@@ -211,13 +211,14 @@ $(document).ready(function () {
 
         // Attach click handler to the grid container
         grid.addEventListener('click', function (e) {
+            e.preventDefault();
             const gridItem = e.target.closest('.grid-item');
             if (gridItem) {
                 const index = gridItem.getAttribute('data-product-index');
                 const item = filteredProducts[index];
                 const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${item.images.join(',')}`;
+                console.log("home-page sang:", productDetailUrl)
                 window.location.href = productDetailUrl;
-
             }
         });
 

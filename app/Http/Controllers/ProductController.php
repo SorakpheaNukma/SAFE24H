@@ -28,12 +28,13 @@ class ProductController extends Controller
             }
 
             // Lấy danh sách sản phẩm được đề xuất
-            $recommendedProducts = Product::with(['category', 'product_images'])
-                ->where('category_id', $currentProduct->category_id)
-                ->where('product_id', '!=', $request->product_id)
-                ->orderBy('created_at', 'desc') // Sắp xếp theo ngày tạo mới nhất
-                ->take(5) // Giới hạn số lượng sản phẩm đề xuất
-                ->get();
+            $recommendedProducts = Product::with(['category', 'product_images', 'product_variants'])
+            ->where('category_id', $currentProduct->category_id)
+            ->where('product_id', '!=', $request->product_id)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        
 
             // Xử lý dữ liệu sản phẩm đề xuất
             $recommendations = $recommendedProducts->map(function ($p) {
@@ -44,20 +45,26 @@ class ProductController extends Controller
                         $descriptions[$descriptionField] = $p->$descriptionField;
                     }
                 }
-
-                // Kiểm tra null trước khi gọi pluck()
+            
                 $images = $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [];
-
+            
+                $variants = $p->product_variants ? $p->product_variants->map(function ($v) {
+                    return [
+                        'size' => $v->size,
+                        'quantity' => $v->quantity,
+                        'sold' => $v->sold,
+                    ];
+                }) : [];
+            
                 return [
                     'product_id' => $p->product_id,
                     'product_name' => $p->product_name,
-                    'quantity' => $p->quantity ?? 0,
-                    'sold' => $p->sold ?? 0,
-                    'category_name' => $p->category->category_name ?? 'N/A', // Kiểm tra null
-                    'category_id' => $p->category->category_id ?? null, // Kiểm tra null
+                    'category_name' => $p->category->category_name ?? 'N/A',
+                    'category_id' => $p->category->category_id ?? null,
                     'product_price' => number_format($p->product_price, 2),
                     'descriptions' => $descriptions,
                     'images' => $images,
+                    'variants' => $variants, // <-- thêm vào đây
                 ];
             });
 

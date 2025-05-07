@@ -2,11 +2,14 @@
 let currentIndex = 0;
 const itemsPerPage = 10;
 var quantityInputGL = 0;
-const user_idGL = document.querySelector('meta[name="user_id"]').content;
+const user_idGL = localStorage.getItem('user_id');
+if (user_idGL) {
+  console.log('User ID:', user_idGL);
+}
 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
 
 
-function loadItemsRecommend(items) {
+function loadItemsRecommend(items) { //res.data truyền vào đây
     const itemsGrid = document.getElementById('recommend-items-grid');
     itemsGrid.innerHTML = ''; // Clear existing content
 
@@ -66,10 +69,12 @@ function loadItemsRecommend(items) {
     // Add click event listener to each product link
     document.querySelectorAll('.product-link').forEach(link => {
         link.addEventListener('click', (e) => {
+            e.preventDefault();
             const index = link.getAttribute('data-product-index');
             const item = items[index];
 
             const productDetailUrl = `/details-page?item=${JSON.stringify(item)}&img=${item.images.join(',')}`;
+            console.log(productDetailUrl);
             window.location.href = productDetailUrl;
         });
     });
@@ -323,20 +328,18 @@ function displayProductImages(ProductsImages) {
 $(document).ready(function () {
     var { productData, images } = getItemDataFromUrl();
 
-    $('#id-sizeSelect').on('change', function () {
+    $('#id-sizeSelect').off('change').on('change', function () {
         const selectedSize = $(this).val();
-
         if (!selectedSize || !productData.variants) return;
 
         const variant = productData.variants.find(v => v.size === selectedSize);
         if (variant) {
             $('#id-sold').text(`${variant.sold} Sold`);
             $('#id-stock').text(`${variant.quantity} In Stock`);
-
-            // Optional: set max value cho quantity input
             $('#id-quantityInput').attr('max', variant.quantity);
         }
     });
+
     //bookmark - nút tăng giảm số lượng dựa trên tối đa sản phẩm in stock - sửa thêm trong admin
     getProductRecommend(productData.product_id);
 
