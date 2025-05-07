@@ -403,7 +403,7 @@ $(document).ready(function () {
             if (quantityInputGL > 0) {
             addItemToCarts(user_idGL, productData.product_id, quantityInputGL, selectedSize);
             } else {
-                alert('Please add items for add to cart');
+                alert('សូមធ្វើការបញ្ជូលចំនួនទំនិញមុនការបញ្ជាទិញ!');
             }
             console.log("user_id:", user_idGL);
             console.log("product_id:", productData.product_id);
