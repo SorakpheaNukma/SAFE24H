@@ -61,7 +61,9 @@
                             style="transform: translate(-605%, -22%) !important;"></span>
                         <i class="fa fa-shopping-cart me-2"></i>Order
                     </a>
-
+                    <a id="banner-images-edit" class="nav-item nav-link"><i class="fa fa-table me-2"></i>
+                        Edit Banner
+                    </a>
                 </div>
             </nav>
         </div>
@@ -144,6 +146,8 @@
                 <!--Order content -->
                 <div id="id-content-order" class="mt-3" style="display: none;"></div>
 
+                <!-- Banner Content -->
+                <div id="id-banner-content" style="display: none;"></div>
             </div>
         </div>
 

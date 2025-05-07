@@ -116,7 +116,6 @@ Route::get('/getAllProducts', [ProductController::class, 'getAll']);
 Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
 Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);
 Route::get('/home-page', function () {
-    
     return view('client.pages.home_page');
 })->name('client.home_page');
 Route::get('/details-page', function () {
@@ -127,7 +126,6 @@ Route::middleware('MyUserMiddleWare')->group(function () {
     // Route::get('/home-page', function () {
     //     return view('client.pages.home_page');
     // })->name('client.home_page');
-
 
     Route::get('/cart-page', [CartController::class, 'index']);
 
@@ -153,7 +151,7 @@ Route::middleware('MyUserMiddleWare')->group(function () {
     });
 
 
-    Route::post('/update-info', [ProfileController::class, 'updateInfo'])->middleware('auth');
+    Route::post('/update-info', [ProfileController::class, 'updateInfo'])->middleware('MyUserMiddleWare');
     
 });
 

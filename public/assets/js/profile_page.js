@@ -60,22 +60,40 @@ $(document).ready(function () {
                         formData.append('phone', phone);
                         formData.append('email', email);
                         if (profileImage) {
-                            formData.append('profile-image', profileImage);
+                            formData.append('user_profile', profileImage);
+
                         }
 
                         $.ajax({
                             url: '/update-info',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
                             type: 'POST',
                             data: formData,
                             contentType: false,
                             processData: false,
+                            xhrFields: {
+                                withCredentials: true // <<== thêm dòng này!
+                            },
                             success: function (response) {
                                 $.alert('បានរក្សាទុកព័ត៌មានដោយជោគជ័យ!');
-
-                                // Cập nhật giao diện UI
                                 $('#profile_name').text(name);
                                 $('#profile_phone').text(phone);
                                 $('#profile_email').text(email);
+                                localStorage.setItem("username", res.username);
+                                if (profileImage) {         
+                                    const reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        // Thay đổi ảnh đại diện trong content chính
+                                        $('img[src*="profile.png"], img[src*="uploads/profile"]').attr('src', e.target.result);
+                            
+                                        // Thay đổi ảnh đại diện trong navbar
+                                        $('#profile_nav_bar').attr('src', e.target.result);
+                                    };
+                                    reader.readAsDataURL(profileImage);
+                                }
+
                             },
                             error: function () {
                                 $.alert('មានបញ្ហា ខណៈពេលកំពុងរក្សាទុកព័ត៌មាន!');

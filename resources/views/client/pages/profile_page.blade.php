@@ -9,6 +9,7 @@
 <meta name="username" content="{{ Auth::user()->username }}">
 <meta name="phone_number" content="{{ Auth::user()->phone_number }}">
 <meta name="email" content="{{ Auth::user()->email }}">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 
 <main class="mx-2">
@@ -31,8 +32,8 @@
 
                 <!-- Ảnh đại diện -->
                 <div class="me-3">
-                    <img width="100px" src="assets/images/profile.png" />
-                 </div>
+                    <img width="100px" src="{{ asset(Auth::user()->user_profile ?? 'assets/images/profile.png') }}" />
+                </div>
 
                 <!-- Thông tin + nút Edit -->
                 <div class="flex-grow-1">

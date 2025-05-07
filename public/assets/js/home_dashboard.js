@@ -59,6 +59,7 @@ $(document).ready(function() {
             const orderContent = document.getElementById('id-content-order');
             const dashboardActionLink = document.getElementById("id_dashBoard");
             const productActionLink = document.getElementById("id_product");
+            const bannerImagesEdit = document.getElementById("banner-images-edit");
             var proDescription1 = document.getElementById('product-description1-tb');
             var proDescription2 = document.getElementById('product-description2-tb');
 
@@ -974,6 +975,8 @@ $(document).ready(function() {
                 this.classList.add('active');
                 prodcut_Content();
             });
+
+
 
             function showDashboard() {
                 dashboardContent.style.display = "block";
@@ -2379,4 +2382,27 @@ $(document).ready(function() {
     // end btn refresh
     refresh();
 
+    bannerImagesEdit.addEventListener("click", function(event) {
+        event.preventDefault();
+        removeActiveClass();
+        this.classList.add('active');
+        prodcut_Content_table();
+    });
+
+
+    function prodcut_Content_table() {
+        displayEditBanner();
+        dashboardContent.style.display = "none";
+        orderContent.style.display = 'none';
+        productContent.style.display = "block";
+        proImageContent.style.display = "block";
+        proDescription1.style.display = "block";
+        proDescription2.style.display = "block";
+    }
+
+
+    function displayEditBanner() {
+        var tableContainer = document.getElementById("id-banner-content");
+        tableContainer.innerHTML = "asdasdasdhaksjdhskh";
+    }
 });

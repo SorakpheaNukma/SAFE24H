@@ -67,8 +67,12 @@
                     <!-- Profile Section -->
                     <div id="profile" class="ms-2 nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img class="rounded-circle me-lg-2" src="assets/images/profile.png" alt="Profile Picture"
-                                style="width: 40px; height: 40px;">
+                        <img id="profile_nav_bar" class="rounded-circle me-lg-2" 
+                            src="{{ Auth::check() && Auth::user()->user_profile 
+                                ? asset(Auth::user()->user_profile) 
+                                : asset('assets/images/profile.png') }}" 
+                            alt="Profile Picture" style="width: 40px; height: 40px;">
+
                             <span id="id-username" class="d-none d-lg-inline-flex"></span>
                             <i id="dropdown-icon" class="fas fa-chevron-down ms-2"></i>
                         </a>
