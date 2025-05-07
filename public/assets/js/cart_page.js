@@ -169,30 +169,54 @@ $(document).ready(function () {
         }
     
         const itemId = cartsItemsGL[index].cart_id;
+        const productName = cartsItemsGL[index].product_name || 'this product';
     
-        $.ajax({
-            url: `/remove-from-cart`,
-            method: 'POST', // Sử dụng POST thay vì DELETE để đảm bảo dữ liệu được gửi
-            data: {
-                _method: 'DELETE', // Laravel hỗ trợ ghi đè phương thức HTTP
-                id: itemId
+        // Hiển thị dialog xác nhận
+        MyJConfirmDialog({
+            title: '<strong>Confirm Deletion</strong>',
+            content: `តើអ្នកពិតជាចង់លុប <strong>${productName}</strong> ចេញពីកន្ត្រកស្តុករបស់អ្នកមែនទេ?`,
+            type: 'red',
+            confirmText: 'យល់ព្រម, លុប',
+            confirmBtnClass: 'btn-danger',
+            cancelText: 'បោះបង់',
+            
+            onConfirm: function () {
+                // Thực hiện xóa sản phẩm nếu người dùng xác nhận
+                $.ajax({
+                    url: `/remove-from-cart`,
+                    method: 'POST', // Sử dụng POST thay vì DELETE để đảm bảo dữ liệu được gửi
+                    data: {
+                        _method: 'DELETE', // Laravel hỗ trợ ghi đè phương thức HTTP
+                        id: itemId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Gửi CSRF token
+                    },
+                    success: function (res) {
+                        if (res.status === 200) {
+                            showSuccess('ទំនិញត្រូវបានលុបចេញពីកន្ត្រកបានជោគជ័យ 🎉');
+                            cartsItemsGL.splice(index, 1); // Xóa sản phẩm khỏi mảng
+                            renderCartItems(cartsItemsGL); // Render lại giỏ hàng
+                            updateTotalPrice(); // Cập nhật tổng giá
+                        } else {
+                            showError('មានបញ្ហា! មិនអាចលុបបាន.');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error deleting the item:', xhr.responseText);
+                        showError('Error deleting the item.');
+                    }
+                });
             },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Gửi CSRF token
+            onCancel: function () {
+                console.log('User canceled the deletion.');
             },
-            success: function (res) {
-                if (res.status === 200) {
-                    showSuccess('Deleted cart item successfully 🎉');
-                    cartsItemsGL.splice(index, 1); // Xóa sản phẩm khỏi mảng
-                    renderCartItems(cartsItemsGL); // Render lại giỏ hàng
-                    updateTotalPrice(); // Cập nhật tổng giá
-                } else {
-                    showError('Failed to delete item.');
-                }
-            },
-            error: function (xhr) {
-                console.error('Error deleting the item:', xhr.responseText);
-                showError('Error deleting the item.');
+            onContentReady: function () {
+                const contentArea = this.$content;
+                contentArea.css({
+                    'max-height': '90vh', // Tăng chiều cao tối đa lên 90% chiều cao màn hình
+                    'overflow-y': 'auto', // Cho phép cuộn nếu nội dung quá dài
+                });
             }
         });
     }
