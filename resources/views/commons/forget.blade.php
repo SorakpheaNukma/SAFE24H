@@ -19,19 +19,17 @@
                 </a>
             </div>
 
-            <h1 class="mb-2 mx-2">Forgot Password</h1>
-            <p class="w-75 mx-lg-2 text-lg-start text-center">Enter your registered email address. We’ll send you a code
-                to
-                reset
-                your password.
+            <h1 class="mb-2 mx-2">ភ្លេចលេខសម្ងាត់</h1>
+            <p class="w-75 mx-lg-2 text-lg-start text-center">សូមបញ្ចូលអ៊ីម៉ែលរបស់អ្នកដើម្បីទទួលបានលេខកូតសម្រាប់
+                កំណត់លេខសម្ងាត់ថ្មី</p>
             </p>
 
             <!-- Email and Send OTP Button -->
             <form class="w-75 mx-2">
 
                 <div class="form-group mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email"
+                    <label for="email" class="form-label">អ៊ីម៉ែល</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="សូមបំពេញអ៊ីម៉ែលរបស់អ្នក"
                         required>
                 </div>
 
@@ -43,7 +41,7 @@
                         </div>
                     </div>
 
-                    <button id="id-btn-otp" class="btn btn-dark w-100 mb-5 fw-bold">Send OTP</button>
+                    <button id="id-btn-otp" class="btn btn-dark w-100 mb-5 fw-bold">ទទួលលេខកូត</button>
                 </div>
             </form>
         </div>

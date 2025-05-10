@@ -225,6 +225,29 @@ $(document).ready(function() {
                                 });
                             });
 
+                            // ✅ TÍNH SỐ SIZE HẾT HÀNG
+                            let outOfStockCount = 0;
+                            productsLsGL.forEach(product => {
+                                product.variants.forEach(variant => {
+                                    if (parseInt(variant.quantity) === 0) {
+                                        outOfStockCount++;
+                                    }
+                                });
+                            });
+
+                            // ✅ HIỂN THỊ BADGE
+                            const badgeProduct = document.getElementById("id-badge-product");
+                            if (badgeProduct) {
+                                if (outOfStockCount > 0) {
+                                    badgeProduct.classList.remove("d-none");
+                                    badgeProduct.innerText = outOfStockCount;
+                                } else {
+                                    badgeProduct.classList.add("d-none");
+                                    badgeProduct.innerText = '';
+                                }
+                            }
+
+
                             if (callbackdata && typeof callbackdata === 'function') {
                                 callbackdata(res.data);
                             }
@@ -676,6 +699,15 @@ $(document).ready(function() {
 
                 const ordersTableBody = document.getElementById("ordersTableBody");
                 let numberCount = 0;
+                OrdersLsGL.sort((a, b) => {
+                    const statusPriority = {
+                        'processing': 1,
+                        'shipped': 2,
+                        'delivered': 3,
+                    };
+                
+                    return statusPriority[a.status] - statusPriority[b.status];
+                });
 
                 OrdersLsGL.forEach(order => {
                     numberCount++;
@@ -699,7 +731,7 @@ $(document).ready(function() {
                     ordersTableBody.appendChild(row);
                 });
 
-                MyDataTable('#ordersTable', 15);
+                MyDataTable('#ordersTable', 30);
 
                 $("#ordersTableBody").on('click', '.btn-edit-order', function(e) {
                     e.stopPropagation();
@@ -1030,13 +1062,28 @@ $(document).ready(function() {
                 for (var i = 0; i < productsLsGL.length; i++) {
                     var product = productsLsGL[i];
 
+                    // Hiển thị tồn kho theo từng size (variant)
+                    var stockText = '';
+                    if (product.variants.length > 0) {
+                        var stockArr = product.variants.map(function(variant) {
+                            var size = variant.size || 'N/A';
+                            var qty = variant.quantity;
+                            var color = qty == 0 ? 'text-danger' : 'text-success';
+                            return `<span class="${color}">${size}=${qty}</span>`;
+                        });
+                        stockText = stockArr.join(', ');
+                    } else {
+                        stockText = '<span class="text-danger">No variants</span>';
+                    }
+
+
                     var rHtml = `
                 <tr>
                     <td>${i + 1}</td>
                     <td>${product.product_name}</td>
                     <td>${product.category_name}</td>
-                    <td>\$${product.product_price}</td>
-                    <td>${product.quantity}</td>
+                    <td>$${product.product_price}</td>
+                    <td>${stockText}</td>
                    <td>
                         <div class="d-flex">
                             <button class="btn btn-warning me-1 btn-edit-product" data-product-id="${product.product_id}" data-product-name="${product.product_name}" data-product-price="${product.product_price}" data-product-stock="${product.stock}">
@@ -2394,15 +2441,197 @@ $(document).ready(function() {
         displayEditBanner();
         dashboardContent.style.display = "none";
         orderContent.style.display = 'none';
-        productContent.style.display = "block";
-        proImageContent.style.display = "block";
-        proDescription1.style.display = "block";
-        proDescription2.style.display = "block";
+        productContent.style.display = "none"; // Ẩn product để không thấy 2 nút
+        proImageContent.style.display = "none";
+        proDescription1.style.display = "none";
+        proDescription2.style.display = "none";
+        document.getElementById("id-banner-content").style.display = "block";
     }
 
 
     function displayEditBanner() {
+    
         var tableContainer = document.getElementById("id-banner-content");
-        tableContainer.innerHTML = "asdasdasdhaksjdhskh";
+    
+        var tableHtml = `
+            <div class="d-flex justify-content-start mb-3">
+                <button id="addBannerButton" class="btn btn-primary">
+                    Add Banner
+                    <i class="ms-2 fa fa-plus"></i>
+                </button>
+            </div>
+    
+            <table class="table table-hover">
+                <thead>
+                    <tr class="table-info fw-bold">
+                        <th>STT</th>
+                        <th>Banner Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dữ liệu sẽ thêm vào đây sau -->
+                    <tbody id="bannerTableBody"> <!-- ✅ Đây là phần quan trọng -->
+                </tbody>
+            </table>
+    `;
+    tableContainer.innerHTML = tableHtml;
+            $.ajax({
+            url: '/banner-images', // đúng với route bạn đã khai báo
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 200) {
+                    const data = response.data;
+                    const tbody = $('#bannerTableBody');
+                    tbody.empty();
+
+                    data.forEach((banner, index) => {
+                        console.log('Banner:', banner); // Kiểm tra dữ liệu
+                        const row = `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>
+                                    <img src="/uploads/products/${banner.image_path}" alt="Banner" style="height: 80px;">
+                                </td>
+                                <td>
+                <button class="btn btn-danger btn-sm btn-delete-banner" data-id="${banner.banner_images_id}">
+                    Delete
+                </button>
+                                 </td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                    // Sau khi render xong, gán sự kiện cho nút Xóa
+                btnDeleteBanner(); // Gọi luôn ở đây để gán sự kiện cho các nút Delete
+                } else {
+                    console.error("Lỗi khi lấy dữ liệu banner:", response.error);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Lỗi AJAX:", error);
+            }
+        });
+
+
+        btnAddBanner();
     }
+    // Hàm xóa banner
+    function btnDeleteBanner() {
+        $('.btn-delete-banner').off('click').on('click', function () {
+            const bannerId = $(this).data('id'); // Lấy ID từ thuộc tính data-id
+            console.log('bannerId:', bannerId);
+    
+            if (!bannerId) {
+                console.error('Không có ID banner!');
+                return;
+            }
+    
+            $.confirm({
+                title: 'Xác nhận xoá',
+                content: 'Bạn có chắc chắn muốn xoá banner này không?',
+                type: 'red',
+                buttons: {
+                    confirm: {
+                        text: 'Xoá',
+                        btnClass: 'btn-red',
+                        action: function () {
+                            deleteBanner(bannerId);
+                        }
+                    },
+                    cancel: {
+                        text: 'Huỷ',
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        });
+    }
+    
+    // Hàm AJAX xóa banner
+    function deleteBanner(bannerId) {
+        $.ajax({
+            url: '/delete-banner/' + bannerId,
+            method: 'POST',
+            data: {
+                _method: 'DELETE',
+                _token: $('meta[name="csrf-token"]').attr('content') // Laravel bắt buộc có CSRF token
+            },
+            success: function (response) {
+                if (response.status === 200) {
+                    showSuccess(response.message);
+                    displayEditBanner();
+                } else {
+                    $.alert(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Lỗi khi xoá:", error);
+                $.alert('Có lỗi xảy ra khi xoá banner!');
+            }
+        });    
+    }
+    
+    
+    function btnAddBanner() {
+        $('#addBannerButton').off('click').on('click', function () {
+            $.confirm({
+                title: '<strong>Add Banner</strong>',
+                closeIcon: true,
+                columnClass: 'm',
+                draggable: true,
+                typeAnimated: true,
+                type: 'blue',
+                content: `
+                    <form class="formName">
+                        <div class="form-group">
+                            <label>Banner Image</label>
+                            <input type="file" id="bannerImage" accept="image/*" class="form-control" required />
+                        </div>
+                    </form>
+                `,
+                buttons: {
+                    formSubmit: {
+                        text: 'Save Banner',
+                        btnClass: 'btn-blue',
+                        action: function () {
+                            const fileInput = this.$content.find('#bannerImage')[0];
+                            const file = fileInput.files[0];
+    
+                            if (!file) {
+                                $.alert('Please choose an image!');
+                                return false;
+                            }
+    
+                            // Gửi form bằng AJAX (tuỳ bạn muốn làm gì)
+                            const formData = new FormData();
+                            formData.append('bannerImage', file);
+                            
+                            $.ajax({
+                                url: '/add-banner-images',
+                                method: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                success: function (response) {
+                                    showSuccess('Banner uploaded successfully 🎉');
+                                    displayEditBanner(); // reload lại banner list
+                                    // Optional: reload list, close popup, etc.
+                                },
+                                error: function (xhr, status, error) {
+                                    $.alert('Upload failed: ' + (xhr.responseText || error));
+                                }
+                            });
+                    
+                            return false; // Ngăn đóng popup nếu muốn giữ lại
+
+                        }
+                    },
+                }
+            });
+        });
+    }
+    btnAddBanner();    
+    
 });

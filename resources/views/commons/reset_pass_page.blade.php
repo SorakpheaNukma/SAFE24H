@@ -6,17 +6,17 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header text-center">
-                    <h3>Reset Password</h3>
+                    <h3>ដាក់លេខសម្ងាត់ថ្មី</h3>
                 </div>
                 <div class="card-body">
                     <form>
                         <div class="mb-3">
-                            <label for="new-password" class="form-label">New Password</label>
+                            <label for="new-password" class="form-label">លេខសម្ងាត់ថ្មី</label>
                             <input type="password" class="form-control" id="new-password" name="new-password" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="confirm-password" class="form-label">Confirm Password</label>
+                            <label for="confirm-password" class="form-label">បញ្ជាក់លេខសម្ងាត់</label>
                             <input type="password" class="form-control" id="confirm-password" name="confirm-password"
                                 required>
                         </div>
@@ -27,11 +27,11 @@
                             </div>
                         </div>
 
-                        <button id="btn-reset-pass" class="btn btn-dark w-100">Reset Now</button>
+                        <button id="btn-reset-pass" class="btn btn-dark w-100">បញ្ជាក់ឥឡូវនេះ</button>
                     </form>
                 </div>
                 <div class="card-footer text-center">
-                    <p class="mb-0">Remembered your password for login later?</p>
+                    <p class="mb-0">ចងចាំលេខសម្ងាត់ដើម្បីចូលប្រើប្រាស់ពេលក្រោយ?</p>
                 </div>
             </div>
         </div>

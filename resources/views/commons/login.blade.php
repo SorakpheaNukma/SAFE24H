@@ -10,22 +10,22 @@
 
         <div
             class="col-md-6 d-flex flex-column justify-content-center align-items-center align-items-lg-start align-items-md-start">
-            <h1 class="mx-2">Welcome 👋</h1>
-            <p class="mx-2">Please login here.</p>
+            <h1 class="mx-2">សូមស្វាគមន៏ 👋</h1>
+            <p class="mx-2">សូមធ្វើការបំពេញដើម្បីប្រើប្រាស់.</p>
 
             <form class="w-75 mx-2">
 
                 <div class="form-group mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email"
+                    <label for="email" class="form-label">អ៊ីម៉ែល</label>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="សូមបញ្ចូលអ៊ីម៉ែល"
                         required>
                 </div>
 
                 <div class="form-group mb-3 position-relative">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label">លេខសម្ងាត់</label>
                     <div class="input-group">
                         <input type="password" name="password" id="password" class="form-control"
-                            placeholder="Enter your password" required>
+                            placeholder="សូមបញ្ចូលលេខសម្ងាត់" required>
                         <button type="button" class="btn btn-outline-secondary position-absolute end-0"
                             id="togglePassword" style="border: none;  z-index: 2;">
                             <i class="fa fa-eye-slash" id="toggleIcon"></i>
@@ -37,11 +37,11 @@
 
                     <div class="form-check">
                         <input type="checkbox" name="remember" id="remember" class="form-check-input">
-                        <label for="remember" class="form-check-label">Remember me</label>
+                        <label for="remember" class="form-check-label">ចងចាំខ្ញុំ</label>
                     </div>
 
                     <div>
-                        <a href="/forget" class="text-decoration-none text-dark fw-bold">Forgot Password?</a>
+                        <a href="/forget" class="text-decoration-none text-dark fw-bold">ភ្លេចលេខសម្ងាត់?</a>
                     </div>
                 </div>
 
@@ -50,7 +50,7 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-                <button id="loginButton" type="button" class="btn btn-dark w-100 mb-3">Login</button>
+                <button id="loginButton" type="button" class="btn btn-dark w-100 mb-3">ចូលគណនី</button>
                 <script>
                     // Lắng nghe sự kiện khi nhấn phím
                     document.addEventListener('keydown', function(event) {
@@ -64,8 +64,8 @@
 
                 <!-- -->
                 <div class="text-center">
-                    <p>Don't have an account?
-                        <a href="/sign-up" class="text-decoration-none text-dark fw-bold mb-5">Sign Up</a>
+                    <p>អ្នកមិនទាន់មានគណនីមែនទេ?
+                        <a href="/sign-up" class="text-decoration-none text-dark fw-bold mb-5">បង្កើតគណនី</a>
                     </p>
                 </div>
             </form>

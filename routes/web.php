@@ -16,6 +16,7 @@ use App\Http\Controllers\ForgetController;
 use App\Http\Controllers\OTPController;
 use App\Http\Controllers\BannerImageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 
 
 
@@ -52,6 +53,15 @@ Route::middleware('MyMiddlewareNavigation')->group(function () {
 Route::middleware('MyMiddleWareAuth')->group(function () {
     //Banner Image
     Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
+    Route::post('/add-banner-images', [BannerImageController::class, 'createBannerImage']);
+    Route::delete('/delete-banner/{id}', [BannerImageController::class, 'clear']);
+
+    //comment and rate
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+
+
+    //Product
     Route::get('/getAllProducts', [ProductController::class, 'getAll']);
     Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
     Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);
@@ -112,6 +122,10 @@ Route::middleware('MyAdminMiddleware')->group(function () {
 
 //client
 Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
+Route::post('/add-banner-images', [BannerImageController::class, 'createBannerImage']);
+Route::delete('/delete-banner/{id}', [BannerImageController::class, 'clear']);
+
+
 Route::get('/getAllProducts', [ProductController::class, 'getAll']);
 Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
 Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);

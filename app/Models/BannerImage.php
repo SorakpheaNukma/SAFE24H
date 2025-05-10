@@ -9,9 +9,13 @@ class BannerImage extends Model
 {
     use HasFactory;
 
-    // Nếu tên bảng không phải là 'banner_images', bạn có thể định nghĩa lại như sau:
     protected $table = 'banner_images';
+        // 👇 Đây là phần quan trọng
+        protected $primaryKey = 'banner_images_id';
+        public $incrementing = true;
+        protected $keyType = 'int';
 
-    // Các cột trong bảng mà bạn muốn thao tác
     protected $fillable = ['image_path'];
+
+    public $timestamps = false; 
 }

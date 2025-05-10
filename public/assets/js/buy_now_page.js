@@ -157,7 +157,7 @@ $(document).ready(function () {
         document.getElementById('final-total').textContent = `$${totalPayment.toFixed(2)}`;
 
         orderTotalElement.innerHTML = `
-    <h6 class="fw-bold mb-2 mb-md-0">សរុបទំនិញ (${itemCount} ទំនិញ${itemCount > 1 ? 's' : ''}):</h6>
+    <h6 class="fw-bold mb-2 mb-md-0">សរុបទំនិញ (${itemCount} ទំនិញ):</h6>
     <h6 class="fw-bold text-md-end">$${merchandiseTotal.toFixed(2)}</h6>`;
     }
 

@@ -18,9 +18,9 @@
                 </a>
             </div>
 
-            <h1 class="mb-2 mx-2">Enter OTP</h1>
-            <p class="w-75 mx-lg-2 text-lg-start text-center">
-                We have sent an OTP to your email address. If you don't see it, please wait a few seconds.
+            <h1 class="mb-2 mx-2">បញ្ចូលលេខកូត</h1>
+            <p class="w-75 mx-lg-2 text-lg-start text-center mt-3">
+                ពួកយើងបានផ្ញើរលេខកូតតាមអ៊ីម៉ែលរបស់អ្នក.
             </p>
 
             <!-- OTP Form -->
@@ -37,7 +37,7 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-                <button id="btn-verify-otp" class="btn btn-dark w-100 mb-5">Verify OTP</button>
+                <button id="btn-verify-otp" class="btn btn-dark w-100 mb-5">កំណត់បញ្ជាក់លេខកូត</button>
             </form>
         </div>
     </div>

@@ -46,7 +46,13 @@
                     <a id="id_dashBoard" class="nav-item nav-link active"><i
                             class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
 
-                    <a id="id_product" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Product</a>
+                            <a id="id_product" class="nav-item nav-link position-relative">
+                                <!-- Badge number -->
+                                <span id="id-badge-product" class="d-none position-absolute start-100 badge rounded-pill bg-danger"
+                                    style="transform: translate(-605%, -22%) !important;"></span>
+                                <i class="fa fa-table me-2"></i>Product
+                            </a>
+
 
                     <!-- <a id="id_user" class="nav-item nav-link">
                                                 <i class="fa fa-user-friends me-2"></i>User</a> -->
@@ -152,4 +158,5 @@
         </div>
 
     </div>
+    
 @endsection

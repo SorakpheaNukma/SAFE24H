@@ -112,7 +112,7 @@
 
             <!-- Product Description -->
             <div class="Product_Description col-12 col-md-4 d-flex flex-column mb-3 mb-md-0">
-                <div style="font-weight: bold; text-align: left; white-space: nowrap; font-size:40px">Descriptions</div>
+                <div style="font-weight: bold; text-align: left; white-space: nowrap; font-size:40px">អំពីទំនិញ</div>
                 <div id="product-detail-id" class="w-100"></div>
             </div>
         </div>
@@ -128,11 +128,11 @@
         <div style="padding: 15px; width:100%;">
             <div class="row">
                 <div>
-                    <p class= "fw-semibold fs-4 p-0 m-0" >ផលិតផលស្រដៀងៗគ្នា</p>
+                    <p class= "fw-semibold fs-4 p-0 m-0 bold" >ទំនិញស្រដៀងៗគ្នា</p>
                         <div class="d-flex flex-wrap justify-content-start" style="margin-top:10px; gap:auto;" id="recommend-items-grid">
                     </div>
                     <div class="text-center mt-3" id="view-more-container" style="display: none;">
-                        <button class="btn btn-dark" onclick="addMoreItems()">View More</button>
+                        <button class="btn btn-dark" onclick="addMoreItems()">បន្ថែមទៀត</button>
                     </div>
                 </div>
             </div>

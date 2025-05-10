@@ -14,7 +14,7 @@ function loadItemsRecommend(items) { //res.data truyền vào đây
     itemsGrid.innerHTML = ''; // Clear existing content
 
     if (!items || items.length === 0) {
-        itemsGrid.innerHTML = `<p>No recommendations available at the moment.</p>`;
+        itemsGrid.innerHTML = `<p>មិនមានទំនិញស្រដៀងៗគ្នា.</p>`;
         return;
     }
 
@@ -194,11 +194,14 @@ function btnBuyNow(quantityStock) {
         e.preventDefault();
         if (!isLoggedIn) {
             e.preventDefault();
-            alert("សូមចូលគណនីដើម្បីទិញផលិតផលនេះ។");
+            alert("សូមបំពេញព័ត៍មានដើម្បីទិញទំនិញនេះ");
             window.location.href = "/login";
             return;
         }
-        if (quantityInputGL === 0) {
+        let quantity = parseInt(quantityInputGL);
+        console.log("DEBUG - quantityInputGL:", quantityInputGL, typeof quantityInputGL);
+    
+        if (isNaN(quantity) || quantity <= 0) {
             alert('សូមធ្វើការបញ្ជូលចំនួនទំនិញមុនការបញ្ជាទិញ!');
             return;
         }
@@ -341,8 +344,8 @@ $(document).ready(function () {
 
         const variant = productData.variants.find(v => v.size === selectedSize);
         if (variant) {
-            $('#id-sold').text(`${variant.sold} Sold`);
-            $('#id-stock').text(`${variant.quantity} In Stock`);
+            $('#id-sold').text(`លក់បានចំនួន ${variant.sold} `);
+            $('#id-stock').text(`មានក្នុងស្តុកចំនួន ${variant.quantity} `); // Số lượng trong kho
             $('#id-quantityInput')
                 .val(0) // 👈 Reset về 0 mỗi lần chọn size mới
                 .attr('max', variant.quantity);
@@ -372,7 +375,7 @@ $(document).ready(function () {
                 if (res.status == 200) {
                     getAllCartItems();
 
-                    showSuccess(res.message);
+                    showSuccess('ទំនិញត្រូវបានបញ្ចូលក្នុងកន្ត្រកបានជោគជ័យ 🎉');
                 } else {
                     showError('Fails to add to Cart.');
                 }
@@ -396,7 +399,7 @@ $(document).ready(function () {
             e.preventDefault();
             if (!isLoggedIn) {
                 e.preventDefault();
-                alert("សូមចូលគណនីដើម្បីទិញផលិតផលនេះ។");
+                alert("សូមបំពេញព័ត៍មានដើម្បីទិញទំនិញនេះ");
                 window.location.href = "/login";
                 return;
             }

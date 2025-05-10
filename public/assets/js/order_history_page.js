@@ -15,18 +15,12 @@ $(document).ready(function () {
 
     // Build order card HTML
     function buildOrderCard(order) {
-        // console.log("size:", item.size); 
+        console.log('Order:', order); 
         const dmain = window.location.origin;
         let itemListHTML = '';
-        
-        let ratingButtonHTML = '';
-        if (order.status === 'delivered') {
-            ratingButtonHTML = `
-                <div class="text-end mt-3">
-                    <button class="btn btn-sm btn-outline-primary rate-btn" data-order-id="${order.order_id}">Đánh giá và phản hồi</button>
-                </div>
-            `;
-        }
+
+
+
         order.order_items.forEach(item => {
 
             const imagePath = item.image_path || 'default.jpg';
@@ -42,8 +36,36 @@ $(document).ready(function () {
                     </div>
                 </div>
             `;
-
         });
+        //bookmark
+        let ratingButtonHTML = '';
+        if (order.status === 'delivered') {
+            order.order_items.forEach(item => {
+                ratingButtonHTML += `
+                    <div class="text-end mt-3">
+                        <button class="btn btn-sm btn-outline-primary rate-btn" data-product-id="${item.product_id}">
+                            Đánh giá và phản hồi
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        let actionButtonsHTML = '';
+        if (order.status === 'processing') {
+            actionButtonsHTML = `
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button class="btn btn-sm btn-outline-secondary edit-order-btn" data-order-id="${order.order_id}">
+                        ✏️ Sửa đơn hàng
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger delete-order-btn" data-order-id="${order.order_id}">
+                        🗑️ Xóa đơn hàng
+                    </button>
+                </div>
+            `;
+        }
+
+
 
         // Build the order card
         return `
@@ -59,6 +81,7 @@ $(document).ready(function () {
                         ${itemListHTML}
                     </div>
                     ${ratingButtonHTML}
+                    ${actionButtonsHTML} 
                 </div>
             </div>`;
     }
@@ -135,11 +158,66 @@ $(document).ready(function () {
     $('#loading-spinner').addClass('d-none');
     getCompletedOrders();
     
+        // Khi click nút đánh giá bookmark
     $(document).on('click', '.rate-btn', function () {
-        const orderId = $(this).data('order-id');
-    
-        // Hiển thị modal (hoặc form đánh giá)
-        $('#ratingModal').data('order-id', orderId).modal('show');
+        const productId = $(this).data('product-id');
+         console.log("👉 productId được gán vào form:", productId); // Log ra để kiểm tra
+        $('#product_id').val(productId);
+
+        // Gán CSRF token vào input ẩn trong form
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
+        $('#csrf_token').val(csrfToken);
+
+        $('#ratingModal').modal('show');
     });
+
+    // Submit form đánh giá
+    $('#ratingForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Đảm bảo token luôn có trong formData
+        if (!formData.has('_token')) {
+            formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+        }
+
+        $.ajax({
+            url: '/reviews',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function () {
+                alert('✅ Đánh giá thành công!');
+                $('#ratingModal').modal('hide');
+                $('#ratingForm')[0].reset();
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert('❌ Gửi đánh giá thất bại!');
+            }
+        });
+    });
+
+    //xóa
+    $(document).on('click', '.delete-order-btn', function () {
+    const orderId = $(this).data('order-id');
+    if (confirm('Bạn có chắc muốn xóa đơn hàng này?')) {
+        $.ajax({
+            url: `/delete-order/${orderId}`,
+            method: 'DELETE',
+            success: function () {
+                alert('✅ Xóa đơn hàng thành công!');
+                getCompletedOrders(); // Reload lại danh sách đơn hàng
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert('❌ Không thể xóa đơn hàng!');
+            }
+        });
+    }
+});
+
     
 });

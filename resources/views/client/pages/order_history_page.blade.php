@@ -52,6 +52,9 @@
 </div>
 
 <!-- 🌟 Modal Đánh Giá -->
+<!-- Nhớ để thêm meta csrf-token vào <head> -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -61,10 +64,11 @@
       </div>
       <div class="modal-body">
         <form id="ratingForm">
-          @csrf
+          <input type="hidden" name="product_id" id="product_id">
+          <input type="hidden" name="_token" id="csrf_token" value="">
           <div class="mb-3">
             <label for="rating" class="form-label">អត្រា (1-5)</label>
-            <select class="form-select" id="rating" required>
+            <select class="form-select" id="rating" name="rating" required>
               <option value="">ជ្រើសរើស</option>
               <option value="1">1 - អន់</option>
               <option value="2">2 - មធ្យម</option>
@@ -75,7 +79,7 @@
           </div>
           <div class="mb-3">
             <label for="comment" class="form-label">មតិ</label>
-            <textarea class="form-control" id="comment" rows="3" required></textarea>
+            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
           </div>
           <button type="submit" class="btn btn-primary">ដាក់ស្នើ</button>
         </form>
@@ -83,6 +87,8 @@
     </div>
   </div>
 </div>
+
+
 
 <link rel="stylesheet" href="{{asset('assets/css/order_history_page.css')}}" />
 <script src="{{ asset('assets/js/order_history_page.js') }}"></script>
