@@ -118,9 +118,15 @@
         </div>
 
         <div class="container_comment" style="padding-left:15px">
-            <p style="font-size: 25px; font-weight:bold;">Comment and Rate</p>
-            <div >
-                comment here
+            <div style="display:flex; flex-direction:row;">
+                <p style="font-size: 25px; font-weight:bold;">Comment and Rate</p>
+            </div>
+            <div style="margin-bottom: 15px;display:flex;flex-direction:row;border-bottom:solid 1px #fafafa;">
+                <textarea class="big-textarea" placeholder="Nhập bình luận của bạn..."></textarea>
+                <button id="btn-comment">Comment</button>
+            </div>
+            <div class="comments-list">
+                <!-- Các comment sẽ được AJAX đổ vào đây -->
             </div>
         </div>
 

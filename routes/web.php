@@ -68,8 +68,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/add-category', [CategoryController::class, 'createCategory']);
     Route::put('/edit-category', [CategoryController::class, 'updateCategory']);
     Route::delete('/delete-category', [CategoryController::class, 'deleteCategory']);
-
-    
+    Route::delete('/delete-banner/{id}', [BannerImageController::class, 'clear']);
+    Route::post('/add-banner-images', [BannerImageController::class, 'createBannerImage']);
     Route::post('/add-product', [ProductController::class, 'addProduct']);
     Route::put('/edit-product', [ProductController::class, 'updateProduct']);
     Route::delete('/delete-product', [ProductController::class, 'deleteProduct']);
@@ -122,8 +122,8 @@ Route::middleware('MyAdminMiddleware')->group(function () {
 
 //client
 Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
-Route::post('/add-banner-images', [BannerImageController::class, 'createBannerImage']);
-Route::delete('/delete-banner/{id}', [BannerImageController::class, 'clear']);
+;
+
 
 
 Route::get('/getAllProducts', [ProductController::class, 'getAll']);
@@ -135,6 +135,9 @@ Route::get('/home-page', function () {
 Route::get('/details-page', function () {
     return view('client.pages.detail_page');
 });
+Route::get('/reviews', [ReviewController::class, 'getReviewsByQuery']);
+
+
 // user
 Route::middleware('MyUserMiddleWare')->group(function () {
     // Route::get('/home-page', function () {

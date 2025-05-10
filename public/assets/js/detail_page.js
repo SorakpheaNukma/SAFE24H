@@ -333,6 +333,95 @@ function displayProductImages(ProductsImages) {
     }
 }
 
+function fetchProductComments() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemParam = urlParams.get('item');
+    if (!itemParam) return;
+
+    const decodedItem = JSON.parse(decodeURIComponent(itemParam));
+    const productId = decodedItem.product_id;
+
+    $.ajax({
+        url: `/reviews?product_id=${productId}`,
+        type: 'GET',
+        dataType: 'json',
+        success: function (reviews) {
+            const $commentList = $('.comments-list');
+            $commentList.empty();
+
+            if (reviews.length === 0) {
+                $commentList.append('<p>Chưa có đánh giá nào.</p>');
+                return;
+            }
+
+            reviews.forEach(review => {
+                const commentHTML = `
+                    <div class="comment-item" style="margin-bottom: 20px;">
+                    <img class="user-avt" src="/${review.user.user_profile || 'uploads/profile/default-avatar.jpg'}" alt="User Image" width="50" height="50">
+                        <div style="display:flex; flex-direction:column;width:100%;">
+                            <div style="display:flex; flex-direction:row;">
+                                <div class="username-rate" style="margin-right: 15px;">
+                                    <p><strong>${review.user?.username || 'Anonymous'}</strong></p>
+                                    <p>Rated: ${review.rating}/5⭐</p>
+                                </div>
+                                <div class="user-comment-content" style="flex-grow: 1;">
+                                    <p>${review.comment}</p>
+                                </div>
+                                <p style="font-size: 12px; color: gray; margin-left:auto;">
+                                    ${new Date(review.created_at).toLocaleDateString()}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $commentList.append(commentHTML);
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error('Lỗi khi tải đánh giá:', error);
+        }
+    });
+}
+
+
+function btnComment() {
+    $('#btn-comment').on('click', function (e) {
+        e.preventDefault();
+
+        const comment = $('.big-textarea').val().trim();
+        if (!comment) {
+            alert('Vui lòng nhập bình luận trước khi gửi!');
+            return;
+        }
+
+        const rating = 5; // hoặc thêm input để người dùng chọn
+        const itemParam = new URLSearchParams(window.location.search).get('item');
+        if (!itemParam) return;
+
+        const decodedItem = JSON.parse(decodeURIComponent(itemParam));
+        const productId = decodedItem.product_id;
+
+        $.ajax({
+            url: '/reviews',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                product_id: productId,
+                rating: rating,
+                comment: comment
+            },
+            success: function (res) {
+                alert(res.message);
+                $('.big-textarea').val('');
+                fetchProductComments();
+            },
+            error: function (xhr) {
+                console.error('Lỗi khi gửi bình luận:', xhr.responseJSON);
+                alert('Gửi bình luận thất bại!');
+            }
+        });
+    });
+}
 
 
 $(document).ready(function () {
@@ -448,7 +537,6 @@ $(document).ready(function () {
             }, 30); // điều chỉnh tốc độ tại đây
         }
     }, 100); // delay một chút để DOM tính toán đúng scrollWidth
-
     
     $('#id-price').text(`$${productData.product_price}`);
     displayProductDesDetails(productData.descriptions);
@@ -459,6 +547,8 @@ $(document).ready(function () {
     loadItemsRecommend();
     btnAddQuantityProduct();
     btnMinusQuantityProduct();
+    fetchProductComments();
+    btnComment();
 
     btnBuyNow(productData.quantity);
     btnAddToCart(productData.quantity);

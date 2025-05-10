@@ -93,5 +93,57 @@ body {
     font-family: 'Khmer OS', Arial, sans-serif;
 }
 
-  
-  
+.comment-item{
+    border: solid 1px #7a7a7a;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.username-rate{
+    display: flex;
+    flex-direction: column;
+}
+.username-rate p{
+    margin: 0 10px 0 10px;
+}
+.user-comment-content{
+    margin-left: 10px;
+    border-left: solid 2px #b5b5b5;
+    padding-left: 10px;
+}
+.user-avt{
+    max-width: 60px;
+    max-height: 60px;
+    border-radius: 50%;
+}
+#btn-comment{
+    margin-left:8px;
+    height:38px;
+    max-width: 110px;
+    border:solid 1px #fafafa;
+    background-color: blue;
+    color:white;
+    border-radius:8px;
+    font-weight: bold;
+    padding:5px;
+}
+#btn-comment:hover{
+    background-color: white;
+    color: blue;
+    border: solid 1px #a7a7a7;
+    font-weight: bold;
+}
+.big-textarea {
+    width: 100%;
+    max-width: 800px;
+    font-size: 18px;
+    padding: 12px 16px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-right: 10px;
+    box-sizing: border-box;
+    resize: none; /* Ẩn nút kéo góc */
+    height: 120px; /* Tùy chỉnh chiều cao */
+}

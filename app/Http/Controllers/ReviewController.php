@@ -10,6 +10,19 @@ use App\Models\Review;
 
 class ReviewController extends Controller
 {
+    // Lấy đánh giá
+    public function getReviewsByQuery(Request $request)
+    {
+        $product_id = $request->query('product_id');
+        $reviews = Review::with(['user:user_id,username,user_profile'])
+            ->where('product_id', $product_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($reviews);
+    }
+
+    // Gửi đánh giá
     public function store(Request $request)
     {
         $request->validate([
@@ -17,10 +30,9 @@ class ReviewController extends Controller
             'rating' => 'required|integer|between:1,5',
             'comment' => 'required|string',
         ]);
-        
 
         Review::create([
-            'user_id' => Auth::id(), // hoặc lấy từ session nếu chưa dùng Auth
+            'user_id' => Auth::id(),
             'product_id' => $request->product_id,
             'rating' => $request->rating,
             'comment' => $request->comment,
