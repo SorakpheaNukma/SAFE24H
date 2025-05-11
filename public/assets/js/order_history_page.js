@@ -1,3 +1,5 @@
+let allOrders = [];
+
 $(document).ready(function () {
     // Show/hide loading spinner
     function showLoading(show) {
@@ -15,7 +17,7 @@ $(document).ready(function () {
 
     // Build order card HTML
     function buildOrderCard(order) {
-        console.log('Order:', order); 
+        // console.log('Order:', order); 
         const dmain = window.location.origin;
         let itemListHTML = '';
 
@@ -40,15 +42,13 @@ $(document).ready(function () {
         //bookmark
         let ratingButtonHTML = '';
         if (order.status === 'delivered') {
-            order.order_items.forEach(item => {
-                ratingButtonHTML += `
-                    <div class="text-end mt-3">
-                        <button class="btn btn-sm btn-outline-primary rate-btn" data-product-id="${item.product_id}">
-                            Đánh giá và phản hồi
-                        </button>
-                    </div>
-                `;
-            });
+            ratingButtonHTML += `
+                <div class="text-end mt-3">
+                    <button class="btn btn-sm btn-outline-primary rate-btn mt-2" data-order-id="${order.order_id}">
+                        Đánh giá
+                    </button>
+                </div>
+            `;
         }
 
         let actionButtonsHTML = '';
@@ -97,13 +97,13 @@ $(document).ready(function () {
             method: 'GET',
             success: function (res) {
                 showLoading(false);
-
+                allOrders = res.data;
                 $('#processing-orders, #shipped-orders, #received-orders').empty();
 
                 if (res.status === 200 && res.data.length > 0) {
                     // Process and append orders to the correct sections
                     let hasProcessing = false, hasShipped = false, hasDelivered = false;
-
+                    
                     processingCount = 0;
                     toShipCount = 0;
 
@@ -158,16 +158,46 @@ $(document).ready(function () {
     $('#loading-spinner').addClass('d-none');
     getCompletedOrders();
     
-        // Khi click nút đánh giá bookmark
+    // Khi click nút đánh giá bookmark
     $(document).on('click', '.rate-btn', function () {
-        const productId = $(this).data('product-id');
-         console.log("👉 productId được gán vào form:", productId); // Log ra để kiểm tra
-        $('#product_id').val(productId);
-
-        // Gán CSRF token vào input ẩn trong form
+        const orderId = $(this).data('order-id');
+        const order = allOrders.find(o => o.order_id === orderId);
+    
+        if (!order) {
+            alert("Không tìm thấy đơn hàng.");
+            return;
+        }
+    
         const csrfToken = $('meta[name="csrf-token"]').attr('content');
         $('#csrf_token').val(csrfToken);
-
+    
+        let formHTML = '';
+    
+        order.order_items.forEach((item, index) => {
+            formHTML += `
+            <div class="rating-block border rounded p-3 mb-3">
+                <input type="hidden" name="ratings[${index}][product_id]" value="${item.product_id}">
+                <label class="fw-bold">${item.product_name}</label>
+                <div class="mb-2">
+                    <label>Đánh giá:</label>
+                    <select class="form-select" name="ratings[${index}][rating]" required>
+                        <option value="">Chọn</option>
+                        <option value="1">1 - Tệ</option>
+                        <option value="2">2 - Trung bình</option>
+                        <option value="3">3 - Tốt</option>
+                        <option value="4">4 - Rất tốt</option>
+                        <option value="5">5 - Tuyệt vời</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label>Nhận xét:</label>
+                    <textarea class="form-control" name="ratings[${index}][comment]" rows="2" required></textarea>
+                </div>
+            </div>
+            `;
+        });
+    
+        $('#ratingFormContainer').html(formHTML);
         $('#ratingModal').modal('show');
     });
 

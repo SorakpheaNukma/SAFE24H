@@ -64,24 +64,13 @@
       </div>
       <div class="modal-body">
         <form id="ratingForm">
-          <input type="hidden" name="product_id" id="product_id">
           <input type="hidden" name="_token" id="csrf_token" value="">
-          <div class="mb-3">
-            <label for="rating" class="form-label">អត្រា (1-5)</label>
-            <select class="form-select" id="rating" name="rating" required>
-              <option value="">ជ្រើសរើស</option>
-              <option value="1">1 - អន់</option>
-              <option value="2">2 - មធ្យម</option>
-              <option value="3">3 - ល្អ</option>
-              <option value="4">4 - ល្អណាស់</option>
-              <option value="5">5 - ល្អបំផុត</option>
-            </select>
+          <div id="ratingFormContainer" style="max-height: 400px; overflow-y: auto;">
+            <!-- JS sẽ tạo các khối đánh giá tại đây -->
           </div>
-          <div class="mb-3">
-            <label for="comment" class="form-label">មតិ</label>
-            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+          <div class="text-end mt-3">
+            <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
           </div>
-          <button type="submit" class="btn btn-primary">ដាក់ស្នើ</button>
         </form>
       </div>
     </div>

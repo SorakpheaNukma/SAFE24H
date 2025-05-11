@@ -384,44 +384,44 @@ function fetchProductComments() {
 }
 
 
-function btnComment() {
-    $('#btn-comment').on('click', function (e) {
-        e.preventDefault();
+// function btnComment() {
+//     $('#btn-comment').on('click', function (e) {
+//         e.preventDefault();
 
-        const comment = $('.big-textarea').val().trim();
-        if (!comment) {
-            alert('Vui lòng nhập bình luận trước khi gửi!');
-            return;
-        }
+//         const comment = $('.big-textarea').val().trim();
+//         if (!comment) {
+//             alert('Vui lòng nhập bình luận trước khi gửi!');
+//             return;
+//         }
 
-        const rating = 5; // hoặc thêm input để người dùng chọn
-        const itemParam = new URLSearchParams(window.location.search).get('item');
-        if (!itemParam) return;
+//         const rating = 5; // hoặc thêm input để người dùng chọn
+//         const itemParam = new URLSearchParams(window.location.search).get('item');
+//         if (!itemParam) return;
 
-        const decodedItem = JSON.parse(decodeURIComponent(itemParam));
-        const productId = decodedItem.product_id;
+//         const decodedItem = JSON.parse(decodeURIComponent(itemParam));
+//         const productId = decodedItem.product_id;
 
-        $.ajax({
-            url: '/reviews',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                product_id: productId,
-                rating: rating,
-                comment: comment
-            },
-            success: function (res) {
-                alert(res.message);
-                $('.big-textarea').val('');
-                fetchProductComments();
-            },
-            error: function (xhr) {
-                console.error('Lỗi khi gửi bình luận:', xhr.responseJSON);
-                alert('Gửi bình luận thất bại!');
-            }
-        });
-    });
-}
+//         $.ajax({
+//             url: '/reviews',
+//             type: 'POST',
+//             dataType: 'json',
+//             data: {
+//                 product_id: productId,
+//                 rating: rating,
+//                 comment: comment
+//             },
+//             success: function (res) {
+//                 alert(res.message);
+//                 $('.big-textarea').val('');
+//                 fetchProductComments();
+//             },
+//             error: function (xhr) {
+//                 console.error('Lỗi khi gửi bình luận:', xhr.responseJSON);
+//                 alert('Gửi bình luận thất bại!');
+//             }
+//         });
+//     });
+// }
 
 
 $(document).ready(function () {
@@ -548,7 +548,7 @@ $(document).ready(function () {
     btnAddQuantityProduct();
     btnMinusQuantityProduct();
     fetchProductComments();
-    btnComment();
+    // btnComment();
 
     btnBuyNow(productData.quantity);
     btnAddToCart(productData.quantity);

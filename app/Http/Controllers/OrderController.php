@@ -80,6 +80,7 @@ class OrderController extends Controller
                             : url('/default.jpg');
 
                     return [
+                        'product_id' => $product->product_id ?? null, // ✅ Thêm dòng này
                         'product_name' => $product->product_name ?? 'No name',
                         'image_path' => $productImage,
                         'price' => $item->price,
@@ -252,4 +253,5 @@ class OrderController extends Controller
             return response()->json(['error' => 'Failed to delete order' . $e->getMessage()], 500);
         }
     }
+    
 }
