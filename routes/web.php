@@ -96,6 +96,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/save-order', [OrderController::class, 'createOrders']);
     Route::put('/edit-order', [OrderController::class, 'updateOrder']);
     Route::delete('/delete-order', [OrderController::class, 'deleteOrder']);
+    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 
     Route::get('/getall-order-items', [OrderItemController::class, 'getAllOrderItems']);
     Route::post('/save-order-items', [OrderItemController::class, 'addOrderItem']); //book
@@ -122,7 +123,7 @@ Route::middleware('MyAdminMiddleware')->group(function () {
 
 //client
 Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
-;
+
 
 
 

@@ -673,91 +673,124 @@ $(document).ready(function() {
             }
 
             //Content Orders
-            function displayContentOrders() {
-                const dvContentOrder = document.getElementById("id-content-order");
+function displayContentOrders() {
+    const dvContentOrder = document.getElementById("id-content-order");
 
-                dvContentOrder.innerHTML = `
-            <div class="container mt-3">
-                <h2 class="mb-2">Orders Management</h2>
-                <div class="table-responsive">
+    dvContentOrder.innerHTML = `
+        <div class="container mt-3">
+            <h2 class="mb-2">Orders Management</h2>
+            <div class="table-responsive">
                 <table class="table" id="ordersTable">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Nº</th>
-                                <th>Customer</th>
-                                <th>Total Amount</th>
-                                <th>Status</th>
-                                <th>Order Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ordersTableBody"></tbody>
-                    </table>
-                </div>
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nº</th>
+                            <th>Customer</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Order Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
             </div>
+        </div>
+    `;
+
+    const ordersTableBody = document.getElementById("ordersTableBody");
+    let numberCount = 0;
+
+    OrdersLsGL.sort((a, b) => {
+        const statusPriority = {
+            'processing': 1,
+            'shipped': 2,
+            'delivered': 3,
+            'cancelled': 4, // ✅ lowercase để so sánh đúng
+        };
+
+        return statusPriority[a.status.toLowerCase()] - statusPriority[b.status.toLowerCase()];
+    });
+
+    OrdersLsGL.forEach(order => {
+        numberCount++;
+        const formattedDateTime = formatDate(order.order_date);
+
+        const status = order.status.toLowerCase(); // ✅ lowercase để xử lý thống nhất
+
+        // ✅ Gán màu theo trạng thái
+        let badgeClass = '';
+        switch (status) {
+            case 'processing':
+                badgeClass = 'bg-warning';
+                break;
+            case 'shipped':
+                badgeClass = 'bg-primary';
+                break;
+            case 'delivered':
+                badgeClass = 'bg-success';
+                break;
+            case 'cancelled':
+                badgeClass = 'bg-danger'; // ✅ đỏ cho cancelled
+                break;
+            default:
+                badgeClass = 'bg-secondary';
+        }
+
+        // ✅ Chỉ hiển thị nút Edit nếu trạng thái KHÔNG PHẢI là 'cancelled' hoặc 'delivered'
+        let editButton = '';
+        if (status !== 'cancelled' && status !== 'delivered') {
+            editButton = `
+                <button class="btn btn-warning btn-sm btn-edit-order"
+                    data-order-id="${order.order_id}"
+                    data-order-status="${order.status}">
+                    Edit
+                </button>
+            `;
+        }
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${numberCount}</td>
+            <td>${order.users.username}</td>
+            <td>$${order.total_amount}</td>
+            <td><span class="badge ${badgeClass}">${order.status}</span></td>
+            <td>${formattedDateTime}</td>
+            <td>
+                <button class="btn btn-info btn-sm btn-view-order" data-order-id="${order.order_id}">View</button>
+                ${editButton}
+                <button class="btn btn-danger btn-sm btn-delete-order" data-order-id="${order.order_id}">Delete</button>
+                <input type="hidden" class="order-data" value='${JSON.stringify(order)}' />
+            </td>
         `;
 
-                const ordersTableBody = document.getElementById("ordersTableBody");
-                let numberCount = 0;
-                OrdersLsGL.sort((a, b) => {
-                    const statusPriority = {
-                        'processing': 1,
-                        'shipped': 2,
-                        'delivered': 3,
-                    };
-                
-                    return statusPriority[a.status] - statusPriority[b.status];
-                });
+        ordersTableBody.appendChild(row);
+    });
 
-                OrdersLsGL.forEach(order => {
-                    numberCount++;
-                    const formattedDateTime = formatDate(order.order_date);
+    MyDataTable('#ordersTable', 30);
 
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                <td>${numberCount}</td>
-                <td>${order.users.username}</td>
-                <td>$${order.total_amount}</td>
-                <td><span class="badge ${order.status === 'processing' ? 'bg-warning' : 'bg-success'}">${order.status}</span></td>
-                <td>${formattedDateTime}</td>
-                <td>
-                    <button class="btn btn-info btn-sm btn-view-order" data-order-id="${order.order_id}">View</button>
-                    <button class="btn btn-warning btn-sm btn-edit-order" data-order-id="${order.order_id}" data-order-status="${order.status}">Edit</button>
-                    <button class="btn btn-danger btn-sm btn-delete-order" data-order-id="${order.order_id}">Delete</button>
-                    
-                    <input type="hidden" class="order-data" value='${JSON.stringify(order)}' />
-                </td>
-            `;
-                    ordersTableBody.appendChild(row);
-                });
+    $("#ordersTableBody").on('click', '.btn-edit-order', function (e) {
+        e.stopPropagation();
+        var order_id = $(this).data("order-id");
+        var order_status = $(this).data("order-status");
+        editOrderDialog(order_id, order_status);
+    });
 
-                MyDataTable('#ordersTable', 30);
+    $("#ordersTableBody").on('click', '.btn-delete-order', function (e) {
+        e.stopPropagation();
+        var orderData = $(this).closest("td").find(".order-data").val();
+        orderData = JSON.parse(orderData);
+        deleteOrderDialog(orderData);
+    });
 
-                $("#ordersTableBody").on('click', '.btn-edit-order', function(e) {
-                    e.stopPropagation();
-                    var order_id = $(this).data("order-id");
-                    var order_status = $(this).data("order-status");
+    $("#ordersTableBody").on('click', '.btn-view-order', function (e) {
+        e.stopPropagation();
+        var orderData = $(this).closest("td").find(".order-data").val();
+        orderData = JSON.parse(orderData);
+        viewOrderDialog(orderData);
+    });
+}
 
-                    editOrderDialog(order_id, order_status);
-                });
-
-                $("#ordersTableBody").on('click', '.btn-delete-order', function(e) {
-                    e.stopPropagation();
-                    var orderData = $(this).closest("td").find(".order-data").val();
-                    orderData = JSON.parse(orderData);
-
-                    deleteOrderDialog(orderData);
-                });
-
-                $("#ordersTableBody").on('click', '.btn-view-order', function(e) {
-                    e.stopPropagation();
-                    var orderData = $(this).closest("td").find(".order-data").val();
-                    //console.log("orderData: " + orderData);
-                    orderData = JSON.parse(orderData);
-
-                    viewOrderDialog(orderData);
-                });
-            }
 
             function viewOrderDialog(orderData) {
                 console.log("Order Data:", orderData);  // Kiểm tra dữ liệu đã có

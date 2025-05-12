@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\Events\MessageSent;
+use App\Models\ProductVariants;
+
 
 class OrderController extends Controller
 {
@@ -253,5 +255,35 @@ class OrderController extends Controller
             return response()->json(['error' => 'Failed to delete order' . $e->getMessage()], 500);
         }
     }
+
+    public function cancel($id)
+    {
+        $order = Order::with('orderItems')->find($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Đơn hàng không tồn tại.'], 404);
+        }
+
+        if ($order->status === 'cancelled' || $order->status === 'delivered') {
+            return response()->json(['message' => 'Đơn hàng không thể huỷ.'], 400);
+        }
+
+        // Hoàn lại số lượng vào kho
+        foreach ($order->orderItems as $item) {
+            $variant = ProductVariants::find($item->variant_id); // hoặc $item->variant nếu bạn dùng quan hệ
+            if ($variant) {
+                $variant->quantity += $item->quantity;
+                $variant->sold -= $item->quantity;
+                $variant->save();
+            }
+        }
+
+        $order->status = 'cancelled';
+        $order->save();
+
+        return response()->json(['message' => 'Đơn hàng đã được huỷ.']);
+}
+
+
     
 }

@@ -64,16 +64,11 @@
                     <span class="text">អាចដូរវិញបាន ឥតគិតថ្លៃ</span>
                 </div>
 
-                <!-- Reviews and Rating -->
                 <div class="d-flex gap-4 mb-2">
-                    <p style = "color: star">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star-half"></i>
-                    </p>
+                    <p class="rating-stars text-warning fs-5 mb-0"></p>
+                    <p class="avg-rating-text text-muted mb-0"></p>
                 </div>
+
 
                 <!-- Sold -->
                 <div style="display:flex; flex-direction:row; gap:10px;">
@@ -119,7 +114,7 @@
 
         <div class="container_comment" style="padding-left:15px">
             <div style="display:flex; flex-direction:row;">
-                <p style="font-size: 25px; font-weight:bold;">Comment and Rate</p>
+                <p style="font-size: 25px; font-weight:bold;">មតិ និងការវាយតម្លៃ</p>
             </div>
             <!-- <div style="margin-bottom: 15px;display:flex;flex-direction:row;border-bottom:solid 1px #fafafa;">
                 <textarea class="big-textarea" placeholder="Nhập bình luận của bạn..."></textarea>

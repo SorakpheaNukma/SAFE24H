@@ -299,14 +299,6 @@ function displayProductDesDetails(descriptions) {
     }
 }
 
-
-// function displsyImgAbout(Images) {
-//     const dvImg = document.getElementById('id-img-about');
-//     const dmain = window.location.origin;
-
-//     dvImg.innerHTML += ` <img width="80%" src="${dmain}/uploads/products/${Images}" class="img-fluid">`;
-// }
-
 function displayProductImages(ProductsImages) {
     var dvProductImages = document.getElementById('id-product-images');
     var dmain = window.location.origin;
@@ -350,9 +342,18 @@ function fetchProductComments() {
             $commentList.empty();
 
             if (reviews.length === 0) {
-                $commentList.append('<p>Chưa có đánh giá nào.</p>');
+                $commentList.append('<p>មិនទាន់មានការបញ្ចេញមតិយោបល់.</p>');
+                $(".rating-stars").html(renderStars(0)); // Gán 0 sao
                 return;
             }
+                // ✅ Tính trung bình rating
+                const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+                const avgRating = totalRating / reviews.length;
+
+                // ✅ Gán phần sao trung bình vào giao diện
+                $(".rating-stars").html(renderStars(avgRating));
+                $(".avg-rating-text").text(`${avgRating.toFixed(1)} ពី  ${reviews.length} វាយតម្លៃ`);
+
 
             reviews.forEach(review => {
                 const commentHTML = `
@@ -378,50 +379,33 @@ function fetchProductComments() {
             });
         },
         error: function (xhr, status, error) {
-            console.error('Lỗi khi tải đánh giá:', error);
+            console.error('Error rate:', error);
         }
     });
 }
+function renderStars(rating) {
+    let fullStars = Math.floor(rating);
+    let halfStar = rating - fullStars >= 0.5;
+    let emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    let starsHTML = '';
+
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<i class="fa-solid fa-star"></i> ';
+    }
+
+    if (halfStar) {
+        starsHTML += '<i class="fa-solid fa-star-half-stroke"></i> ';
+    }
+
+    for (let i = 0; i < emptyStars; i++) {
+        starsHTML += '<i class="fa-regular fa-star"></i> ';
+    }
+
+    return starsHTML;
+}
 
 
-// function btnComment() {
-//     $('#btn-comment').on('click', function (e) {
-//         e.preventDefault();
-
-//         const comment = $('.big-textarea').val().trim();
-//         if (!comment) {
-//             alert('Vui lòng nhập bình luận trước khi gửi!');
-//             return;
-//         }
-
-//         const rating = 5; // hoặc thêm input để người dùng chọn
-//         const itemParam = new URLSearchParams(window.location.search).get('item');
-//         if (!itemParam) return;
-
-//         const decodedItem = JSON.parse(decodeURIComponent(itemParam));
-//         const productId = decodedItem.product_id;
-
-//         $.ajax({
-//             url: '/reviews',
-//             type: 'POST',
-//             dataType: 'json',
-//             data: {
-//                 product_id: productId,
-//                 rating: rating,
-//                 comment: comment
-//             },
-//             success: function (res) {
-//                 alert(res.message);
-//                 $('.big-textarea').val('');
-//                 fetchProductComments();
-//             },
-//             error: function (xhr) {
-//                 console.error('Lỗi khi gửi bình luận:', xhr.responseJSON);
-//                 alert('Gửi bình luận thất bại!');
-//             }
-//         });
-//     });
-// }
 
 
 $(document).ready(function () {
@@ -441,7 +425,6 @@ $(document).ready(function () {
         }
     });
 
-    //bookmark - nút tăng giảm số lượng dựa trên tối đa sản phẩm in stock - sửa thêm trong admin
     getProductRecommend(productData.product_id);
 
     $.ajaxSetup({

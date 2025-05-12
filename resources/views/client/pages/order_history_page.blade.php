@@ -69,7 +69,7 @@
             <!-- JS sẽ tạo các khối đánh giá tại đây -->
           </div>
           <div class="text-end mt-3">
-            <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+            <button type="submit" class="btn btn-primary">យល់ព្រម</button>
           </div>
         </form>
       </div>
@@ -78,6 +78,7 @@
 </div>
 
 
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <link rel="stylesheet" href="{{asset('assets/css/order_history_page.css')}}" />
 <script src="{{ asset('assets/js/order_history_page.js') }}"></script>

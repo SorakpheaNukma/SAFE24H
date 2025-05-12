@@ -34,11 +34,6 @@
                     </div>
                     <input class="form-check-input" type="checkbox" id="selectAll" />
                     <label class="form-check-label" for="selectAll" style="color: blue;">ជ្រើសរើសយកទាំងអស់</label>
-
-                    <!--btn delete
-                    <label id="deleteSelectedAllItems" class="form-check-label ms-3" for="item1">
-                        <i class="fa-solid fa-trash-can" style="cursor: pointer;"></i>
-                    </label>-->
                 </div>
             </div>
         </div>

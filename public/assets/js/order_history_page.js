@@ -45,7 +45,7 @@ $(document).ready(function () {
             ratingButtonHTML += `
                 <div class="text-end mt-3">
                     <button class="btn btn-sm btn-outline-primary rate-btn mt-2" data-order-id="${order.order_id}">
-                        Đánh giá
+                        វាយតម្លៃ
                     </button>
                 </div>
             `;
@@ -58,8 +58,8 @@ $(document).ready(function () {
                     <button class="btn btn-sm btn-outline-secondary edit-order-btn" data-order-id="${order.order_id}">
                         ✏️ Sửa đơn hàng
                     </button>
-                    <button class="btn btn-sm btn-outline-danger delete-order-btn" data-order-id="${order.order_id}">
-                        🗑️ Xóa đơn hàng
+                    <button class="btn btn-sm btn-outline-danger cancel-order-btn" data-order-id="${order.order_id}">
+                        ❌ Huỷ đơn hàng
                     </button>
                 </div>
             `;
@@ -164,9 +164,10 @@ $(document).ready(function () {
         const order = allOrders.find(o => o.order_id === orderId);
     
         if (!order) {
-            alert("Không tìm thấy đơn hàng.");
+            alert("រកមិនឃើញការបញ្ជាទិញទេ។");
             return;
         }
+
     
         const csrfToken = $('meta[name="csrf-token"]').attr('content');
         $('#csrf_token').val(csrfToken);
@@ -179,18 +180,19 @@ $(document).ready(function () {
                 <input type="hidden" name="ratings[${index}][product_id]" value="${item.product_id}">
                 <label class="fw-bold">${item.product_name}</label>
                 <div class="mb-2">
-                    <label>Đánh giá:</label>
+                    <label>វាយតម្លៃ:</label>
                     <select class="form-select" name="ratings[${index}][rating]" required>
-                        <option value="">Chọn</option>
-                        <option value="1">1 - Tệ</option>
-                        <option value="2">2 - Trung bình</option>
-                        <option value="3">3 - Tốt</option>
-                        <option value="4">4 - Rất tốt</option>
-                        <option value="5">5 - Tuyệt vời</option>
+                        <option value="">ជ្រើសរើស</option>
+                        <option value="1">1 - អន់</option>
+                        <option value="2">2 - មធ្យម</option>
+                        <option value="3">3 - ល្អ</option>
+                        <option value="4">4 - ល្អបំផុត</option>
+                        <option value="5">5 - ល្អឥតខ្ចោះ</option>
                     </select>
+
                 </div>
                 <div class="mb-2">
-                    <label>Nhận xét:</label>
+                    <label>មតិ:</label>
                     <textarea class="form-control" name="ratings[${index}][comment]" rows="2" required></textarea>
                 </div>
             </div>
@@ -219,35 +221,53 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function () {
-                alert('✅ Đánh giá thành công!');
+                alert('✅ ការវាយតម្លៃបានជោគជ័យ!');
                 $('#ratingModal').modal('hide');
                 $('#ratingForm')[0].reset();
             },
             error: function (xhr) {
                 console.error(xhr.responseText);
-                alert('❌ Gửi đánh giá thất bại!');
+                alert('❌ បញ្ចូនការវាយតម្លៃបានបរាជ័យ!');
             }
         });
     });
 
     //xóa
-    $(document).on('click', '.delete-order-btn', function () {
+    $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+
+    $(document).on('click', '.cancel-order-btn', function () {
     const orderId = $(this).data('order-id');
-    if (confirm('Bạn có chắc muốn xóa đơn hàng này?')) {
+    if (confirm('Bạn có chắc muốn huỷ đơn hàng này không?')) {
         $.ajax({
-            url: `/delete-order/${orderId}`,
-            method: 'DELETE',
+            url: `/orders/${orderId}/cancel`,
+            method: 'POST',
             success: function () {
-                alert('✅ Xóa đơn hàng thành công!');
-                getCompletedOrders(); // Reload lại danh sách đơn hàng
+                alert('✅ Đã huỷ đơn hàng thành công!');
+
+                // Gọi lại API để lấy tất cả đơn hàng mới
+                $.get('/get-all-orders', function (res) {
+                    if (res.status === 200) {
+                        OrdersLsGL = res.data; // Cập nhật lại danh sách đơn hàng
+                        displayContentOrders(); // Hiển thị lại bảng đơn hàng
+                    } else {
+                        alert('❌ Không thể lấy lại danh sách đơn hàng.');
+                    }
+                });
             },
             error: function (xhr) {
                 console.error(xhr.responseText);
-                alert('❌ Không thể xóa đơn hàng!');
+                alert('❌ Không thể huỷ đơn hàng!');
             }
         });
     }
 });
+
+
+
 
     
 });
