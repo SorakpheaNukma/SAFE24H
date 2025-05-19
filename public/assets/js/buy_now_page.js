@@ -1,12 +1,9 @@
 $(document).ready(function () {
     let totalPrice = 0;
     let itemCount = 0;
-    //let dmain = "https://safe24h.com";
     const shippingFee = 2.00;
     var ProductsLsGL = [];
-
     const user_idGL = document.querySelector('meta[name="user_id"]').content;
-
     var UserDataGL = [];
 
     $('#id-change-address').on('click', function () {
@@ -16,14 +13,20 @@ $(document).ready(function () {
     $('#shipping-total').text(shippingFee.toFixed(2) + "$");
 
     function getItemDataFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        const itemData = params.get('items');
-        const detailParam = params.get('detail');
-        const images = params.get('images');
+    const params = new URLSearchParams(window.location.search);
+    const itemData = params.get('items');
+    const detailParam = params.get('detail');
+    const images = params.get('images');
 
-        const productData = JSON.parse(itemData);
-        return { productData, detailParam, images };
+    let productData = {};
+    try {
+        productData = JSON.parse(decodeURIComponent(itemData)); // 👈 Decode đúng
+    } catch (err) {
+        console.error("Lỗi parse JSON:", err);
     }
+
+    return { productData, detailParam, images };
+    }   
 
     var { productData, detailParam, images } = getItemDataFromUrl();
 
@@ -34,6 +37,7 @@ $(document).ready(function () {
                     product_id: product.product_id,
                     product_name: product.product_name,
                     product_price: product.price,
+                    discount_price: productData.discounted_price ?? productData.discount_price ?? null,
                     image_path: product.images,
                     quantity: product.quantity,
                     size: product.size,
@@ -46,6 +50,7 @@ $(document).ready(function () {
                 product_id: productData.product_id,
                 product_name: productData.product_name,
                 price: productData.price,
+                discount_price: productData.discounted_price ?? productData.discount_price ?? null,
                 image_path: productData.images || images,
                 quantity: productData.quantity,
                 size: productData.size,
@@ -57,12 +62,11 @@ $(document).ready(function () {
         ProductsLsGL = Array.isArray(productData) ? productData : [productData];
         console.log("Loaded ProductsLsGL (bulk):", ProductsLsGL);
     }
-
     // Function to dynamically add a single product when detailParam is true
     function addSingleProductItem(product) {
         const productName = product.product_name;
         const quantity = product.quantity;
-        const price = product.price;
+        const price = product.discount_price !== null ? product.discount_price : product.price;
         const dmain = window.location.origin;
         const imagePath = product.image_path ? product.image_path : 'default.jpg';
         const size = product.size;
@@ -91,8 +95,7 @@ $(document).ready(function () {
         // Update the order total display
         updateOrderTotal();
     }
-
-    // Function to dynamically add product items
+    // Function to dynamically add product items bookmarrk
     function addProductItem(product) {
         if (!product || !product.product_name || !product.price) {
             console.warn('Product data invalid or incomplete:', product);
@@ -101,7 +104,12 @@ $(document).ready(function () {
     
         const productName = product.product_name;
         const quantity = product.quantity;
-        const price = product.price;
+        let price = 0;
+            if (typeof product.discount_price === 'number' && !isNaN(product.discount_price)) {
+                price = product.discount_price;
+            } else if (typeof product.price === 'number' && !isNaN(product.price)) {
+                price = product.price;
+            }
         const size = product.size;
         const imagePath = product.images || 'default.jpg';
         const dmain = window.location.origin;
@@ -127,7 +135,7 @@ $(document).ready(function () {
                             <div>
                                 <h6 class="remove-item" data-product-id="${productId}" data-price="${price * quantity}" data-quantity="${quantity}" 
                                     style="color: #007bff; cursor: pointer; margin: 0;">
-                                    Remove
+                                    លុប
                                 </h6>
                             </div>
                         </div>
@@ -144,8 +152,6 @@ $(document).ready(function () {
     
         updateOrderTotal();
     }
-    
-
     // Function to update the order total display
     function updateOrderTotal() {
         const orderTotalElement = document.getElementById('order-total');
@@ -167,16 +173,39 @@ $(document).ready(function () {
         const productPrice = parseFloat($(this).data('price'));
         const productQuantity = parseInt($(this).data('quantity'));
 
-        // Remove the item from the DOM
-        $(`#${productId}`).remove();
+        Swal.fire({
+            title: 'លុបទំនិញ',
+            html: 'តើអ្នកពិតជាចង់លុបទំនិញនេះចេញពីបញ្ជីបញ្ជាទិញមែនទេ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'លុប',
+            cancelButtonText: 'បោះបង់',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Remove the item from the DOM
+                $(`#${productId}`).remove();
 
-        // Update the total price and item count
-        totalPrice -= productPrice;
-        itemCount -= productQuantity;
+                // Update the total price and item count
+                totalPrice -= productPrice;
+                itemCount -= productQuantity;
 
-        // Update the order total display
-        updateOrderTotal();
+                // Update the order total display
+                updateOrderTotal();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'បានលុបទំនិញ!',
+                    text: 'ទំនិញត្រូវបានដកចេញដោយជោគជ័យ។',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
     });
+
 
     function initializeData() {
         ProductsLsGL.forEach(product => {
@@ -220,7 +249,6 @@ $(document).ready(function () {
 
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
-
 
     function saveOrder(callback) {
         const orderDate = getCurrentDateTime();
@@ -284,7 +312,6 @@ $(document).ready(function () {
             }
         });
     }
-
 
     function saveOrderItems(orderId, callback) {
         var orderItems = [];

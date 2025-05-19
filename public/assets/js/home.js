@@ -17,57 +17,6 @@ $(document).ready(function () {
         $('#id-title-header').text(defaultHeaderTitle);
     }
 
-    function getAllProducts(callback) {
-        showSpinner();
-
-        $.ajax({
-            url: '/getAllProducts',
-            method: 'GET',
-            success: function (res) {
-                if (res.status == 200) {
-                    productsLsGL = [];
-
-                    res.data.forEach(function (p) {
-                        productsLsGL.push({
-                            product_id: p.product_id,
-                            product_name: p.product_name,
-                            product_price: p.product_price,
-                            category_id: p.category_id,
-                            category_name: p.category_name,
-                            images: p.images && Array.isArray(p.images) ? p.images : [],
-                            descriptions: p.descriptions || {},
-                            variants: p.variants || []
-                        });
-                    });
-                    
-
-                    setTimeout(() => {
-                        hideSpinner();
-                    }, 200);
-
-                    populateGrid();
-                    initializeDefaultCategory();
-
-                    if (callback) callback();
-                } else {
-                    hideSpinner();
-                    $.alert('Failed to get product!');
-                }
-            },
-            error: function (res) {
-                hideSpinner();
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong!!');
-                }
-            }
-        });
-    }
 
     getAllProducts(ifSearchedProductsFromURl);
 
@@ -151,87 +100,154 @@ $(document).ready(function () {
         spinner.style.opacity = '0';
         spinner.style.visibility = 'hidden';
     }
+function getAllProducts(callback) {
+    showSpinner();
+
+    $.ajax({
+        url: '/getAllProducts',
+        method: 'GET',
+        success: function (res) {
+            if (res.status == 200) {
+                productsLsGL = [];
+
+                res.data.forEach(function (p) {
+                    productsLsGL.push({
+                        product_id: p.product_id,
+                        product_name: p.product_name,
+                        product_price: parseFloat(p.product_price), // ép về số
+                        discounted_price: parseFloat(p.discounted_price), // NEW: từ server
+                        category_id: p.category_id,
+                        category_name: p.category_name,
+                        images: p.images && Array.isArray(p.images) ? p.images : [],
+                        descriptions: p.descriptions || {},
+                        variants: p.variants || [],
+                        discount_percent: p.discount_percent || 0
+                    });
+                });
+
+                setTimeout(() => {
+                    hideSpinner();
+                }, 200);
+
+                populateGrid();
+                initializeDefaultCategory();
+
+                if (callback) callback();
+            } else {
+                hideSpinner();
+                $.alert('Failed to get product!');
+            }
+        },
+        error: function (res) {
+            hideSpinner();
+            if (res.status === 422) {
+                let error = res.responseJSON.error;
+                let firstError = Object.values(error)[0][0];
+                showError(firstError);
+            } else if (res.status === 500) {
+                showError('An error occurred. Please try again later.');
+            } else {
+                showError('Something went wrong!!');
+            }
+        }
+    });
+}
+
 
     // Function to populate the grid, accepts filtered products if provided
-    function populateGrid(filteredProducts = productsLsGL) {
-        const grid = document.getElementById('gridContainer');
-        let html = '';
-        const dmain = window.location.origin;
+function populateGrid(filteredProducts = productsLsGL) {
+    console.log("Danh sách sản phẩm được truyền vào populateGrid:", filteredProducts);
+    const grid = document.getElementById('gridContainer');
+    let html = '';
+    const dmain = window.location.origin;
 
-        // if (!filteredProducts || filteredProducts.length === 0) {
-        //     grid.innerHTML = '<p class="text-center">No products found.</p>';
-        //     $('#viewMore').hide();
-        //     return;
-        // }
-        
-        // Calculate the end index for pagination
-        const end = Math.min(currentItemsCount + itemsPerPage, filteredProducts.length);
+    const end = Math.min(currentItemsCount + itemsPerPage, filteredProducts.length);
 
-        for (let i = currentItemsCount; i < end; i++) {
-            const item = filteredProducts[i];
-            const image = `
-                <a>
-                    <img src="${dmain}/uploads/products/${item.images[0]}" alt="${item.product_name}">
-                </a>
-            `;
+    for (let i = currentItemsCount; i < end; i++) {
+        const item = filteredProducts[i];
+        console.log("Sản phẩm đang xử lý:", item);
 
-            html += `
-                <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
-                    <div class="grid-item" data-product-index="${i}">
-                        <div class="image-container">
-                            ${image} 
-                        </div>
-                        <div class="item-description">
-                            <div>
-                                <div class="product-title">${item.product_name}</div>
-                            </div>
-                            <div style="display:flex; flex-direction:row;">
-                                <div style="display:flex; flex-direction:column;">
-                                    <div class="product-price">\$${item.product_price}</div>
-                                </div>
-                                <div style="display:flex; justify-content: center; align-items: center; margin-left: auto; width: 300px; overflow: hidden;">
-                                    <div class="product-description">${item.descriptions.des_1 || ''}</div>
-                                </div>
-                            </div>
-                        </div>
+        const image = `
+            <a>
+                <img src="${dmain}/uploads/products/${item.images[0]}" alt="${item.product_name}">
+            </a>
+        `;
+
+        const hasDiscount = item.discount_percent > 0;
+        const discountPercent = Number(item.discount_percent) || 0;
+        const discountedPrice = hasDiscount
+            ? (item.product_price - (item.product_price * discountPercent / 100))
+            : item.product_price;
+
+
+html += `
+    <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
+        <div class="card" data-product-index="${i}" style="border-radius: 16px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden;max-height: 420px;">
+            
+            ${hasDiscount ? `
+                <div class="badge bg-light text-danger fw-bold" style="position: absolute; top: 12px; left: 12px; font-size: 12px;">
+                    ${discountPercent}% OFF
+                </div>
+            ` : ''}
+
+            <img src="${dmain}/uploads/products/${item.images[0]}" class="card-img-top" alt="${item.product_name}" style="max-height: 240px; object-fit: cover;">
+
+            <div class="card-body" style="padding: 12px;">
+                <h5 class="card-title text-primary fw-semibold mb-1" style="font-family: 'Khmer OS', sans-serif;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;">${item.product_name}</h5>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        ${hasDiscount
+                            ? `
+                                <div class="text-danger fw-bold fs-3">\$${discountedPrice.toFixed(2)}</div>
+                                <div style="text-decoration: line-through; color: #aaa; font-size: 16px;">\$${item.product_price.toFixed(2)}</div>
+                            `
+                            : `<div class="text-danger fw-bold fs-3">\$${item.product_price.toFixed(2)}</div>`
+                        }
+                    </div>
+                    <div style="font-family: 'Khmer OS', sans-serif; 
+                        white-space: nowrap; 
+                        overflow: hidden; 
+                        text-overflow: ellipsis; 
+                        margin-top: 8px; 
+                        margin-left: 12px;">
+                        ${item.descriptions.des_1 || ''}
                     </div>
                 </div>
-            `;
-        }
+            </div>
+        </div>
+    </div>
+`;
 
-        grid.innerHTML = html; // Replace the grid with filtered products
-        currentItemsCount = end;
 
-        // Show or hide the "View More" button based on the number of products
-        // if (filteredProducts.length <= itemsPerPage) {
-        //     $('#viewMore').hide();
-        // } else {
-        //     $('#viewMore').show();
-        // }
-
-        // Attach click handler to the grid container
-        grid.addEventListener('click', function (e) {
-            e.preventDefault();
-            const gridItem = e.target.closest('.grid-item');
-            if (gridItem) {
-                const index = gridItem.getAttribute('data-product-index');
-                const item = filteredProducts[index];
-                const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${item.images.join(',')}`;
-                console.log("home-page sang:", productDetailUrl)
-                window.location.href = productDetailUrl;
-            }
-        });
-
-        // if (currentItemsCount >= filteredProducts.length) {
-        //     $('#viewMore').hide();
-        // }
     }
 
-    // $('#viewMore').on('click', function () {
-    //     populateGrid();
-    // });
+    grid.innerHTML = html;
+    currentItemsCount = end;
 
-    //banner images
+    // Rebind click event
+    grid.addEventListener('click', function (e) {
+        e.preventDefault();
+        let gridItem = e.target.closest('.grid-item');
+        if (!gridItem) {
+            gridItem = e.target.closest('.card'); // fallback nếu bạn quên thêm grid-item
+        }
+
+        if (gridItem) {
+            const index = gridItem.getAttribute('data-product-index');
+            const item = filteredProducts[index];
+            const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${item.images.join(',')}`;
+            console.log("home-page sang:", productDetailUrl);
+            window.location.href = productDetailUrl;
+        }
+    });
+
+}
+
+
+  //banner images
     $.ajax({
         url: 'http://127.0.0.1:8000/banner-images', // Địa chỉ API của bạn
         method: 'GET', // Phương thức GET để lấy dữ liệu

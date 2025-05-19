@@ -53,5 +53,10 @@ class Product extends Model
     {
         return $this->hasMany(Review::class, 'product_id', 'product_id');
     }
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_product', 'product_id', 'event_id');
+    }
+
 
 }

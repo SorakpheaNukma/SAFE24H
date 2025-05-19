@@ -22,24 +22,28 @@
 
     <div class="container-fluid" id="container_detail_page">
         <div class="row">
-            <!-- Product Images -->
-            <div class="col-12 col-md-4 d-flex flex-column justify-content-center align-items-center mb-3 mb-md-0">
-                <!-- Product Images Carousel -->
-                <div id="carouselProductImages" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner" id="id-product-images" style="width:273px; height:409px;">
-                        <!-- Images will be inserted here via JavaScript -->
-                    </div>
-                    <!-- Controls -->
-                    <a class="carousel-control-prev" href="#carouselProductImages" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselProductImages" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
+                        <!-- Product Images -->
+            <div class="col-12 col-md-4 d-flex flex-column align-items-center mb-3">
+            <!-- Carousel hình ảnh chính -->
+            <div id="carouselProductImages" class="carousel slide mb-3" data-ride="carousel">
+                <div class="carousel-inner rounded shadow" id="id-product-images"
+                     style="max-width: 300px; max-height: 450px; margin: 0 auto;">
+                    <!-- JS sẽ chèn ảnh vào đây -->
                 </div>
+                <!-- Controls -->
+                <a class="carousel-control-prev" href="#carouselProductImages" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </a>
+                <a class="carousel-control-next" href="#carouselProductImages" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </a>
             </div>
+
+            <!-- Thumbnail preview -->
+            <div class="d-flex justify-content-center gap-2 flex-wrap" id="carousel-thumbnails">
+                <!-- JS render các thumbnail -->
+            </div>
+        </div>
 
             <!-- Product Details -->
             <div class="col-12 col-md-4 d-flex flex-column justify-content-start align-items-start">
@@ -116,10 +120,6 @@
             <div style="display:flex; flex-direction:row;">
                 <p style="font-size: 25px; font-weight:bold;">មតិ និងការវាយតម្លៃ</p>
             </div>
-            <!-- <div style="margin-bottom: 15px;display:flex;flex-direction:row;border-bottom:solid 1px #fafafa;">
-                <textarea class="big-textarea" placeholder="Nhập bình luận của bạn..."></textarea>
-                <button id="btn-comment">Comment</button>
-            </div> -->
             <div class="comments-list">
                 <!-- Các comment sẽ được AJAX đổ vào đây -->
             </div>
@@ -143,5 +143,7 @@
 
 <script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
 <script src="{{ asset('assets/js/detail_page.js') }}"></script>
-
+    <!-- SweetAlert2 CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection

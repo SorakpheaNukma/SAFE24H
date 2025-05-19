@@ -17,6 +17,7 @@ use App\Http\Controllers\OTPController;
 use App\Http\Controllers\BannerImageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\EventController;
 
 
 
@@ -117,8 +118,19 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
 
 // admin
 Route::middleware('MyAdminMiddleware')->group(function () {
-    Route::get('/home-dashboard', [Home_dashBoard::class, 'index'])->name('admin.home_dashboard');
+Route::get('/home-dashboard', [Home_dashBoard::class, 'index'])->name('admin.home_dashboard');
+Route::post('/admin/event', [EventController::class, 'store'])->name('event.store');
+Route::get('/admin/events', [EventController::class, 'getAllEvents']);
+Route::get('/admin/event/{id}', [EventController::class, 'show']);
+Route::put('/admin/event/{id}', [EventController::class, 'update'])->name('event.update');
+Route::delete('/admin/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
+
+
+
 });
+
+
+
 
 
 //client
@@ -141,9 +153,6 @@ Route::get('/reviews', [ReviewController::class, 'getReviewsByQuery']);
 
 // user
 Route::middleware('MyUserMiddleWare')->group(function () {
-    // Route::get('/home-page', function () {
-    //     return view('client.pages.home_page');
-    // })->name('client.home_page');
 
     Route::get('/cart-page', [CartController::class, 'index']);
 
@@ -173,16 +182,5 @@ Route::middleware('MyUserMiddleWare')->group(function () {
     
 });
 
-
-
-
-
-
-
-
-//
-// Route::get('/test', function () {
-//     broadcast(new App\Events\MessageSent("hello"));
-// });
 
 

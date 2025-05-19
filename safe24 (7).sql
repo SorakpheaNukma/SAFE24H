@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th5 11, 2025 lúc 11:18 AM
--- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: May 18, 2025 at 11:11 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `safe24`
+-- Database: `safe24`
 --
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `banner_images`
+-- Table structure for table `banner_images`
 --
 
 CREATE TABLE `banner_images` (
@@ -35,18 +35,19 @@ CREATE TABLE `banner_images` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `banner_images`
+-- Dumping data for table `banner_images`
 --
 
 INSERT INTO `banner_images` (`banner_images_id`, `image_path`, `create_at`, `update_at`) VALUES
 (1, 'image.png', '2025-04-06 10:32:38', '2025-04-06 11:03:35'),
 (2, 'image2.png', '2025-04-06 10:32:38', '2025-04-06 11:03:48'),
-(3, 'image3.png', '2025-04-06 10:32:38', '2025-04-06 11:03:58');
+(3, 'image3.png', '2025-04-06 10:32:38', '2025-04-06 11:03:58'),
+(4, 'wysegIggym.png', '2025-05-11 14:56:47', '2025-05-11 14:56:47');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `carts`
+-- Table structure for table `carts`
 --
 
 CREATE TABLE `carts` (
@@ -59,21 +60,20 @@ CREATE TABLE `carts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `carts`
+-- Dumping data for table `carts`
 --
 
 INSERT INTO `carts` (`id`, `user_id`, `variant_id`, `quantity`, `created_at`, `updated_at`) VALUES
-(1, 2, 9, 1, '2025-04-29 01:31:38', '2025-04-29 01:31:38'),
-(2, 2, 28, 1, '2025-04-29 01:44:15', '2025-04-29 01:44:15'),
-(3, 2, 32, 1, '2025-04-29 02:15:41', '2025-04-29 02:15:41'),
-(4, 2, 22, 1, '2025-04-29 02:35:49', '2025-04-29 02:35:49'),
-(5, 2, 31, 1, '2025-05-07 00:54:29', '2025-05-07 00:54:29'),
-(6, 2, 8, 5, '2025-05-07 00:55:13', '2025-05-07 00:55:13');
+(11, 2, 39, 1, '2025-05-12 09:18:24', '2025-05-12 09:18:24'),
+(17, 2, 31, 1, '2025-05-15 01:07:54', '2025-05-15 01:07:54'),
+(18, 2, 36, 1, '2025-05-16 02:16:41', '2025-05-16 02:16:41'),
+(19, 2, 46, 1, '2025-05-17 00:18:01', '2025-05-17 00:18:01'),
+(20, 2, 58, 1, '2025-05-17 20:15:22', '2025-05-17 20:15:22');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `categories`
+-- Table structure for table `categories`
 --
 
 CREATE TABLE `categories` (
@@ -84,7 +84,7 @@ CREATE TABLE `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `categories`
+-- Dumping data for table `categories`
 --
 
 INSERT INTO `categories` (`category_id`, `category_name`, `created_at`, `updated_at`) VALUES
@@ -95,7 +95,60 @@ INSERT INTO `categories` (`category_id`, `category_name`, `created_at`, `updated
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `invalidated_tokens`
+-- Table structure for table `events`
+--
+
+CREATE TABLE `events` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `from_date` date NOT NULL,
+  `to_date` date NOT NULL,
+  `discount` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `events`
+--
+
+INSERT INTO `events` (`id`, `title`, `from_date`, `to_date`, `discount`, `created_at`, `updated_at`) VALUES
+(5, 'Free', '2025-05-18', '2025-05-21', 80, '2025-05-16 04:12:32', '2025-05-17 20:05:25'),
+(6, 'Now', '2025-05-17', '2025-05-18', 90, '2025-05-17 07:08:33', '2025-05-17 07:08:33'),
+(7, 'tmr', '2025-05-18', '2025-05-18', 10, '2025-05-17 07:15:41', '2025-05-17 07:15:41'),
+(13, 'ghad', '2025-05-18', '2025-05-18', 22, '2025-05-17 23:43:10', '2025-05-17 23:43:10');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `event_product`
+--
+
+CREATE TABLE `event_product` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `event_id` bigint(20) UNSIGNED NOT NULL,
+  `product_id` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `event_product`
+--
+
+INSERT INTO `event_product` (`id`, `event_id`, `product_id`, `created_at`, `updated_at`) VALUES
+(15, 5, 9, NULL, NULL),
+(16, 6, 13, NULL, NULL),
+(17, 7, 12, NULL, NULL),
+(42, 13, 7, NULL, NULL),
+(43, 13, 6, NULL, NULL),
+(44, 13, 4, NULL, NULL),
+(45, 13, 2, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `invalidated_tokens`
 --
 
 CREATE TABLE `invalidated_tokens` (
@@ -107,7 +160,7 @@ CREATE TABLE `invalidated_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `invalidated_tokens`
+-- Dumping data for table `invalidated_tokens`
 --
 
 INSERT INTO `invalidated_tokens` (`id_tk`, `access_tk`, `expired_tk`, `created_at`, `updated_at`) VALUES
@@ -193,12 +246,31 @@ INSERT INTO `invalidated_tokens` (`id_tk`, `access_tk`, `expired_tk`, `created_a
 (80, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY4NzY1MTksImV4cCI6MTc3ODQxMjUxOSwibmJmIjoxNzQ2ODc2NTE5LCJqdGkiOiJmcnltbER6TmJnTk55ajhkIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.cofyQyx__HlWqrH4SdCr_Ktqn3pkjv4czk_4O2jF46g', '2026-05-10 04:28:39', '2025-05-11 01:25:40', '2025-05-11 01:25:40'),
 (81, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NTE5NDYsImV4cCI6MTc3ODQ4Nzk0NiwibmJmIjoxNzQ2OTUxOTQ2LCJqdGkiOiI0WGF3SnBYWjVqbjl4ZWs0Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.DNKO7mZKfd7be2xJKwY8H7C2YYGCbsWBsdKhXkGw_UU', '2026-05-11 01:25:46', '2025-05-11 01:26:23', '2025-05-11 01:26:23'),
 (82, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NTE5ODgsImV4cCI6MTc3ODQ4Nzk4OCwibmJmIjoxNzQ2OTUxOTg4LCJqdGkiOiJFeXBsVGYzVldBeXQwWDU0Iiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.D-LOLuon5s0zUVqQ_0czRvRlYIWMcdwHdMj0MkS6_ZE', '2026-05-11 01:26:28', '2025-05-11 01:39:17', '2025-05-11 01:39:17'),
-(83, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NTI3NjYsImV4cCI6MTc3ODQ4ODc2NiwibmJmIjoxNzQ2OTUyNzY2LCJqdGkiOiJBNUpKWUdUS3dJeENEd1dFIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.P3SXrY2aRl2Faylvc0ZNeDxiHBVZqJf7Z7Hww18n7aw', '2026-05-11 01:39:26', '2025-05-11 01:40:03', '2025-05-11 01:40:03');
+(83, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NTI3NjYsImV4cCI6MTc3ODQ4ODc2NiwibmJmIjoxNzQ2OTUyNzY2LCJqdGkiOiJBNUpKWUdUS3dJeENEd1dFIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.P3SXrY2aRl2Faylvc0ZNeDxiHBVZqJf7Z7Hww18n7aw', '2026-05-11 01:39:26', '2025-05-11 01:40:03', '2025-05-11 01:40:03'),
+(84, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NTUyNjEsImV4cCI6MTc3ODQ5MTI2MSwibmJmIjoxNzQ2OTU1MjYxLCJqdGkiOiJVWVl5R0J0ODltWGhxQndOIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.XXk0qj5IUku2lq9cD_WRRtMu6i0Vnz6DXFNfRjWLFeY', '2026-05-11 02:21:01', '2025-05-11 03:45:46', '2025-05-11 03:45:46'),
+(85, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NjAzNTEsImV4cCI6MTc3ODQ5NjM1MSwibmJmIjoxNzQ2OTYwMzUxLCJqdGkiOiJXTEtsUVFwZ08wb25uTzlSIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.acnzvercizkZcXdhoq1bMwpOnbiNFACKxEQs_Qhtx0Q', '2026-05-11 03:45:51', '2025-05-11 03:46:32', '2025-05-11 03:46:32'),
+(86, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NjAzOTYsImV4cCI6MTc3ODQ5NjM5NiwibmJmIjoxNzQ2OTYwMzk2LCJqdGkiOiJOaU1pUjVZVXRiZ2hKZHRoIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.NeyoH4TnpMnjmvVTc0Rzni3WluDK_Ehfz4x9XClGz0Y', '2026-05-11 03:46:36', '2025-05-11 03:46:56', '2025-05-11 03:46:56'),
+(87, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NjA0MjEsImV4cCI6MTc3ODQ5NjQyMSwibmJmIjoxNzQ2OTYwNDIxLCJqdGkiOiI0UHNvZzEyUXBma2toWEVZIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.B-ZN8fyJEYOZV_iu3xUbsJY4Nl500iavhJUOlmzZL6A', '2026-05-11 03:47:01', '2025-05-11 07:39:32', '2025-05-11 07:39:32'),
+(88, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NzQzNzcsImV4cCI6MTc3ODUxMDM3NywibmJmIjoxNzQ2OTc0Mzc3LCJqdGkiOiJvVFNOS0xPa0dLMXJKdkVjIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.fhXHNKe4TLoiOwxirCMMOEu9KkljvktK_hwfCGH1i0E', '2026-05-11 07:39:37', '2025-05-12 00:40:01', '2025-05-12 00:40:01'),
+(89, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDY5NzQ3MTUsImV4cCI6MTc3ODUxMDcxNSwibmJmIjoxNzQ2OTc0NzE1LCJqdGkiOiJqVzVMazRCNm1SUlhMSUppIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.IzDrYMbaGhkTCNw3y8XXHdF7cvNFzDSghTtKhLQ71Gs', '2026-05-11 07:45:15', '2025-05-12 00:43:41', '2025-05-12 00:43:41'),
+(90, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcwMzU2MDcsImV4cCI6MTc3ODU3MTYwNywibmJmIjoxNzQ3MDM1NjA3LCJqdGkiOiJkcDUxQVo0T2RHUWU0c2pvIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JEbqH2-4r-GJE7m2RxJmKeVGEImNJvrBoOS1dJMdSHM', '2026-05-12 00:40:07', '2025-05-12 02:11:12', '2025-05-12 02:11:12'),
+(91, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcwNDEwNzcsImV4cCI6MTc3ODU3NzA3NywibmJmIjoxNzQ3MDQxMDc3LCJqdGkiOiI2Y0x0UUVNb2RudnlqSldXIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.LUoSK69IOwxR7T-ja_HLjSiF244gmAxzBClcp7ES6Kk', '2026-05-12 02:11:17', '2025-05-12 02:54:11', '2025-05-12 02:54:11'),
+(92, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcwNDM2NjAsImV4cCI6MTc3ODU3OTY2MCwibmJmIjoxNzQ3MDQzNjYwLCJqdGkiOiJSMzFYbnE5T0NDSTBBMFMzIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.GHPmgIblRjgYOb-Qfla1qlziKnFH-p7UYrhQgFJHg5E', '2026-05-12 02:54:20', '2025-05-12 07:25:36', '2025-05-12 07:25:36'),
+(93, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcxMjA1ODQsImV4cCI6MTc3ODY1NjU4NCwibmJmIjoxNzQ3MTIwNTg0LCJqdGkiOiJ0REQ4Qk1lT210ZFMwWkFGIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.FynlUn3cL386aivUD8awXbgUcU8lFwFaTh19Ns97kLI', '2026-05-13 00:16:24', '2025-05-13 09:44:53', '2025-05-13 09:44:53'),
+(94, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcyMTIwNzksImV4cCI6MTc3ODc0ODA3OSwibmJmIjoxNzQ3MjEyMDc5LCJqdGkiOiJyNURFajhJTGNSMFdkRlR3Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.fcqCTABeMljxfMTN8EDTWrlD3VB7ZAY-AoJNu4YZwBM', '2026-05-14 01:41:19', '2025-05-14 19:25:26', '2025-05-14 19:25:26'),
+(95, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcyNzU5MzEsImV4cCI6MTc3ODgxMTkzMSwibmJmIjoxNzQ3Mjc1OTMxLCJqdGkiOiJrdmVTN2NrNEVRbzkwOU05Iiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.WHA-ecK0Dsdz6UkMcCbIieLz7kPjMa83-kZQqh_fEoU', '2026-05-14 19:25:31', '2025-05-14 23:57:38', '2025-05-14 23:57:38'),
+(96, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcyOTIyNjQsImV4cCI6MTc3ODgyODI2NCwibmJmIjoxNzQ3MjkyMjY0LCJqdGkiOiJPMDNpOWVCMFZpaU1zRW5jIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.56W0eXTs0OwiCG6IbQ64mDrMFx5Zu-aNpGS8Da1VoYs', '2026-05-14 23:57:44', '2025-05-15 01:06:30', '2025-05-15 01:06:30'),
+(97, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDcyOTYzOTQsImV4cCI6MTc3ODgzMjM5NCwibmJmIjoxNzQ3Mjk2Mzk0LCJqdGkiOiJsMUh4WHFMdFhlVjREZXBiIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JNwgqoIivSkNblL5KpbQp_tBQncnaafpJiE0PrxIsGE', '2026-05-15 01:06:34', '2025-05-15 04:18:13', '2025-05-15 04:18:13'),
+(98, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDczMDc4OTgsImV4cCI6MTc3ODg0Mzg5OCwibmJmIjoxNzQ3MzA3ODk4LCJqdGkiOiJFWVdMT3RWamNLWDNHdEFkIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.maWWwHYrLmO6YDYqGVW8POI_d3W83zYVplaUDA04NvQ', '2026-05-15 04:18:18', '2025-05-15 08:37:30', '2025-05-15 08:37:30'),
+(99, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDczMjM0NTUsImV4cCI6MTc3ODg1OTQ1NSwibmJmIjoxNzQ3MzIzNDU1LCJqdGkiOiJ2eG5hSTBOa3pMUEtCQWxQIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.hwEDU8QGP7aqz8AMyo7L7O50bsKRLauuoy7zNrVUAl8', '2026-05-15 08:37:35', '2025-05-17 01:07:50', '2025-05-17 01:07:50'),
+(100, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDc0NzMxMDksImV4cCI6MTc3OTAwOTEwOSwibmJmIjoxNzQ3NDczMTA5LCJqdGkiOiJBRnNSMG9WMERveEdrOUY2Iiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.a9z6hcQtMWXhSlpERSZm1-u0JcHuUE2BKfhlO0Vyu6o', '2026-05-17 02:11:49', '2025-05-17 23:41:21', '2025-05-17 23:41:21'),
+(101, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDc1NTA0OTEsImV4cCI6MTc3OTA4NjQ5MSwibmJmIjoxNzQ3NTUwNDkxLCJqdGkiOiJDM3BxYzdKa1NIYUtlWWx4Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.trKi3TxK6YFJC7fk1wLasVIvfyPmTmE146LAJ7THZpQ', '2026-05-17 23:41:31', '2025-05-17 23:43:20', '2025-05-17 23:43:20'),
+(102, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDc1NTA2MDYsImV4cCI6MTc3OTA4NjYwNiwibmJmIjoxNzQ3NTUwNjA2LCJqdGkiOiI3bHlPbHoyc3RueWU2RWlQIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.WLDAOOKcjqW3OItuy9a1IIEUsHXlBUtNz4N3HJoKjIM', '2026-05-17 23:43:26', '2025-05-17 23:43:41', '2025-05-17 23:43:41');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `migrations`
+-- Table structure for table `migrations`
 --
 
 CREATE TABLE `migrations` (
@@ -208,7 +280,7 @@ CREATE TABLE `migrations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `migrations`
+-- Dumping data for table `migrations`
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
@@ -230,12 +302,14 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (66, '2025_04_18_155423_add_variant_id_to_order_items_table', 6),
 (67, '2025_04_19_163328_add_variant_id_to_carts_table', 7),
 (68, '2025_05_08_135005_create_reviews_table', 8),
-(69, '2025_05_10_082414_create_comments_table', 8);
+(69, '2025_05_10_082414_create_comments_table', 8),
+(75, '2025_05_14_030412_create_events_table', 9),
+(76, '2025_05_14_030435_create_event_product_table', 10);
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `orders`
+-- Table structure for table `orders`
 --
 
 CREATE TABLE `orders` (
@@ -249,34 +323,30 @@ CREATE TABLE `orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `orders`
+-- Dumping data for table `orders`
 --
 
 INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `order_date`, `created_at`, `updated_at`) VALUES
-(1, 2, 21.00, 'delivered', '2025-04-29 15:31:49', '2025-04-29 01:31:49', '2025-04-29 01:34:14'),
-(2, 2, 39.00, 'processing', '2025-04-29 15:49:33', '2025-04-29 01:49:33', '2025-04-29 01:49:33'),
-(3, 2, 21.00, 'processing', '2025-04-29 16:11:06', '2025-04-29 02:11:07', '2025-04-29 02:11:07'),
-(4, 2, 21.00, 'processing', '2025-04-29 16:11:19', '2025-04-29 02:11:19', '2025-04-29 02:11:19'),
-(5, 2, 39.00, 'processing', '2025-04-29 16:12:02', '2025-04-29 02:12:02', '2025-04-29 02:12:02'),
-(6, 2, 17.00, 'processing', '2025-04-29 16:12:48', '2025-04-29 02:12:48', '2025-04-29 02:12:48'),
-(7, 2, 56.00, 'delivered', '2025-04-29 16:17:44', '2025-04-29 02:17:45', '2025-05-11 01:39:59'),
-(8, 2, 56.00, 'processing', '2025-04-29 16:19:09', '2025-04-29 02:19:09', '2025-04-29 02:19:09'),
-(9, 2, 18.00, 'processing', '2025-04-29 16:27:52', '2025-04-29 02:27:53', '2025-04-29 02:27:53'),
-(10, 2, 18.00, 'processing', '2025-04-29 16:28:04', '2025-04-29 02:28:04', '2025-04-29 02:28:04'),
-(11, 2, 56.00, 'processing', '2025-04-29 16:28:59', '2025-04-29 02:28:59', '2025-04-29 02:28:59'),
-(12, 2, 71.00, 'processing', '2025-04-29 16:35:59', '2025-04-29 02:35:59', '2025-04-29 02:35:59'),
-(13, 2, 71.00, 'processing', '2025-04-29 16:39:41', '2025-04-29 02:39:41', '2025-04-29 02:39:41'),
-(14, 2, 32.00, 'processing', '2025-04-29 16:42:21', '2025-04-29 02:42:22', '2025-04-29 02:42:22'),
-(15, 2, 15.00, 'processing', '2025-04-29 16:49:38', '2025-04-29 02:49:38', '2025-04-29 02:49:38'),
-(16, 2, 71.00, 'processing', '2025-04-29 16:49:54', '2025-04-29 02:49:54', '2025-04-29 02:49:54'),
-(17, 2, 71.00, 'processing', '2025-04-29 16:52:47', '2025-04-29 02:52:47', '2025-04-29 02:52:47'),
-(18, 2, 18.00, 'delivered', '2025-04-29 16:53:29', '2025-04-29 02:53:29', '2025-05-11 01:26:18'),
-(19, 2, 23.00, 'processing', '2025-04-29 16:55:17', '2025-04-29 02:55:17', '2025-04-29 02:55:17');
+(25, 2, 16.00, 'delivered', '2025-05-11 21:39:54', '2025-05-11 07:39:54', '2025-05-11 09:52:49'),
+(27, 2, 20.00, 'cancelled', '2025-05-11 23:42:10', '2025-05-11 09:42:10', '2025-05-11 09:42:29'),
+(28, 2, 34.00, 'delivered', '2025-05-11 23:57:57', '2025-05-11 09:57:57', '2025-05-11 09:58:37'),
+(29, 2, 18.00, 'cancelled', '2025-05-11 23:59:59', '2025-05-11 09:59:59', '2025-05-11 10:00:17'),
+(30, 2, 48.00, 'cancelled', '2025-05-12 00:07:48', '2025-05-11 10:07:48', '2025-05-11 10:08:04'),
+(31, 2, 21.00, 'cancelled', '2025-05-12 14:44:01', '2025-05-12 00:44:01', '2025-05-12 00:44:14'),
+(32, 2, 36.00, 'cancelled', '2025-05-12 21:27:31', '2025-05-12 07:27:31', '2025-05-12 07:28:55'),
+(33, 2, 36.00, 'cancelled', '2025-05-12 21:27:58', '2025-05-12 07:27:58', '2025-05-12 07:29:28'),
+(34, 2, 36.00, 'cancelled', '2025-05-12 21:43:07', '2025-05-12 07:43:08', '2025-05-12 07:43:21'),
+(35, 2, 36.00, 'cancelled', '2025-05-12 21:44:15', '2025-05-12 07:44:15', '2025-05-12 07:44:35'),
+(36, 2, 69.00, 'delivered', '2025-05-13 15:32:47', '2025-05-13 01:32:47', '2025-05-13 01:33:49'),
+(37, 2, 24.00, 'shipped', '2025-05-13 18:23:58', '2025-05-13 04:23:58', '2025-05-13 09:45:57'),
+(38, 2, 8.00, 'shipped', '2025-05-17 15:00:08', '2025-05-17 01:00:09', '2025-05-17 01:08:24'),
+(39, 2, 13.00, 'cancelled', '2025-05-17 16:12:20', '2025-05-17 02:12:20', '2025-05-17 02:12:43'),
+(40, 2, 51.00, 'delivered', '2025-05-18 13:40:31', '2025-05-17 23:40:31', '2025-05-17 23:42:10');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `order_items`
+-- Table structure for table `order_items`
 --
 
 CREATE TABLE `order_items` (
@@ -290,48 +360,32 @@ CREATE TABLE `order_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `order_items`
+-- Dumping data for table `order_items`
 --
 
 INSERT INTO `order_items` (`item_id`, `order_id`, `variant_id`, `quantity`, `price`, `created_at`, `updated_at`) VALUES
-(11, 1, 9, 1, 21.00, '2025-04-29 01:31:50', '2025-04-29 01:31:50'),
-(12, 2, 9, 1, 21.00, '2025-04-29 01:49:33', '2025-04-29 01:49:33'),
-(13, 2, 28, 1, 18.00, '2025-04-29 01:49:33', '2025-04-29 01:49:33'),
-(14, 5, 9, 1, 21.00, '2025-04-29 02:12:02', '2025-04-29 02:12:02'),
-(15, 5, 28, 1, 18.00, '2025-04-29 02:12:02', '2025-04-29 02:12:02'),
-(16, 7, 9, 1, 21.00, '2025-04-29 02:17:45', '2025-04-29 02:17:45'),
-(17, 7, 28, 1, 18.00, '2025-04-29 02:17:45', '2025-04-29 02:17:45'),
-(18, 7, 32, 1, 17.00, '2025-04-29 02:17:45', '2025-04-29 02:17:45'),
-(19, 8, 9, 1, 21.00, '2025-04-29 02:19:10', '2025-04-29 02:19:10'),
-(20, 8, 28, 1, 18.00, '2025-04-29 02:19:10', '2025-04-29 02:19:10'),
-(21, 8, 32, 1, 17.00, '2025-04-29 02:19:10', '2025-04-29 02:19:10'),
-(22, 11, 9, 1, 21.00, '2025-04-29 02:29:00', '2025-04-29 02:29:00'),
-(23, 11, 28, 1, 18.00, '2025-04-29 02:29:00', '2025-04-29 02:29:00'),
-(24, 11, 32, 1, 17.00, '2025-04-29 02:29:00', '2025-04-29 02:29:00'),
-(25, 12, 9, 1, 21.00, '2025-04-29 02:36:00', '2025-04-29 02:36:00'),
-(26, 12, 28, 1, 18.00, '2025-04-29 02:36:00', '2025-04-29 02:36:00'),
-(27, 12, 32, 1, 17.00, '2025-04-29 02:36:00', '2025-04-29 02:36:00'),
-(28, 12, 22, 1, 15.00, '2025-04-29 02:36:00', '2025-04-29 02:36:00'),
-(29, 13, 9, 1, 21.00, '2025-04-29 02:39:41', '2025-04-29 02:39:41'),
-(30, 13, 28, 1, 18.00, '2025-04-29 02:39:41', '2025-04-29 02:39:41'),
-(31, 13, 32, 1, 17.00, '2025-04-29 02:39:41', '2025-04-29 02:39:41'),
-(32, 13, 22, 1, 15.00, '2025-04-29 02:39:41', '2025-04-29 02:39:41'),
-(33, 15, 22, 1, 15.00, '2025-04-29 02:49:39', '2025-04-29 02:49:39'),
-(34, 16, 9, 1, 21.00, '2025-04-29 02:49:55', '2025-04-29 02:49:55'),
-(35, 16, 28, 1, 18.00, '2025-04-29 02:49:55', '2025-04-29 02:49:55'),
-(36, 16, 32, 1, 17.00, '2025-04-29 02:49:55', '2025-04-29 02:49:55'),
-(37, 16, 22, 1, 15.00, '2025-04-29 02:49:55', '2025-04-29 02:49:55'),
-(38, 17, 9, 1, 21.00, '2025-04-29 02:52:47', '2025-04-29 02:52:47'),
-(39, 17, 28, 1, 18.00, '2025-04-29 02:52:47', '2025-04-29 02:52:47'),
-(40, 17, 32, 1, 17.00, '2025-04-29 02:52:48', '2025-04-29 02:52:48'),
-(41, 17, 22, 1, 15.00, '2025-04-29 02:52:48', '2025-04-29 02:52:48'),
-(42, 18, 28, 1, 18.00, '2025-04-29 02:53:30', '2025-04-29 02:53:30'),
-(43, 19, 13, 1, 23.00, '2025-04-29 02:55:17', '2025-04-29 02:55:17');
+(47, 25, 37, 1, 16.00, '2025-05-11 07:39:54', '2025-05-11 07:39:54'),
+(49, 27, 2, 1, 20.00, '2025-05-11 09:42:11', '2025-05-11 09:42:11'),
+(50, 28, 33, 2, 17.00, '2025-05-11 09:57:58', '2025-05-11 09:57:58'),
+(51, 29, 29, 1, 18.00, '2025-05-11 10:00:00', '2025-05-11 10:00:00'),
+(52, 30, 19, 2, 24.00, '2025-05-11 10:07:49', '2025-05-11 10:07:49'),
+(53, 31, 8, 1, 21.00, '2025-05-12 00:44:02', '2025-05-12 00:44:02'),
+(54, 32, 27, 2, 18.00, '2025-05-12 07:27:32', '2025-05-12 07:27:32'),
+(55, 33, 27, 2, 18.00, '2025-05-12 07:27:58', '2025-05-12 07:27:58'),
+(56, 34, 26, 2, 18.00, '2025-05-12 07:43:08', '2025-05-12 07:43:08'),
+(57, 35, 26, 2, 18.00, '2025-05-12 07:44:15', '2025-05-12 07:44:15'),
+(58, 36, 26, 2, 18.00, '2025-05-13 01:32:48', '2025-05-13 01:32:48'),
+(59, 36, 39, 1, 16.00, '2025-05-13 01:32:48', '2025-05-13 01:32:48'),
+(60, 36, 33, 1, 17.00, '2025-05-13 01:32:48', '2025-05-13 01:32:48'),
+(61, 37, 19, 1, 24.00, '2025-05-13 04:23:59', '2025-05-13 04:23:59'),
+(62, 38, 39, 1, 8.00, '2025-05-17 01:00:09', '2025-05-17 01:00:09'),
+(63, 39, 62, 1, 13.00, '2025-05-17 02:12:21', '2025-05-17 02:12:21'),
+(64, 40, 32, 3, 17.00, '2025-05-17 23:40:31', '2025-05-17 23:40:31');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `payments`
+-- Table structure for table `payments`
 --
 
 CREATE TABLE `payments` (
@@ -346,7 +400,7 @@ CREATE TABLE `payments` (
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `personal_access_tokens`
+-- Table structure for table `personal_access_tokens`
 --
 
 CREATE TABLE `personal_access_tokens` (
@@ -365,7 +419,7 @@ CREATE TABLE `personal_access_tokens` (
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `products`
+-- Table structure for table `products`
 --
 
 CREATE TABLE `products` (
@@ -389,23 +443,28 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `products`
+-- Dumping data for table `products`
 --
 
 INSERT INTO `products` (`product_id`, `product_name`, `product_price`, `des_1`, `des_2`, `des_3`, `des_4`, `des_5`, `des_6`, `des_7`, `des_8`, `des_9`, `des_10`, `des_11`, `category_id`, `created_at`, `updated_at`) VALUES
 (1, 'Áo y tá xanh trắng', 20.00, 'Áo y tá xanh trắng 1', 'Áo y tá xanh trắng 2', 'Áo y tá xanh trắng 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-04-19 01:57:11', '2025-04-19 02:49:58'),
-(2, 'Bộ quần áo ý tá hồng gợi cảm', 21.00, 'Bộ quần áo ý tá hồng gợi cảm 1', 'Bộ quần áo ý tá hồng gợi cảm 2', 'Bộ quần áo ý tá hồng gợi cảm 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-04-19 02:52:41', '2025-04-19 02:52:41'),
+(2, 'Bộ quần áo ý tá hồng gợi cảm', 21.00, 'Bộ quần áo ý tá hồng gợi cảm 1', 'Bộ quần áo ý tá hồng gợi cảm 2', 'Bộ quần áo ý tá hồng gợi cảm 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-04-19 02:52:41', '2025-05-12 02:55:07'),
 (3, 'Bộ điều dưỡng xanh xám', 23.00, 'Bộ điều dưỡng xanh xám 1', 'Bộ điều dưỡng xanh xám 2', 'Bộ điều dưỡng xanh xám 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-04-19 02:53:32', '2025-04-19 02:53:32'),
 (4, 'Bộ đồ y tá đen xanh', 24.00, 'Bộ đồ y tá đen xanh 1', 'Bộ đồ y tá đen xanh 2', 'Bộ đồ y tá đen xanh 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-04-19 02:54:15', '2025-04-19 02:54:15'),
-(5, 'Bộ đồ đầu bếp liền tạp dề', 15.00, 'Bộ đồ đầu bếp liền tạp dề 1', 'Bộ đồ đầu bếp liền tạp dề 2', 'Bộ đồ đầu bếp liền tạp dề 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2025-04-19 02:57:44', '2025-04-19 02:57:44'),
-(6, 'Bộ áo liền tạp dề nữ', 18.00, 'Bộ áo liền tạp dề nữ 1', 'Bộ áo liền tạp dề nữ 2', 'Bộ áo liền tạp dề nữ 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2025-04-19 02:58:53', '2025-04-19 02:58:53'),
+(5, 'Bộ đồ đầu bếp liền tạp dề', 15.00, 'Bộ đồ đầu bếp liền tạp dề 1', 'Bộ đồ đầu bếp liền tạp dề 2', 'Bộ đồ đầu bếp liền tạp dề 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2025-04-19 02:57:44', '2025-05-13 01:36:00'),
+(6, 'Bộ áo liền tạp dề nữ', 18.00, 'Bộ áo liền tạp dề nữ 1', 'Bộ áo liền tạp dề nữ 2', 'Bộ áo liền tạp dề nữ 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2025-04-19 02:58:53', '2025-05-12 07:16:52'),
 (7, 'Set đồ đầu bếp đen nam nữ', 17.00, 'Set đồ đầu bếp đen nam nữ 1', 'Set đồ đầu bếp đen nam nữ 2', 'Set đồ đầu bếp đen nam nữ 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2025-04-19 02:59:50', '2025-04-19 09:04:13'),
-(8, 'Set phục vụ xám nam', 16.00, 'Set phục vụ xám nam 1', 'Set phục vụ xám nam 2', 'Set phục vụ xám nam 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2025-04-19 03:00:33', '2025-04-19 09:03:56');
+(8, 'Apron អៀមខ្លីពណ៌គគី', 16.00, 'Apron អៀមខ្លីពណ៌គគី 1', 'Apron អៀមខ្លីពណ៌គគី 2', 'Apron អៀមខ្លីពណ៌គគី 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2025-04-19 03:00:33', '2025-05-15 20:29:32'),
+(9, 'អាវប្លូស​ បុរសសាច់ក្រាស់ ត្រេ ក្រហម&ខៀវ', 24.00, 'អាវប្លូស​ បុរសសាច់ក្រាស់ ត្រេ ក្រហម&ខៀវ 1`', 'អាវប្លូស​ បុរសសាច់ក្រាស់ ត្រេ ក្រហម&ខៀវ 2', 'អាវប្លូស​ បុរសសាច់ក្រាស់ ត្រេ ក្រហម&ខៀវ 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-05-15 20:34:58', '2025-05-15 20:34:58'),
+(10, 'VIPឈុតនារីពណ៌ស្វាយ ឡាយស', 14.50, 'VIPឈុតនារីពណ៌ស្វាយ ឡាយស 1', 'VIPឈុតនារីពណ៌ស្វាយ ឡាយស 2', 'VIPឈុតនារីពណ៌ស្វាយ ឡាយស 3', 'VIPឈុតនារីពណ៌ស្វាយ ឡាយស 4', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(11, 'អាវប្លូស នារីសាច់ស្ដើង ត្រេ ក្រហម&ខៀវ', 20.00, 'អាវប្លូស នារីសាច់ស្ដើង ត្រេ ក្រហម&ខៀវ 1', 'អាវប្លូស នារីសាច់ស្ដើង ត្រេ ក្រហម&ខៀវ 2', 'អាវប្លូស នារីសាច់ស្ដើង ត្រេ ក្រហម&ខៀវ 3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(12, 'ឈុតបុរសពណ៌ទឹកប៊ិច ឡាយស', 16.00, 'ឈុតបុរសពណ៌ទឹកប៊ិច ឡាយស 1', 'ឈុតបុរសពណ៌ទឹកប៊ិច ឡាយស 2', 'ឈុតបុរសពណ៌ទឹកប៊ិច ឡាយស 3', 'ឈុតបុរសពណ៌ទឹកប៊ិច ឡាយស 4', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(13, 'ឈុតបុរសពណ៌បៃតង1', 13.00, 'ឈុតបុរសពណ៌បៃតង', 'ឈុតបុរសពណ៌បៃតង', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, '2025-05-17 01:52:58', '2025-05-17 01:52:58');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `product_images`
+-- Table structure for table `product_images`
 --
 
 CREATE TABLE `product_images` (
@@ -417,7 +476,7 @@ CREATE TABLE `product_images` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `product_images`
+-- Dumping data for table `product_images`
 --
 
 INSERT INTO `product_images` (`product_img_id`, `product_id`, `image_path`, `created_at`, `updated_at`) VALUES
@@ -445,12 +504,33 @@ INSERT INTO `product_images` (`product_img_id`, `product_id`, `image_path`, `cre
 (22, 7, 'b184c46f-81e5-43d0-85e3-77a9f6a88a7a.jpg', '2025-04-19 02:59:50', '2025-04-19 02:59:50'),
 (23, 8, 'd03b0076-9603-4b45-895f-ca536952e53c.jpg', '2025-04-19 03:00:33', '2025-04-19 03:00:33'),
 (24, 8, '2906a105-2ed7-41b4-8749-ee4713785432.jpg', '2025-04-19 03:00:33', '2025-04-19 03:00:33'),
-(25, 8, 'f7d34346-7d1c-4268-95b5-c2bee30b12b1.jpg', '2025-04-19 03:00:33', '2025-04-19 03:00:33');
+(25, 8, 'f7d34346-7d1c-4268-95b5-c2bee30b12b1.jpg', '2025-04-19 03:00:33', '2025-04-19 03:00:33'),
+(26, 9, '23f057d3-d637-46ff-8a90-ef6ed5a54840.jpg', '2025-05-15 20:35:00', '2025-05-15 20:35:00'),
+(27, 9, '9c665165-5fa2-4e8f-92b9-4c8bc832fc6c.jpg', '2025-05-15 20:35:00', '2025-05-15 20:35:00'),
+(28, 9, 'c28b8dcf-3114-4ac7-96bf-d6f319615108.jpg', '2025-05-15 20:35:00', '2025-05-15 20:35:00'),
+(29, 9, 'e076a1ca-4b2e-4014-897f-f97763ef1562.jpg', '2025-05-15 20:35:00', '2025-05-15 20:35:00'),
+(30, 9, 'da4608d0-27d7-44e1-babb-7bd2828efb23.jpg', '2025-05-15 20:35:00', '2025-05-15 20:35:00'),
+(31, 10, '8cf20abf-31b5-4f01-9887-bb81049ae486.jpg', '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(32, 10, '5c188313-e9b5-49b1-915c-971ceac633ca.jpg', '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(33, 10, '32a73192-8d7f-43b6-8fe2-1a7833d46c64.jpg', '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(34, 10, '264e8082-65ed-4fa2-9ca6-7c9fa933c20d.jpg', '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(35, 11, 'a15d4332-c15d-4175-8cc9-de55377914f0.jpg', '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(36, 11, '48f75c4f-029d-497c-aea5-e34b384bd926.jpg', '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(37, 11, 'cb4056e7-0769-4b70-a7be-5fe041c4ac33.jpg', '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(38, 11, 'c76eb435-7f9b-40b2-bb97-7e0cd4d1a950.jpg', '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(39, 12, '510137ba-4f5d-4e96-ba81-2b7f902d964d.jpg', '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(40, 12, 'f7ecac30-d608-4b5e-a1fb-b920216fd853.jpg', '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(41, 12, '7c166535-11ad-4bc4-8b35-e602d0df618d.jpg', '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(42, 12, 'a429f30e-6ac1-40df-b102-abf58baba21c.jpg', '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(43, 13, '4ee206ca-0f81-43d0-949d-1e99e22126b9.jpg', '2025-05-17 01:52:59', '2025-05-17 01:52:59'),
+(44, 13, '2c66c0a5-6122-48ae-aa08-dc8149bf3f11.jpg', '2025-05-17 01:52:59', '2025-05-17 01:52:59'),
+(45, 13, '0df1e53a-b173-4caa-8b28-8df3fcbf6e8f.jpg', '2025-05-17 01:52:59', '2025-05-17 01:52:59'),
+(46, 13, 'ac4ad622-ca8c-4c1f-9a62-6464955d48fa.jpg', '2025-05-17 01:52:59', '2025-05-17 01:52:59');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `product_variants`
+-- Table structure for table `product_variants`
 --
 
 CREATE TABLE `product_variants` (
@@ -464,19 +544,19 @@ CREATE TABLE `product_variants` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `product_variants`
+-- Dumping data for table `product_variants`
 --
 
 INSERT INTO `product_variants` (`id`, `product_id`, `size`, `quantity`, `sold`, `created_at`, `updated_at`) VALUES
 (1, 1, 'S', 2, 0, '2025-04-19 01:57:11', '2025-04-19 02:49:58'),
-(2, 1, 'M', 1, 1, '2025-04-19 01:57:11', '2025-04-29 01:29:17'),
+(2, 1, 'M', 0, 2, '2025-04-19 01:57:11', '2025-05-11 09:42:11'),
 (3, 1, 'L', 2, 0, '2025-04-19 01:57:11', '2025-04-19 02:49:58'),
 (4, 1, 'XL', 2, 0, '2025-04-19 01:57:11', '2025-04-19 02:49:58'),
 (5, 1, '2XL', 2, 0, '2025-04-19 01:57:11', '2025-04-19 02:49:58'),
 (6, 2, 'S', 3, 0, '2025-04-19 02:52:41', '2025-04-19 02:52:41'),
 (7, 2, 'M', 3, 0, '2025-04-19 02:52:41', '2025-04-19 02:52:41'),
-(8, 2, 'L', 2, 1, '2025-04-19 02:52:41', '2025-04-28 00:41:03'),
-(9, 2, 'XL', -9, 12, '2025-04-19 02:52:41', '2025-04-29 02:52:47'),
+(8, 2, 'L', 1, 2, '2025-04-19 02:52:41', '2025-05-12 00:44:02'),
+(9, 2, 'XL', 2, 12, '2025-04-19 02:52:41', '2025-05-12 02:55:07'),
 (10, 2, '2XL', 3, 0, '2025-04-19 02:52:41', '2025-04-19 02:52:41'),
 (11, 3, 'S', 3, 0, '2025-04-19 02:53:32', '2025-04-19 02:53:32'),
 (12, 3, 'M', 3, 0, '2025-04-19 02:53:32', '2025-04-19 02:53:32'),
@@ -486,32 +566,56 @@ INSERT INTO `product_variants` (`id`, `product_id`, `size`, `quantity`, `sold`, 
 (16, 4, 'S', 2, 0, '2025-04-19 02:54:15', '2025-04-19 02:54:15'),
 (17, 4, 'M', 2, 0, '2025-04-19 02:54:15', '2025-04-19 02:54:15'),
 (18, 4, 'L', 2, 0, '2025-04-19 02:54:15', '2025-04-19 02:54:15'),
-(19, 4, 'XL', 3, 0, '2025-04-19 02:54:15', '2025-04-19 02:54:15'),
+(19, 4, 'XL', 0, 3, '2025-04-19 02:54:15', '2025-05-13 04:23:59'),
 (20, 4, '2XL', 1, 1, '2025-04-19 02:54:15', '2025-04-29 01:29:17'),
 (21, 5, 'S', 2, 0, '2025-04-19 02:57:44', '2025-04-19 02:57:44'),
-(22, 5, 'M', -3, 5, '2025-04-19 02:57:44', '2025-04-29 02:52:48'),
-(23, 5, 'L', 2, 0, '2025-04-19 02:57:44', '2025-04-19 02:57:44'),
+(23, 5, 'L', 1, 1, '2025-04-19 02:57:44', '2025-05-11 08:05:34'),
 (24, 5, '2XL', 2, 0, '2025-04-19 02:57:44', '2025-04-19 02:57:44'),
 (25, 6, 'S', 2, 0, '2025-04-19 02:58:53', '2025-04-19 02:58:53'),
-(26, 6, 'M', 2, 0, '2025-04-19 02:58:53', '2025-04-19 02:58:53'),
-(27, 6, 'L', 3, 0, '2025-04-19 02:58:53', '2025-04-19 02:58:53'),
-(28, 6, 'XL', -7, 10, '2025-04-19 02:58:53', '2025-04-29 02:53:30'),
-(29, 6, '2XL', 2, 0, '2025-04-19 02:58:53', '2025-04-19 02:58:53'),
+(26, 6, 'M', 0, 2, '2025-04-19 02:58:53', '2025-05-13 01:32:48'),
+(27, 6, 'L', -2, 5, '2025-04-19 02:58:53', '2025-05-12 07:27:58'),
+(28, 6, 'XL', 11, 10, '2025-04-19 02:58:53', '2025-05-12 07:16:52'),
+(29, 6, '2XL', 1, 1, '2025-04-19 02:58:53', '2025-05-11 10:00:00'),
 (30, 7, 'S', 5, 0, '2025-04-19 02:59:50', '2025-04-19 09:04:13'),
 (31, 7, 'M', 3, 0, '2025-04-19 02:59:50', '2025-04-19 02:59:50'),
-(32, 7, 'L', 12, 8, '2025-04-19 02:59:50', '2025-04-29 02:52:48'),
-(33, 7, 'XL', 3, 0, '2025-04-19 02:59:50', '2025-04-19 02:59:50'),
-(34, 7, '2XL', 2, 0, '2025-04-19 02:59:50', '2025-04-19 02:59:50'),
+(32, 7, 'L', 7, 13, '2025-04-19 02:59:50', '2025-05-17 23:40:31'),
+(33, 7, 'XL', 0, 3, '2025-04-19 02:59:50', '2025-05-13 01:32:48'),
+(34, 7, '2XL', 0, 2, '2025-04-19 02:59:50', '2025-05-11 03:46:47'),
 (35, 8, 'S', 8, 3, '2025-04-19 03:00:33', '2025-04-21 03:27:47'),
 (36, 8, 'M', 8, 2, '2025-04-19 03:00:33', '2025-04-23 00:54:01'),
-(37, 8, 'L', 9, 1, '2025-04-19 03:00:33', '2025-04-23 23:31:36'),
+(37, 8, 'L', 8, 2, '2025-04-19 03:00:33', '2025-05-11 07:39:54'),
 (38, 8, 'XL', 5, 0, '2025-04-19 03:00:33', '2025-04-19 03:00:33'),
-(39, 8, '2XL', 5, 0, '2025-04-19 03:00:33', '2025-04-19 03:00:33');
+(39, 8, '2XL', 3, 2, '2025-04-19 03:00:33', '2025-05-17 01:00:09'),
+(40, 5, 'M', 1, 0, '2025-05-13 01:36:00', '2025-05-13 01:36:00'),
+(41, 5, 'XL', 1, 0, '2025-05-13 01:36:00', '2025-05-13 01:36:00'),
+(42, 9, 'S', 3, 0, '2025-05-15 20:34:58', '2025-05-15 20:34:58'),
+(43, 9, 'M', 3, 0, '2025-05-15 20:34:58', '2025-05-15 20:34:58'),
+(44, 9, 'L', 3, 0, '2025-05-15 20:34:58', '2025-05-15 20:34:58'),
+(45, 9, 'XL', 3, 0, '2025-05-15 20:34:58', '2025-05-15 20:34:58'),
+(46, 9, '2XL', 4, 0, '2025-05-15 20:34:58', '2025-05-15 20:34:58'),
+(47, 10, 'S', 2, 0, '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(48, 10, 'M', 2, 0, '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(49, 10, 'L', 2, 0, '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(50, 10, 'XL', 2, 0, '2025-05-17 01:35:19', '2025-05-17 01:35:19'),
+(51, 11, 'S', 2, 0, '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(52, 11, 'M', 2, 0, '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(53, 11, 'L', 2, 0, '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(54, 11, 'XL', 2, 0, '2025-05-17 01:37:02', '2025-05-17 01:37:02'),
+(55, 12, 'S', 2, 0, '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(56, 12, 'M', 2, 0, '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(57, 12, 'L', 2, 0, '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(58, 12, 'XL', 2, 0, '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(59, 12, '2XL', 2, 0, '2025-05-17 01:42:00', '2025-05-17 01:42:00'),
+(60, 13, 'S', 2, 0, '2025-05-17 01:52:58', '2025-05-17 01:52:58'),
+(61, 13, 'M', 2, 0, '2025-05-17 01:52:58', '2025-05-17 01:52:58'),
+(62, 13, 'L', 21, 0, '2025-05-17 01:52:58', '2025-05-17 02:12:43'),
+(63, 13, 'XL', 1, 0, '2025-05-17 01:52:58', '2025-05-17 01:52:58'),
+(64, 13, '2XL', 1, 0, '2025-05-17 01:52:58', '2025-05-17 01:52:58');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `push_notification_browsers`
+-- Table structure for table `push_notification_browsers`
 --
 
 CREATE TABLE `push_notification_browsers` (
@@ -522,7 +626,7 @@ CREATE TABLE `push_notification_browsers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `push_notification_browsers`
+-- Dumping data for table `push_notification_browsers`
 --
 
 INSERT INTO `push_notification_browsers` (`id`, `subscriptions`, `created_at`, `updated_at`) VALUES
@@ -531,7 +635,7 @@ INSERT INTO `push_notification_browsers` (`id`, `subscriptions`, `created_at`, `
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `reviews`
+-- Table structure for table `reviews`
 --
 
 CREATE TABLE `reviews` (
@@ -545,7 +649,7 @@ CREATE TABLE `reviews` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `reviews`
+-- Dumping data for table `reviews`
 --
 
 INSERT INTO `reviews` (`id`, `user_id`, `product_id`, `rating`, `comment`, `created_at`, `updated_at`) VALUES
@@ -554,12 +658,18 @@ INSERT INTO `reviews` (`id`, `user_id`, `product_id`, `rating`, `comment`, `crea
 (3, 3, 8, 5, 'abdasbdjabskjd', '2025-05-10 04:28:04', '2025-05-10 04:28:04'),
 (4, 2, 2, 4, 'vip y ta hong', '2025-05-11 02:12:20', '2025-05-11 02:12:20'),
 (5, 2, 6, 3, 'vip tap de nu', '2025-05-11 02:12:20', '2025-05-11 02:12:20'),
-(6, 2, 7, 5, 'vip dau bep den nam nu', '2025-05-11 02:12:20', '2025-05-11 02:12:20');
+(6, 2, 7, 5, 'vip dau bep den nam nu', '2025-05-11 02:12:20', '2025-05-11 02:12:20'),
+(7, 2, 8, 4, 'chất lượng tốt', '2025-05-11 07:45:47', '2025-05-11 07:45:47'),
+(8, 2, 8, 5, 'tối quá', '2025-05-13 05:31:25', '2025-05-13 05:31:25'),
+(9, 2, 7, 4, 'đẹp quá', '2025-05-13 05:52:28', '2025-05-13 05:52:28'),
+(10, 2, 7, 5, 'ស្អាតណាស់', '2025-05-13 08:58:09', '2025-05-13 08:58:09'),
+(11, 2, 7, 4, 'khong co gi noi', '2025-05-15 03:49:43', '2025-05-15 03:49:43'),
+(12, 2, 8, 5, 'ស្អាតណាស់', '2025-05-17 23:41:09', '2025-05-17 23:41:09');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -580,26 +690,26 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `phone_number`, `user_profile`, `user_role`, `otp`, `otp_expired_time`, `created_at`, `updated_at`, `address`, `country`, `more_address`) VALUES
 (1, 'admin', 'admin@gmail.com', '$2y$10$maznh/Ay2DVOmlWHUG/8ku1Snjat3qIHmVMvyVaAuGy0v0.XZhPuW', '093483', NULL, 'admin', NULL, NULL, '2024-09-14 07:17:41', '2024-09-14 07:17:41', NULL, NULL, NULL),
-(2, 'veng ann', 'kunvengann@gmail.com', '$2y$10$9Ui7Bo8aGVgzR1ssHiA.muCJAxTUEUi5mQay6cKDsO/b1QtuY5JD2', '087498674', 'uploads/profile/1746608789_arisu.jpg', 'user', NULL, NULL, '2024-09-14 07:15:02', '2025-05-07 02:40:32', 'កែងផ្លូវ២០៨, ផ្លូវលេខ ១១៤', 'ស្វាយរៀង', NULL),
+(2, 'veng ann', 'kunvengann@gmail.com', '$2y$10$9Ui7Bo8aGVgzR1ssHiA.muCJAxTUEUi5mQay6cKDsO/b1QtuY5JD2', '087498674', 'uploads/profile/1747124716_pic.png', 'user', NULL, NULL, '2024-09-14 07:15:02', '2025-05-13 01:25:16', 'កែងផ្លូវ២០៨, ផ្លូវលេខ ១១៤', 'ស្វាយរៀង', NULL),
 (3, 'Mao dep chai vkl', 'loginmabachduy2012@gmail.com', '$2y$10$v4CoFLKuZAZ5a7pFLl.5ROj5CuKO/Fph3vAAFOzMTIw02s1F7x4pC', '0123123123', NULL, 'user', NULL, NULL, '2025-05-10 04:10:53', '2025-05-10 04:10:53', NULL, NULL, NULL);
 
 --
--- Chỉ mục cho các bảng đã đổ
+-- Indexes for dumped tables
 --
 
 --
--- Chỉ mục cho bảng `banner_images`
+-- Indexes for table `banner_images`
 --
 ALTER TABLE `banner_images`
   ADD PRIMARY KEY (`banner_images_id`);
 
 --
--- Chỉ mục cho bảng `carts`
+-- Indexes for table `carts`
 --
 ALTER TABLE `carts`
   ADD PRIMARY KEY (`id`),
@@ -607,32 +717,46 @@ ALTER TABLE `carts`
   ADD KEY `variant_id` (`variant_id`);
 
 --
--- Chỉ mục cho bảng `categories`
+-- Indexes for table `categories`
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`category_id`);
 
 --
--- Chỉ mục cho bảng `invalidated_tokens`
+-- Indexes for table `events`
+--
+ALTER TABLE `events`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `event_product`
+--
+ALTER TABLE `event_product`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `event_product_event_id_product_id_unique` (`event_id`,`product_id`),
+  ADD KEY `event_product_product_id_foreign` (`product_id`);
+
+--
+-- Indexes for table `invalidated_tokens`
 --
 ALTER TABLE `invalidated_tokens`
   ADD PRIMARY KEY (`id_tk`);
 
 --
--- Chỉ mục cho bảng `migrations`
+-- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `orders`
+-- Indexes for table `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`order_id`),
   ADD KEY `orders_user_id_foreign` (`user_id`);
 
 --
--- Chỉ mục cho bảng `order_items`
+-- Indexes for table `order_items`
 --
 ALTER TABLE `order_items`
   ADD PRIMARY KEY (`item_id`),
@@ -640,14 +764,14 @@ ALTER TABLE `order_items`
   ADD KEY `variant_id` (`variant_id`);
 
 --
--- Chỉ mục cho bảng `payments`
+-- Indexes for table `payments`
 --
 ALTER TABLE `payments`
   ADD PRIMARY KEY (`payment_id`),
   ADD KEY `payments_order_id_foreign` (`order_id`);
 
 --
--- Chỉ mục cho bảng `personal_access_tokens`
+-- Indexes for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
   ADD PRIMARY KEY (`id`),
@@ -655,34 +779,34 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
--- Chỉ mục cho bảng `products`
+-- Indexes for table `products`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`product_id`),
   ADD KEY `products_category_id_foreign` (`category_id`);
 
 --
--- Chỉ mục cho bảng `product_images`
+-- Indexes for table `product_images`
 --
 ALTER TABLE `product_images`
   ADD PRIMARY KEY (`product_img_id`),
   ADD KEY `product_images_product_id_foreign` (`product_id`);
 
 --
--- Chỉ mục cho bảng `product_variants`
+-- Indexes for table `product_variants`
 --
 ALTER TABLE `product_variants`
   ADD PRIMARY KEY (`id`),
   ADD KEY `product_variants_product_id_foreign` (`product_id`);
 
 --
--- Chỉ mục cho bảng `push_notification_browsers`
+-- Indexes for table `push_notification_browsers`
 --
 ALTER TABLE `push_notification_browsers`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `reviews`
+-- Indexes for table `reviews`
 --
 ALTER TABLE `reviews`
   ADD PRIMARY KEY (`id`),
@@ -690,156 +814,175 @@ ALTER TABLE `reviews`
   ADD KEY `reviews_product_id_foreign` (`product_id`);
 
 --
--- Chỉ mục cho bảng `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
 --
--- AUTO_INCREMENT cho các bảng đã đổ
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT cho bảng `banner_images`
+-- AUTO_INCREMENT for table `banner_images`
 --
 ALTER TABLE `banner_images`
-  MODIFY `banner_images_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `banner_images_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT cho bảng `carts`
+-- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
--- AUTO_INCREMENT cho bảng `categories`
+-- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `category_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `category_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT cho bảng `invalidated_tokens`
+-- AUTO_INCREMENT for table `events`
+--
+ALTER TABLE `events`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `event_product`
+--
+ALTER TABLE `event_product`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+
+--
+-- AUTO_INCREMENT for table `invalidated_tokens`
 --
 ALTER TABLE `invalidated_tokens`
-  MODIFY `id_tk` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+  MODIFY `id_tk` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
--- AUTO_INCREMENT cho bảng `migrations`
+-- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
--- AUTO_INCREMENT cho bảng `orders`
+-- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
--- AUTO_INCREMENT cho bảng `order_items`
+-- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
--- AUTO_INCREMENT cho bảng `payments`
+-- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
   MODIFY `payment_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT cho bảng `personal_access_tokens`
+-- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT cho bảng `products`
+-- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `product_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- AUTO_INCREMENT cho bảng `product_images`
+-- AUTO_INCREMENT for table `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `product_img_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `product_img_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
--- AUTO_INCREMENT cho bảng `product_variants`
+-- AUTO_INCREMENT for table `product_variants`
 --
 ALTER TABLE `product_variants`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
--- AUTO_INCREMENT cho bảng `push_notification_browsers`
+-- AUTO_INCREMENT for table `push_notification_browsers`
 --
 ALTER TABLE `push_notification_browsers`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT cho bảng `reviews`
+-- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT cho bảng `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- Các ràng buộc cho các bảng đã đổ
+-- Constraints for dumped tables
 --
 
 --
--- Các ràng buộc cho bảng `carts`
+-- Constraints for table `carts`
 --
 ALTER TABLE `carts`
   ADD CONSTRAINT `carts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `carts_ibfk_2` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `orders`
+-- Constraints for table `event_product`
+--
+ALTER TABLE `event_product`
+  ADD CONSTRAINT `event_product_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `event_product_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `orders`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `order_items`
+-- Constraints for table `order_items`
 --
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL;
 
 --
--- Các ràng buộc cho bảng `payments`
+-- Constraints for table `payments`
 --
 ALTER TABLE `payments`
   ADD CONSTRAINT `payments_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `products`
+-- Constraints for table `products`
 --
 ALTER TABLE `products`
   ADD CONSTRAINT `products_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `product_images`
+-- Constraints for table `product_images`
 --
 ALTER TABLE `product_images`
   ADD CONSTRAINT `product_images_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `product_variants`
+-- Constraints for table `product_variants`
 --
 ALTER TABLE `product_variants`
   ADD CONSTRAINT `product_variants_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
 
 --
--- Các ràng buộc cho bảng `reviews`
+-- Constraints for table `reviews`
 --
 ALTER TABLE `reviews`
   ADD CONSTRAINT `reviews_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE,

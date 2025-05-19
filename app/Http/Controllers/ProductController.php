@@ -16,153 +16,185 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
 
-    public function getRecommendedProducts(Request $request)
-    {
-        try {
-            // Tìm sản phẩm hiện tại
-            $currentProduct = Product::with('category')->find($request->product_id);
+public function getRecommendedProducts(Request $request)
+{
+    try {
+        $currentProduct = Product::with('category')->find($request->product_id);
+        if (!$currentProduct) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
 
-            // Nếu không tìm thấy sản phẩm, trả về lỗi 404
-            if (!$currentProduct) {
-                return response()->json(['error' => 'Product not found'], 404);
+        $now = now();
+        $recommendedProducts = Product::with([
+            'category',
+            'product_images',
+            'product_variants',
+            // 'events' => function ($query) use ($now) {
+            //     $query->where('from_date', '<=', $now)
+            //           ->where('to_date', '>=', $now);
+            // }
+        ])
+        ->where('category_id', $currentProduct->category_id)
+        ->where('product_id', '!=', $request->product_id)
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+
+        $recommendations = $recommendedProducts->map(function ($p) {
+            $descriptions = [];
+            for ($i = 1; $i <= 11; $i++) {
+                $descriptionField = "des_$i";
+                if (!empty($p->$descriptionField)) {
+                    $descriptions[$descriptionField] = $p->$descriptionField;
+                }
             }
 
-            // Lấy danh sách sản phẩm được đề xuất
-            $recommendedProducts = Product::with(['category', 'product_images', 'product_variants'])
-            ->where('category_id', $currentProduct->category_id)
-            ->where('product_id', '!=', $request->product_id)
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
-        
+            $images = $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [];
 
-            // Xử lý dữ liệu sản phẩm đề xuất
-            $recommendations = $recommendedProducts->map(function ($p) {
-                $descriptions = [];
-                for ($i = 1; $i <= 11; $i++) {
-                    $descriptionField = "des_$i";
-                    if (!empty($p->$descriptionField)) {
-                        $descriptions[$descriptionField] = $p->$descriptionField;
-                    }
-                }
-            
-                $images = $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [];
-            
-                $variants = $p->product_variants ? $p->product_variants->map(function ($v) {
-                    return [
-                        'size' => $v->size,
-                        'quantity' => $v->quantity,
-                        'sold' => $v->sold,
-                    ];
-                }) : [];
-            
+            $variants = $p->product_variants ? $p->product_variants->map(function ($v) {
                 return [
-                    'product_id' => $p->product_id,
-                    'product_name' => $p->product_name,
-                    'category_name' => $p->category->category_name ?? 'N/A',
-                    'category_id' => $p->category->category_id ?? null,
-                    'product_price' => number_format($p->product_price, 2),
-                    'descriptions' => $descriptions,
-                    'images' => $images,
-                    'variants' => $variants, // <-- thêm vào đây
+                    'size' => $v->size,
+                    'quantity' => $v->quantity,
+                    'sold' => $v->sold,
                 ];
-            });
+            }) : [];
 
-            return response()->json([
-                'status' => 200,
-                'data' => $recommendations
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'error' => $e->getMessage()
-            ], 500);
-        }
+            $discount = $p->events->count() > 0 ? $p->events->max('discount') : 0;
+            $originalPrice = $p->product_price;
+            $discountedPrice = $discount > 0 ? $originalPrice * (1 - $discount / 100) : $originalPrice;
+
+            return [
+                'product_id' => $p->product_id,
+                'product_name' => $p->product_name,
+                'category_name' => $p->category->category_name ?? 'N/A',
+                'category_id' => $p->category->category_id ?? null,
+                'product_price' => number_format($originalPrice, 2),
+                'discount_percent' => $discount,
+                'discounted_price' => number_format($discountedPrice, 2),
+                'descriptions' => $descriptions,
+                'images' => $images,
+                'variants' => $variants,
+            ];
+        });
+
+        return response()->json([
+            'status' => 200,
+            'data' => $recommendations
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+public function getAll()
+{
+    try {
+        $now = now();
 
+        $products = Product::with([
+            'category',
+            'product_images',
+            'product_variants',
+            'events' => function ($query) use ($now) {
+                $query->whereDate('from_date', '<=', $now)
+                      ->whereDate('to_date', '>=', $now);
+            }
+        ])
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-    public function getAll()
-    {
-        try {
-            // Lấy danh sách sản phẩm cùng với các quan hệ
-            $products = Product::with(['category', 'product_images', 'product_variants'])
-                ->orderBy('created_at', 'desc')
-                ->get();
-    
-            // Xử lý dữ liệu sản phẩm
-            $proDetail = $products->map(function ($p) {
-                $descriptions = [];
-                for ($i = 1; $i <= 11; $i++) {
-                    $descriptionField = "des_$i";
-                    if (!empty($p->$descriptionField)) {
-                        $descriptions[$descriptionField] = $p->$descriptionField;
-                    }
+        $proDetail = $products->map(function ($p) {
+            $descriptions = [];
+            for ($i = 1; $i <= 11; $i++) {
+                $field = "des_$i";
+                if (!empty($p->$field)) {
+                    $descriptions[$field] = $p->$field;
                 }
-    
-                // Tính tổng số lượng từ product_variants
-                $totalQuantity = $p->product_variants ? $p->product_variants->sum('quantity') : 0;
-    
-                // Lấy danh sách hình ảnh
-                $images = $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [];
-    
-                // Lấy danh sách các biến thể
-                $variants = $p->product_variants ? $p->product_variants->map(function ($variant) {
-                    return [
-                        'variant_id' => $variant->id,
-                        'size' => $variant->size,
-                        'quantity' => $variant->quantity,
-                        'sold' => $variant->sold
-                    ];
-                }) : [];
-    
-                return [
-                    'product_id' => $p->product_id,
-                    'product_name' => $p->product_name,
-                    'category_name' => $p->category->category_name ?? 'N/A', // Kiểm tra null
-                    'category_id' => $p->category->category_id ?? null, // Kiểm tra null
-                    'product_price' => number_format($p->product_price, 2),
-                    'descriptions' => $descriptions,
-                    'images' => $images,
-                    'quantity' => $totalQuantity,
-                    'variants' => $variants,
-                ];
-            });
-    
-            return response()->json([
-                'status' => 200,
-                'data' => $proDetail
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-    public function getById($id)
-    {
-        try {
-            $product = Product::with(['category', 'product_image', 'product_variants'])->find($id);
-            if (!$product) {
-                return response()->json(['error' => 'Product not found'], 404);
             }
 
-            $product->images = ProductImages::where('product_id', $id)->pluck('image_path');
-            $product->variants = $product->product_variants->map(function ($variant) {
+            $totalQuantity = $p->product_variants ? $p->product_variants->sum('quantity') : 0;
+            $images = $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [];
+            $variants = $p->product_variants ? $p->product_variants->map(function ($variant) {
                 return [
+                    'variant_id' => $variant->id,
                     'size' => $variant->size,
                     'quantity' => $variant->quantity,
                     'sold' => $variant->sold
                 ];
-            });
+            }) : [];
 
-            return response()->json($product, 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+            $originalPrice = $p->product_price;
+            $discount = $p->events->max('discount') ?? 0;
+            $discountedPrice = $discount > 0 ? $originalPrice * (1 - $discount / 100) : $originalPrice;
+
+            return [
+                'product_id' => $p->product_id,
+                'product_name' => $p->product_name,
+                'category_name' => $p->category->category_name ?? 'N/A',
+                'category_id' => $p->category->category_id ?? null,
+                'product_price' => number_format($originalPrice, 2),
+                'discount_percent' => $discount,
+                'discounted_price' => number_format($discountedPrice, 2),
+                'descriptions' => $descriptions,
+                'images' => $images,
+                'quantity' => $totalQuantity,
+                'variants' => $variants,
+            ];
+        });
+
+        return response()->json([
+            'status' => 200,
+            'data' => $proDetail
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 500,
+            'error' => $e->getMessage()
+        ]);
     }
+}
 
-    public function addProduct(Request $request)
+public function getById($id)
+{
+    try {
+        $product = Product::with(['category', 'product_images', 'product_variants', 'events'])->find($id);
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        $product->images = $product->product_images->pluck('image_path');
+        $product->variants = $product->product_variants->map(function ($variant) {
+            return [
+                'size' => $variant->size,
+                'quantity' => $variant->quantity,
+                'sold' => $variant->sold
+            ];
+        });
+
+        $now = now();
+        $activeEvent = $product->events()
+            ->where('from_date', '<=', $now)
+            ->where('to_date', '>=', $now)
+            ->orderByDesc('discount')
+            ->first();
+
+        $discount = $activeEvent ? $activeEvent->discount : 0;
+        $product->discount_percent = $discount;
+
+        $originalPrice = $product->product_price;
+        $discountedPrice = $discount > 0 ? $originalPrice * (1 - $discount / 100) : $originalPrice;
+        $product->discounted_price = number_format($discountedPrice, 2);
+        $product->product_price = number_format($originalPrice, 2);
+
+        return response()->json($product, 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+public function addProduct(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|string|max:255',
@@ -216,9 +248,9 @@ class ProductController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
+}
 
-    public function addImageProduct(Request $request)
+public function addImageProduct(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,product_id',
@@ -253,9 +285,9 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
+}
 
-    public function updateProduct(Request $request)
+public function updateProduct(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,product_id',
@@ -322,9 +354,9 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
+}
 
-    public function updateImgProduct(Request $request)
+public function updateImgProduct(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,product_id',
@@ -365,9 +397,9 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
+}
 
-    public function deleteProduct(Request $request)
+public function deleteProduct(Request $request)
     {
         try {
             $product = Product::find($request->product_id);
@@ -382,9 +414,9 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
+}
 
-    public function deleteProductImg(Request $request)
+public function deleteProductImg(Request $request)
     {
         try {
             $productImg = ProductImages::find($request->product_id);
@@ -409,5 +441,5 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
+}
 }

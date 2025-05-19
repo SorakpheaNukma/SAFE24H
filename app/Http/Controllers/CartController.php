@@ -6,6 +6,7 @@ use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProductVariants;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -34,27 +35,53 @@ class CartController extends Controller
                     'status' => 204,
                     'message' => 'Cart is empty.',
                     'data' => []
+                    
                 ], 200); // HTTP 200 OK nhưng thông điệp rõ ràng là không có dữ liệu
             }
 
             // Xử lý dữ liệu và kiểm tra null
             $cartDetails = $cartItems->map(function ($item) {
-                $variant = $item->variant;
-                $product = $variant ? $variant->product : null;
-                $images = $product ? $product->product_images : collect([]);
-                $imagePath = $images->isNotEmpty()
-                    ? url('/uploads/products/' . $images->first()->image_path)
-                    : url('/uploads/products/default.jpg');
-                return [
-                    'cart_id' => $item->id,
-                    'variant_id' => $item->variant_id,
-                    'product_name' => $product->product_name ?? 'N/A',
-                    'quantity' => $item->quantity,
-                    'price' => $product->product_price ?? 0,
-                    'size' => $variant ? $variant->size : 'N/A', // ✨ thêm dòng này
-                    'images' => $imagePath,
-                ];
-            });
+            $variant = $item->variant;
+            $product = $variant ? $variant->product : null;
+            $images = $product ? $product->product_images : collect([]);
+            $imagePath = $images->isNotEmpty()
+                ? url('/uploads/products/' . $images->first()->image_path)
+                : url('/uploads/products/default.jpg');
+
+            $originalPrice = $product->product_price ?? 0;
+            $discount = 0;
+            $finalPrice = $originalPrice;
+
+            // 👉 Lấy giảm giá nếu có trong bảng event_product (KHÔNG kiểm tra thời gian)
+            if ($product) {
+                $today = now()->toDateString();
+                $event = DB::table('events')
+                    ->join('event_product', 'events.id', '=', 'event_product.event_id')
+                    ->where('event_product.product_id', $product->product_id)
+                    ->whereDate('events.from_date', '<=', $today)
+                    ->whereDate('events.to_date', '>=', $today)
+                    ->orderByDesc('events.discount')
+                    ->first();
+
+                if ($event) {
+                    $discount = $event->discount;
+                    $finalPrice = $originalPrice - ($originalPrice * $discount / 100);
+                }
+            }
+
+            return [
+                'cart_id' => $item->id,
+                'variant_id' => $item->variant_id,
+                'product_name' => $product->product_name ?? 'N/A',
+                'quantity' => $item->quantity,
+                'price' => round($finalPrice, 2),
+                'original_price' => round($originalPrice, 2),
+                'discount' => $discount,
+                'size' => $variant ? $variant->size : 'N/A',
+                'images' => $imagePath,
+                'stock_quantity' => $variant ? $variant->quantity : 0,
+            ];
+        });
 
             return response()->json([
                 'status' => 200,
@@ -183,26 +210,6 @@ class CartController extends Controller
             'error' => $e->getMessage()
         ], 500);
     }
-}
-
-    public function deleteMultiple(Request $request)
-    {
-        try {
-            // Validate that 'ids' is an array and contains at least one ID
-            $request->validate([
-                'ids' => 'required|array|min:1',
-                'ids.*' => 'integer|exists:carts,id',
-            ]);
-
-            $deletedCount = Cart::whereIn('id', $request->ids)->delete();
-
-            return response()->json([
-                'status' => 200,
-                'message' => "$deletedCount cart item(s) removed successfully."
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurre:' . $e->getMessage()], 500);
-        }
     }
 
 }

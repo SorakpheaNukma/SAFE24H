@@ -57,10 +57,6 @@
                                 class="d-none custom-badge position-absolute top-0 start-100 translate-middle badge rounded-pill"
                                 style="background-color: blue; color: white;"></span>
                         </a>
-                        {{-- <div class="cart-info d-flex flex-column ms-2 fw-bold">
-                            <p class="text-nowrap mb-0">My Cart</p>
-                            <p class="mb-0 total">$0</p>
-                        </div> --}}
                     </div>
 
 
@@ -84,8 +80,8 @@
 
                     <!-- Login/Sign Up Section -->
                     <div id="auth-buttons" class="ms-2 d-flex d-none">
-                        <a href="/login" class="btn btn-outline-primary me-2">Đăng nhập</a>
-                        <a href="/sign-up" class="btn btn-outline-secondary">Đăng ký</a>
+                        <a href="/login" class="btn btn-outline-primary me-2">ចូលគណនី</a>
+                        <a href="/sign-up" class="btn btn-outline-secondary">បង្កើតគណនី</a>
                     </div>
 
 

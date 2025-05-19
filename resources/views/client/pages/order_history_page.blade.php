@@ -50,37 +50,40 @@
         </div>
     </div>
 </div>
-
-<!-- 🌟 Modal Đánh Giá -->
-<!-- Nhớ để thêm meta csrf-token vào <head> -->
-<meta name="csrf-token" content="{{ csrf_token() }}">
-
+<!-- Modal Đánh Giá -->
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-scrollable" style="max-height: 80vh; overflow-y: auto;">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ratingModalLabel">បញ្ចេញមតិ និងអត្រា</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="ratingForm">
-          <input type="hidden" name="_token" id="csrf_token" value="">
-          <div id="ratingFormContainer" style="max-height: 400px; overflow-y: auto;">
-            <!-- JS sẽ tạo các khối đánh giá tại đây -->
-          </div>
-          <div class="text-end mt-3">
-            <button type="submit" class="btn btn-primary">យល់ព្រម</button>
-          </div>
-        </form>
-      </div>
+      <form id="ratingForm">
+        <input type="hidden" id="csrf_token" name="_token" value="{{ csrf_token() }}">
+
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="ratingModalLabel">📝 វាយតម្លៃផលិតផល</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body" id="ratingFormContainer">
+          <!-- Nội dung các sản phẩm sẽ được inject bằng JS -->
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">ដាក់ស្នើការវាយតម្លៃ</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បោះបង់</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
+
+
 
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <link rel="stylesheet" href="{{asset('assets/css/order_history_page.css')}}" />
 <script src="{{ asset('assets/js/order_history_page.js') }}"></script>
+<!-- SweetAlert2 CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @endsection

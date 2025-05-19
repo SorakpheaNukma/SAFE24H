@@ -13,7 +13,7 @@ $(document).ready(function () {
                     cartsItemsGL = res.data;
                     renderCartItems(cartsItemsGL);
                 } else if (res.status === 204 || (res.data && res.data.length === 0)) {
-                    $('#cartItemsContainer').html('<p>Your cart is empty</p>');
+                    $('#cartItemsContainer').html('<p>គ្មានទំនិញក្នុងកន្រ្តករបស់អ្នក</p>');
                 } else {
                     console.warn('Unexpected response:', res);
                     showError('Unable to load cart data');
@@ -66,12 +66,21 @@ $(document).ready(function () {
                     </div>
                     <div class="ms-3">
                         <h5 class="mb-1">${item.product_name || 'No Name'}</h5>
-                        <p class="mb-1" style="font-weight: bold; font-size: 16px; color: red;">$${item.price || 0}</p>
-                        <p class="mb-0">Size: ${item.size || 'N/A'}</p>
-                        <p class="text-primary g-0 p-0 m-0">${item.quantity === 0 ? 'Out Stock' : 'In Stock'}</p>
+                        <p class="mb-1">
+                            តម្លៃ: 
+                            <span style="color: red; font-size: 20px; font-weight: bold;">
+                                $${item.price || 0}
+                            </span>
+                            <span style="text-decoration: line-through; color: gray; font-size: 16px;">
+                                $${item.original_price || item.price || 0}
+                            </span>
+                        </p>
+
+                        <p class="mb-0">ទំហំ: ${item.size || 'N/A'}</p>
+                        <p class="text-primary g-0 p-0 m-0">${item.stock_quantity <= 0 ? 'អស់ស្តុក' : 'មានស្តុកចំនួន: ' + item.stock_quantity}</p>
                         <div class="quantity-container mb-2">
                             <div class="d-flex align-items-center">
-                                <span class="me-2">Quantity</span>
+                                <span class="me-2">ចំនួន</span>
                                 <div class="d-flex align-items-center mx-2">
                                     <button class="btn btn-secondary btn-sm minus-btn" data-index="${index}">-</button>
                                     <input type="number" class="form-control mx-2 quantity-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 60px;">
@@ -85,12 +94,11 @@ $(document).ready(function () {
         `;
     }
     
-    
     // Function to render all cart items
     function renderCartItems(items) {
         const cartItemsContainer = document.getElementById('cartItemsContainer');
         if (!items || items.length === 0) {
-            cartItemsContainer.innerHTML = '<p>Your cart is empty</p>';
+            cartItemsContainer.innerHTML = '<p>គ្មានទំនិញក្នុងកន្រ្តកស្តុករបស់អ្នក</p>';
             return;
         }
     
@@ -115,18 +123,32 @@ $(document).ready(function () {
 
     // Function to update the quantity and subtotal
     function updateQuantity(index, change) {
-        const item = cartsItemsGL[index];
-        const quantityInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
-        let quantity = parseInt(quantityInput.value) + change;
-        if (quantity < 1) quantity = 1; // Ensure at least 1 item
-        quantityInput.value = quantity;
-    
-        const price = parseFloat(item?.variant?.product?.product_price || 0);
-        const subtotal = document.getElementById(`subtotal${index}`);
-        subtotal.textContent = `$${(quantity * price).toFixed(2)}`;
-    
-        updateTotalPrice();
+    const item = cartsItemsGL[index];
+    const quantityInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
+    if (!quantityInput) return; // Nếu không tìm thấy ô input thì dừng
+
+    let quantity = parseInt(quantityInput.value) + change;
+    if (quantity < 1) quantity = 1;
+
+    // Giới hạn số lượng không vượt quá stock_quantity (nếu có)
+    if (item.stock_quantity !== undefined && quantity > item.stock_quantity) {
+        quantity = item.stock_quantity;
     }
+
+    quantityInput.value = quantity;
+
+    // Lấy giá
+    const price = parseFloat(item.price || 0); // vì item.price đã có trong dữ liệu trả về từ controller
+
+    // Cập nhật subtotal nếu phần tử tồn tại
+    const subtotal = document.getElementById(`subtotal${index}`);
+    if (subtotal) {
+        subtotal.textContent = `$${(quantity * price).toFixed(2)}`;
+    }
+
+    updateTotalPrice();
+}
+
 
     // Function to update the total price of selected items
     function updateTotalPrice() {
@@ -148,7 +170,7 @@ $(document).ready(function () {
     
         document.getElementById('totalPriceContainer').innerHTML = `
             <h5 class="fw-bold" style="font-size: 24px; color:blue;">
-                Total Price: <span class="text-primary">$${totalPrice.toFixed(2)}</span>
+                សរុបតម្លៃ: <span class="text-primary">$${totalPrice.toFixed(2)}</span>
             </h5>
         `;
     }
@@ -160,66 +182,74 @@ $(document).ready(function () {
     });
 
     // Function to delete a single cart item
-    function deleteSingleItem(e) {
-        const index = e.currentTarget.dataset.index;
-    
-        if (!cartsItemsGL[index]) {
-            console.error(`Cart item at index ${index} does not exist`);
-            return;
-        }
-    
-        const itemId = cartsItemsGL[index].cart_id;
-        const productName = cartsItemsGL[index].product_name || 'this product';
-    
-        // Hiển thị dialog xác nhận
-        MyJConfirmDialog({
-            title: '<strong>Confirm Deletion</strong>',
-            content: `តើអ្នកពិតជាចង់លុប <strong>${productName}</strong> ចេញពីកន្ត្រកស្តុករបស់អ្នកមែនទេ?`,
-            type: 'red',
-            confirmText: 'យល់ព្រម, លុប',
-            confirmBtnClass: 'btn-danger',
-            cancelText: 'បោះបង់',
-            
-            onConfirm: function () {
-                // Thực hiện xóa sản phẩm nếu người dùng xác nhận
-                $.ajax({
-                    url: `/remove-from-cart`,
-                    method: 'POST', // Sử dụng POST thay vì DELETE để đảm bảo dữ liệu được gửi
-                    data: {
-                        _method: 'DELETE', // Laravel hỗ trợ ghi đè phương thức HTTP
-                        id: itemId
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Gửi CSRF token
-                    },
-                    success: function (res) {
-                        if (res.status === 200) {
-                            showSuccess('ទំនិញត្រូវបានលុបចេញពីកន្ត្រកបានជោគជ័យ 🎉');
-                            cartsItemsGL.splice(index, 1); // Xóa sản phẩm khỏi mảng
-                            renderCartItems(cartsItemsGL); // Render lại giỏ hàng
-                            updateTotalPrice(); // Cập nhật tổng giá
-                        } else {
-                            showError('មានបញ្ហា! មិនអាចលុបបាន.');
-                        }
-                    },
-                    error: function (xhr) {
-                        console.error('Error deleting the item:', xhr.responseText);
-                        showError('Error deleting the item.');
-                    }
-                });
-            },
-            onCancel: function () {
-                console.log('User canceled the deletion.');
-            },
-            onContentReady: function () {
-                const contentArea = this.$content;
-                contentArea.css({
-                    'max-height': '90vh', // Tăng chiều cao tối đa lên 90% chiều cao màn hình
-                    'overflow-y': 'auto', // Cho phép cuộn nếu nội dung quá dài
-                });
-            }
-        });
+function deleteSingleItem(e) {
+    const index = e.currentTarget.dataset.index;
+
+    if (!cartsItemsGL[index]) {
+        console.error(`Cart item at index ${index} does not exist`);
+        return;
     }
+
+    const itemId = cartsItemsGL[index].cart_id;
+    const productName = cartsItemsGL[index].product_name || 'this product';
+
+    // Hiển thị dialog xác nhận bằng SweetAlert2
+    Swal.fire({
+        title: 'លុបទំនិញ',
+        html: `តើអ្នកពិតជាចង់លុប <strong>${productName}</strong> ចេញពីកន្ត្រករបស់អ្នកមែនទេ?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'លុប',
+        cancelButtonText: 'បោះបង់',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        reverseButtons: true,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Gửi AJAX để xoá
+            $.ajax({
+                url: `/remove-from-cart`,
+                method: 'POST',
+                data: {
+                    _method: 'DELETE',
+                    id: itemId
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '✅ លុបទំនិញជោគជ័យ!',
+                            text: 'ទំនិញត្រូវបានដកចេញពីកន្ត្រករបស់អ្នក។',
+                            confirmButtonText: 'យល់ព្រម' // ✅ Thay đổi text nút xác nhận
+                        });
+
+                        cartsItemsGL.splice(index, 1);
+                        renderCartItems(cartsItemsGL);
+                        updateTotalPrice();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '❌ មិនអាចលុបបាន!',
+                            text: 'មានបញ្ហាកើតឡើង។'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error deleting the item:', xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: '❌ បរាជ័យ!',
+                        text: 'មិនអាចលុបទំនិញបានទេ។'
+                    });
+                }
+            });
+        }
+    });
+}
+
 
 
     function MyJConfirmDialog(options) {

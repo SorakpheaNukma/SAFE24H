@@ -55,11 +55,8 @@ $(document).ready(function () {
         if (order.status === 'processing') {
             actionButtonsHTML = `
                 <div class="d-flex justify-content-end gap-2 mt-3">
-                    <button class="btn btn-sm btn-outline-secondary edit-order-btn" data-order-id="${order.order_id}">
-                        ✏️ Sửa đơn hàng
-                    </button>
                     <button class="btn btn-sm btn-outline-danger cancel-order-btn" data-order-id="${order.order_id}">
-                        ❌ Huỷ đơn hàng
+                        ❌ ផ្អាកការបញ្ជារទិញ
                     </button>
                 </div>
             `;
@@ -158,26 +155,35 @@ $(document).ready(function () {
     $('#loading-spinner').addClass('d-none');
     getCompletedOrders();
     
-    // Khi click nút đánh giá bookmark
+    // Submit form đánh giá
     $(document).on('click', '.rate-btn', function () {
         const orderId = $(this).data('order-id');
         const order = allOrders.find(o => o.order_id === orderId);
-    
+
         if (!order) {
             alert("រកមិនឃើញការបញ្ជាទិញទេ។");
             return;
         }
 
-    
         const csrfToken = $('meta[name="csrf-token"]').attr('content');
         $('#csrf_token').val(csrfToken);
-    
+
         let formHTML = '';
-    
+
         order.order_items.forEach((item, index) => {
-            formHTML += `
-            <div class="rating-block border rounded p-3 mb-3">
-                <input type="hidden" name="ratings[${index}][product_id]" value="${item.product_id}">
+        
+            const imagePath = item.image_path || '/uploads/products/default.jpg';
+
+
+    const productName = item.product_name || 'No name';
+    formHTML += `
+    <div class="rating-block border rounded p-3 mb-3">
+        <input type="hidden" name="ratings[${index}][product_id]" value="${item.product_id}">
+        <div class="d-flex">
+            <div class="me-3">
+                <img src="${imagePath}" alt="${productName}" class="img-thumbnail" style="width: 120px; height: 200px; object-fit: cover;">
+            </div>
+            <div class="flex-grow-1">
                 <label class="fw-bold">${item.product_name}</label>
                 <div class="mb-2">
                     <label>វាយតម្លៃ:</label>
@@ -189,29 +195,28 @@ $(document).ready(function () {
                         <option value="4">4 - ល្អបំផុត</option>
                         <option value="5">5 - ល្អឥតខ្ចោះ</option>
                     </select>
-
                 </div>
                 <div class="mb-2">
                     <label>មតិ:</label>
                     <textarea class="form-control" name="ratings[${index}][comment]" rows="2" required></textarea>
                 </div>
             </div>
-            `;
-        });
-    
+        </div>
+    </div>
+    `;
+});
+
         $('#ratingFormContainer').html(formHTML);
         $('#ratingModal').modal('show');
-    });
 
-    // Submit form đánh giá
-    $('#ratingForm').on('submit', function (e) {
+    // 🟢 GÁN LẠI SUBMIT NGAY SAU KHI FORM RENDER
+    $('#ratingForm').off('submit').on('submit', function (e) {
         e.preventDefault();
 
         const formData = new FormData(this);
 
-        // Đảm bảo token luôn có trong formData
         if (!formData.has('_token')) {
-            formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+            formData.append('_token', csrfToken);
         }
 
         $.ajax({
@@ -221,16 +226,31 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function () {
-                alert('✅ ការវាយតម្លៃបានជោគជ័យ!');
+                Swal.fire({
+                    icon: 'success',
+                    title: '✅ ការវាយតម្លៃបានជោគជ័យ!',
+                    text: 'អរគុណសម្រាប់ការវាយតម្លៃរបស់អ្នក។',
+                    confirmButtonText: 'យល់ព្រម',
+                    confirmButtonColor: '#28a745'
+                });
                 $('#ratingModal').modal('hide');
                 $('#ratingForm')[0].reset();
             },
             error: function (xhr) {
                 console.error(xhr.responseText);
-                alert('❌ បញ្ចូនការវាយតម្លៃបានបរាជ័យ!');
+                Swal.fire({
+                    icon: 'error',
+                    title: '❌ បរាជ័យ!',
+                    text: 'បញ្ចូនការវាយតម្លៃបានបរាជ័យ។ សូមសាកល្បងម្តងទៀត។',
+                    confirmButtonText: 'យល់ព្រម',
+                    confirmButtonColor: '#dc3545'
+                });
             }
         });
     });
+});
+
+
 
     //xóa
     $.ajaxSetup({
@@ -239,32 +259,56 @@ $(document).ready(function () {
     }
 });
 
-    $(document).on('click', '.cancel-order-btn', function () {
+$(document).on('click', '.cancel-order-btn', function () {
     const orderId = $(this).data('order-id');
-    if (confirm('Bạn có chắc muốn huỷ đơn hàng này không?')) {
-        $.ajax({
-            url: `/orders/${orderId}/cancel`,
-            method: 'POST',
-            success: function () {
-                alert('✅ Đã huỷ đơn hàng thành công!');
 
-                // Gọi lại API để lấy tất cả đơn hàng mới
-                $.get('/get-all-orders', function (res) {
-                    if (res.status === 200) {
-                        OrdersLsGL = res.data; // Cập nhật lại danh sách đơn hàng
-                        displayContentOrders(); // Hiển thị lại bảng đơn hàng
-                    } else {
-                        alert('❌ Không thể lấy lại danh sách đơn hàng.');
-                    }
-                });
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                alert('❌ Không thể huỷ đơn hàng!');
-            }
-        });
-    }
+    Swal.fire({
+        title: 'បោះបង់ការបញ្ជាទិញ?',
+        text: 'តើអ្នកប្រាកដថាចង់បោះបង់ការបញ្ជាទិញនេះមែនទេ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'យល់ព្រម',
+        cancelButtonText: 'បោះបង់',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `/orders/${orderId}/cancel`,
+                method: 'POST',
+                success: function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'បានបោះបង់ជោគជ័យ!',
+                        text: 'ការបញ្ជាទិញត្រូវបានលុបចោល។'
+                    });
+
+                    // Gọi lại API để cập nhật đơn hàng
+                    $.get('/get-all-orders', function (res) {
+                        if (res.status === 200) {
+                            OrdersLsGL = res.data;
+                            displayContentOrders();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'បរាជ័យ!',
+                                text: 'មិនអាចទាញយកបញ្ជីការបញ្ជាទិញបានទេ។'
+                            });
+                        }
+                    });
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'បរាជ័យ!',
+                        text: 'មិនអាចបោះបង់ការបញ្ជាទិញបានទេ។'
+                    });
+                }
+            });
+        }
+    });
 });
+
 
 
 

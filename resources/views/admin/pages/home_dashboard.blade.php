@@ -31,7 +31,7 @@
 
                 <div class="d-flex align-items-center ms-4 mb-4">
                     <div class="position-relative">
-                        <img class="rounded-circle" src="assets/images/profile.png" alt=""
+                        <img class="rounded-circle" src="assets/images/Ellipse_3.png" alt=""
                             style="width: 40px; height: 40px;">
                         <div
                             class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1">
@@ -53,14 +53,6 @@
                                 <i class="fa fa-table me-2"></i>Product
                             </a>
 
-
-                    <!-- <a id="id_user" class="nav-item nav-link">
-                                                <i class="fa fa-user-friends me-2"></i>User</a> -->
-
-                    <!--
-                                            <a id="id_payment" class="nav-item nav-link">
-                                                <i class="fa fa-money-check-alt me-2"></i>Payment</a>-->
-
                     <a id="id_order" class="nav-item nav-link">
                         <!-- Badge number -->
                         <span id="id-badge-order" class="d-none position-absolute start-100 badge rounded-pill bg-danger"
@@ -69,6 +61,11 @@
                     </a>
                     <a id="banner-images-edit" class="nav-item nav-link"><i class="fa fa-table me-2"></i>
                         Edit Banner
+                    </a>
+                        <a id="id_event" class="nav-item nav-link position-relative">
+                        <span id="id-badge-event" class="d-none position-absolute start-100 badge rounded-pill bg-danger"
+                            style="transform: translate(-605%, -22%) !important;"></span>
+                        <i class="fa fa-calendar-alt me-2"></i>Event
                     </a>
                 </div>
             </nav>
@@ -100,7 +97,7 @@
 
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img class="rounded-circle me-lg-1" src="assets/images/profile.png" alt=""
+                            <img class="rounded-circle me-lg-1" src="assets/images/Ellipse_3.png" alt=""
                                 style="width: 40px; height: 40px;">
                             <span id="id-username" class="d-none d-lg-inline-flex"></span>
                         </a>
@@ -154,9 +151,80 @@
 
                 <!-- Banner Content -->
                 <div id="id-banner-content" style="display: none;"></div>
+                <!-- event -->
+                <div id="event-content" class="section" style="display: none;">
+                   <div id="event-list-container" class="mb-4"></div>     
+                    <div id="table_event"></div>
+                </div>
             </div>
         </div>
 
     </div>
-    
+<!-- 🆕 Modal hiển thị thông tin Event -->
+<div class="modal fade" id="eventViewModal" tabindex="-1" aria-labelledby="eventViewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="eventViewModalLabel">Event Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Title:</strong> <span id="view-event-title"></span></p>
+        <p><strong>Discount:</strong> <span id="view-event-discount"></span>%</p>
+        <p><strong>Date:</strong> <span id="view-event-date-range"></span></p>
+        <p>Status: <span id="view-event-status"></span></p>
+        <hr>
+        <h6>Selected Products:</h6>
+        <ul id="view-event-products" class="list-group" style="max-height: 300px; overflow-y: auto;"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Edit Event -->
+<!-- Đúng -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Form Edit -->
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input type="text" class="form-control" id="edit-event-title">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">From Date</label>
+          <input type="date" class="form-control" id="edit-event-from-date">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">To Date</label>
+          <input type="date" class="form-control" id="edit-event-to-date">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Discount (%)</label>
+          <input type="number" class="form-control" id="edit-event-discount" min="1" max="100">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Selected Products</label>
+          <div id="edit-event-products" class="d-flex flex-wrap gap-2"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-save-event-edit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection

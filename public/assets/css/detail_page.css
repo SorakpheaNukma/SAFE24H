@@ -16,7 +16,7 @@
 /* CSS to truncate the title text after 2 lines */
 .d-flex.flex-column p {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    --webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -28,6 +28,48 @@
     object-fit: cover;
     background-color: #E4EEF9;
 }
+.price-old {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.price-new {
+    color: #e60000;
+    font-weight: bold;
+    font-size: 26px;
+}
+
+.product-image-wrapper img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+#carousel-thumbnails img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border 0.3s ease;
+}
+
+#carousel-thumbnails img.active {
+    border-color: #007bff;
+}
+.marquee-text {
+    position: absolute;
+    white-space: nowrap;
+    font-size: 18px;
+    font-weight: bold;
+    transition: left 0.1s linear;
+}
+
+
 
 
 /*=====================================================================*/

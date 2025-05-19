@@ -44,3 +44,7 @@
 body {
     font-family: 'Khmer OS', Arial, sans-serif;
 }
+.modal-body {
+    max-height: 60vh; /* Giới hạn chiều cao của body trong modal */
+    overflow-y: auto; /* Thêm thanh cuộn khi nội dung quá dài */
+}

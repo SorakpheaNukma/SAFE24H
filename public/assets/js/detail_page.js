@@ -28,31 +28,49 @@ function loadItemsRecommend(items) { //res.data truyền vào đây
             </a>
         `;
 
-        const html = `  
-            <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
-                <div class="grid-item" data-product-index="${i}">
-                    <div class="image-container">
-                        ${image} 
+const html = `  
+    <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
+        <div class="card" data-product-index="${i}" style="border-radius: 16px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden; max-height: 420px;">
+
+            ${item.discount_percent > 0 ? `
+                <div class="badge bg-light text-danger fw-bold" style="position: absolute; top: 12px; left: 12px; font-size: 12px;">
+                    ${item.discount_percent}% OFF
+                </div>` : ''
+            }
+
+            <a href="javascript:void(0);" class="product-link" data-product-index="${i}">
+                <img src="${dmain}/uploads/products/${item.images[0] || 'default-image.jpg'}" class="card-img-top" alt="${item.product_name}" style="max-height: 240px; object-fit: cover;">
+            </a>
+
+            <div class="card-body" style="padding: 12px;">
+                <h5 class="card-title text-primary fw-semibold mb-1" style="font-family: 'Khmer OS', sans-serif;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;">${item.product_name}</h5>
+
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        ${item.discount_percent > 0
+                            ? `
+                                <div class="text-danger fw-bold fs-3">\$${item.discounted_price}</div>
+                                <div style="text-decoration: line-through; color: #aaa; font-size: 16px;">\$${item.product_price}</div>
+                            `
+                            : `<div class="text-danger fw-bold fs-3">\$${item.product_price}</div>`
+                        }
                     </div>
-                    <div class="item-description">
-                        <div>
-                            <div class="product-title">${item.product_name}</div>
-                        </div>
-                        <div style="display:flex; flex-direction:row;">
-                            <div style="display:flex; flex-direction:column;">
-                                <div class="product-price">\$${item.product_price}</div>
-                            </div>
-                            <div style="display:flex; justify-content: center; align-items: center; margin-left: auto; width: 300px; overflow: hidden;">
-                                <div class="product-description">
-                                    ${item.descriptions.des_1 || ''}
-                                </div>
-                            </div>
-                        </div>
+                    <div style="font-family: 'Khmer OS', sans-serif; 
+                        white-space: nowrap; 
+                        overflow: hidden; 
+                        text-overflow: ellipsis; 
+                        margin-top: 8px; 
+                        margin-left: 12px;">
+                        ${item.descriptions.des_1 || ''}
                     </div>
                 </div>
             </div>
-        `;
-
+        </div>
+    </div>
+`;
         itemsGrid.innerHTML += html;
     });
 
@@ -79,8 +97,6 @@ function loadItemsRecommend(items) { //res.data truyền vào đây
         });
     });
 }
-
-
 
 function getProductRecommend(productId) {
     const itemsGrid = document.getElementById('recommend-items-grid');
@@ -152,7 +168,6 @@ function btnAddQuantityProduct() {
     });
 }
 
-
 function checkAddress(callback) {
     $.ajax({
         url: '/me-info',
@@ -188,40 +203,59 @@ function checkAddress(callback) {
     });
 }
 
-
 function btnBuyNow(quantityStock) {
     $('#id-btn-buy-now').on('click', function (e) {
         e.preventDefault();
+
         if (!isLoggedIn) {
-            e.preventDefault();
-            alert("សូមបំពេញព័ត៍មានដើម្បីទិញទំនិញនេះ");
-            window.location.href = "/login";
+            Swal.fire({
+                icon: 'warning',
+                title: 'សូមចូលគណនី',
+                text: 'សូមបំពេញព័ត៍មានដើម្បីទិញទំនិញនេះ',
+                confirmButtonText: 'ទៅកាន់ការចូល',
+            }).then(() => {
+                window.location.href = "/login";
+            });
             return;
         }
+
         let quantity = parseInt(quantityInputGL);
         console.log("DEBUG - quantityInputGL:", quantityInputGL, typeof quantityInputGL);
-    
+
         if (isNaN(quantity) || quantity <= 0) {
-            alert('សូមធ្វើការបញ្ជូលចំនួនទំនិញមុនការបញ្ជាទិញ!');
+            Swal.fire({
+                icon: 'info',
+                title: 'ចំនួនមិនត្រឹមត្រូវ',
+                text: 'សូមបញ្ចូលចំនួនទំនិញមុនពេលទិញ!',
+            });
             return;
         }
 
         if (quantityStock === 0) {
-            alert('អធ្យាស្រ័យទំនិញអស់ស្តុក');
+            Swal.fire({
+                icon: 'error',
+                title: 'អស់ស្តុក',
+                text: 'អធ្យាស្រ័យ! ទំនិញនេះអស់ស្តុក។',
+            });
             return;
         }
 
         const selectedSize = $('#id-sizeSelect').val();
         if (!selectedSize) {
-            alert('សូមធ្វើការជ្រើសរើសទំហំទំនិញមុនការបញ្ជាទិញ!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'មិនបានជ្រើសទំហំ',
+                text: 'សូមជ្រើសរើសទំហំមុនពេលទិញ!',
+            });
             return;
         }
-        // First, check if the user has an address
+
+        // Kiểm tra địa chỉ
         checkAddress(function (hasAddress) {
             if (hasAddress) {
-                // If user has an address, proceed to "Buy Now" page
+                // Nếu có địa chỉ, tiếp tục
                 var { productData, images } = getItemDataFromUrl();
-                var firstImage = images.length > 0 ? images[0] : 'default.jpg';  // default.jpg nếu không có ảnh
+                var firstImage = images.length > 0 ? images[0] : 'default.jpg';
 
                 let variantId = null;
                 if (productData.variants && Array.isArray(productData.variants)) {
@@ -230,38 +264,37 @@ function btnBuyNow(quantityStock) {
                         variantId = matchedVariant.variant_id;
                     }
                 }
+
                 var newProduct = {
                     product_id: productData.product_id,
                     product_name: productData.product_name,
                     price: productData.product_price,
+                    discounted_price: productData.discounted_price,
                     quantity: quantityInputGL,
                     size: selectedSize,
                     variant_id: variantId
                 };
+
                 const productStr = encodeURIComponent(JSON.stringify(newProduct));
                 window.location.href = `/buy-now-page?detail=true&items=${productStr}&images=${encodeURIComponent(firstImage)}`;
             } else {
-                //
-                $.confirm({
-                    title: '<strong>Warning!</strong>',
-                    content: 'អ្នកមិនទាន់ទីតាំងទទួល. សូមធ្វើការបញ្ជាក់ទីតាំង?',
-                    draggable: true,
-                    columnClass: 'm',
-                    typeAnimated: true,
-                    type: 'blue',
-                    buttons: {
-                        yes: function () {
-                            window.location.href = '/address-page';
-                        },
-                        no: function () {
-                        }
+                // Hiển thị SweetAlert2 confirm box thay vì jQuery Confirm
+                Swal.fire({
+                    title: 'មិនមានទីតាំងទទួល',
+                    text: 'អ្នកមិនទាន់បានបញ្ចាក់ទីតាំងទទួលទេ។ ចង់បញ្ជាក់ឥឡូវនេះទេ?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'បាទ/ចាស ចង់បញ្ជាក់',
+                    cancelButtonText: 'មិនចាំបាច់',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/address-page';
                     }
                 });
             }
         });
     });
 }
-
 
 function getItemDataFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -279,7 +312,6 @@ function getItemDataFromUrl() {
 
     return { productData, images };
 }
-
 
 function displayProductDesDetails(descriptions) {
     const desContent = document.getElementById('product-detail-id');
@@ -363,7 +395,7 @@ function fetchProductComments() {
                             <div style="display:flex; flex-direction:row;">
                                 <div class="username-rate" style="margin-right: 15px;">
                                     <p><strong>${review.user?.username || 'Anonymous'}</strong></p>
-                                    <p>Rated: ${review.rating}/5⭐</p>
+                                    <p>អត្រាវាយតម្លៃ: ${review.rating}/5⭐</p>
                                 </div>
                                 <div class="user-comment-content" style="flex-grow: 1;">
                                     <p>${review.comment}</p>
@@ -383,6 +415,7 @@ function fetchProductComments() {
         }
     });
 }
+
 function renderStars(rating) {
     let fullStars = Math.floor(rating);
     let halfStar = rating - fullStars >= 0.5;
@@ -404,9 +437,6 @@ function renderStars(rating) {
 
     return starsHTML;
 }
-
-
-
 
 $(document).ready(function () {
     var { productData, images } = getItemDataFromUrl();
@@ -433,95 +463,198 @@ $(document).ready(function () {
         }
     });
 
-    function addItemToCarts(user_id, product_id, quantity, size) {  
-        $.ajax({
-            url: '/add-to-cart',
-            method: 'POST',
-            data: {
-                'user_id': user_id,
-                'product_id': product_id,
-                'quantity': quantity,
-                'size': size,
-            },
-            success: function (res) {
-                if (res.status == 200) {
-                    getAllCartItems();
+function addItemToCarts(payload) {
+    $.ajax({
+        url: '/add-to-cart',
+        method: 'POST',
+        data: payload,          // gửi toàn bộ object
+        success: function (res) {
+            if (res.status == 200) {
+                getAllCartItems();
 
-                    showSuccess('ទំនិញត្រូវបានបញ្ចូលក្នុងកន្ត្រកបានជោគជ័យ 🎉');
-                } else {
-                    showError('Fails to add to Cart.');
-                }
-            },
-            error: function (res) {
-                if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
-                    showError(firstError);
-                } else if (res.status === 500) {
-                    showError('An error occurred. Please try again later.');
-                } else {
-                    showError('Something went wrong!!');
-                }
-            }
-        });
-    }
-
-    function btnAddToCart(quantityStock) {
-        $('#id-btn-add-to-cart').on('click', function (e) {
-            e.preventDefault();
-            if (!isLoggedIn) {
-                e.preventDefault();
-                alert("សូមបំពេញព័ត៍មានដើម្បីទិញទំនិញនេះ");
-                window.location.href = "/login";
-                return;
-            }
-            const selectedSize = $('#id-sizeSelect').val();
-            
-            if (!selectedSize) {
-                alert('សូមជ្រើសរើសទំហំមុនពេលបញ្ចូលទៅក្នុងកន្ត្រក'); // Vui lòng chọn size
-                return;
-            }
-    
-            if (quantityStock === 0) {
-                alert('អធ្យាស្រ័យទំនិញអស់ស្តុក');
-                return;
-            }
-
-            if (quantityInputGL > 0) {
-            addItemToCarts(user_idGL, productData.product_id, quantityInputGL, selectedSize);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'បានបញ្ចូលជោគជ័យ!',
+                    text: 'ទំនិញត្រូវបានបញ្ចូលក្នុងកន្ត្រករបស់អ្នក 🎉',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             } else {
-                alert('សូមធ្វើការបញ្ជូលចំនួនទំនិញមុនការបញ្ជាទិញ!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'បរាជ័យ!',
+                    text: 'មិនអាចបន្ថែមបានទេ។',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
-            console.log("user_id:", user_idGL);
-            console.log("product_id:", productData.product_id);
-            console.log("quantity:", quantityInputGL);
-            console.log("size:", selectedSize);
+        },
+        error: function (res) {
+            let errorMessage = 'មានបញ្ហាអ្វីមួយកើតឡើង!!';
 
+            if (res.status === 422) {
+                const error = res.responseJSON.error;
+                errorMessage = Object.values(error)[0][0];
+            } else if (res.status === 500) {
+                errorMessage = 'កំហុសនៅម៉ាស៊ីនមេ។ សូមព្យាយាមម្តងទៀត។';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'បរាជ័យ!',
+                text: errorMessage,
+                timer: 2500,
+                showConfirmButton: false
+            });
+        }
+    });
+}
+
+function btnAddToCart(quantityStock) {
+    $('#id-btn-add-to-cart').on('click', function (e) {
+        e.preventDefault();
+
+        // 1) Kiểm tra đăng nhập
+        if (!isLoggedIn) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'សូមចូលគណនី',
+                text: 'សូមបំពេញព័ត៍មានដើម្បីទិញទំនិញនេះ',
+                confirmButtonText: 'ចូលគណនី'
+            }).then(() => {
+                window.location.href = "/login";
+            });
+            return;
+        }
+
+        // 2) Kiểm tra size
+        const selectedSize = $('#id-sizeSelect').val();
+        if (!selectedSize) {
+            Swal.fire({
+                icon: 'info',
+                title: 'មិនបានជ្រើសទំហំ',
+                text: 'សូមជ្រើសរើសទំហំមុនពេលបញ្ចូលទៅក្នុងកន្ត្រក',
+            });
+            return;
+        }
+
+        // 3) Kiểm tra tồn kho
+        if (quantityStock === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'អស់ស្តុក',
+                text: 'អធ្យាស្រ័យទំនិញអស់ស្តុក',
+            });
+            return;
+        }
+
+        // 4) Kiểm tra số lượng
+        if (quantityInputGL <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'ចំនួនមិនត្រឹមត្រូវ',
+                text: 'សូមធ្វើការបញ្ជូលចំនួនទំនិញមុនការបញ្ជាទិញ!',
+            });
+            return;
+        }
+
+        /* -------------------------------------------------
+           5) Chuẩn bị dữ liệu giống nút Buy Now
+        ---------------------------------------------------*/
+        const { productData } = getItemDataFromUrl();   // hàm bạn đã có
+        const size = selectedSize;
+
+        // Tìm variant_id tương ứng size
+        let variantId = null;
+        if (productData.variants && Array.isArray(productData.variants)) {
+            const matched = productData.variants.find(v => v.size === size);
+            if (matched) variantId = matched.variant_id;
+        }
+
+        // Tính giá sau giảm nếu có `discount_percent`
+        let originalPrice = parseFloat(productData.product_price.toString().replace(/,/g, ''));
+        let discountedPrice = originalPrice;
+
+        if (productData.discount_percent && productData.discount_percent > 0) {
+            discountedPrice = (originalPrice * (1 - productData.discount_percent / 100)).toFixed(2);
+        } else if (productData.discounted_price) {
+            // Trường hợp trang chi tiết đã có sẵn discounted_price
+            discountedPrice = parseFloat(productData.discounted_price);
+        }
+
+        // 6) Gọi AJAX thêm vào giỏ
+        addItemToCarts({
+            user_id:   user_idGL,
+            product_id: productData.product_id,
+            quantity:   quantityInputGL,
+            size:       size,
+            price:      originalPrice,
+            discounted_price: discountedPrice,
+            variant_id: variantId
         });
-    }
+
+        // 7) Thông báo đã thêm thành công
+        Swal.fire({
+            icon: 'success',
+            title: 'បានបញ្ចូលក្នុងកន្ត្រក',
+            text: 'ទំនិញបានបញ្ចូលទៅក្នុងកន្ត្រករួចរាល់',
+            showConfirmButton: false,
+            timer: 1500
+        });
+
+        // DEBUG (tuỳ chọn)
+        console.log({
+            user_id: user_idGL,
+            product_id: productData.product_id,
+            quantity: quantityInputGL,
+            size,
+            variant_id: variantId,
+            discounted_price: discountedPrice
+        });
+    });
+}
+
+
 
     $('#id-product-name').text(productData.product_name);
 
     setTimeout(() => {
         const text = document.getElementById('id-product-name');
         const container = text.parentElement;
-    
-        if (text.scrollWidth > container.clientWidth) {
-            let direction = -1;
-            let position = 0;
-            const maxScroll = text.scrollWidth - container.clientWidth;
-    
-            setInterval(() => {
-                position += direction;
-                if (position <= -maxScroll || position >= 0) {
-                    direction *= -1;
-                }
-                text.style.left = `${position}px`;
-            }, 30); // điều chỉnh tốc độ tại đây
+
+        const maxScroll = text.scrollWidth - container.clientWidth;
+        if (maxScroll <= 0) return;
+
+        let position = 0;
+        let direction = -1;
+
+        function animate() {
+            position += direction;
+            if (position <= -maxScroll || position >= 0) {
+                direction *= -1;
+            }
+            text.style.left = `${position}px`;
+            requestAnimationFrame(animate);
         }
-    }, 100); // delay một chút để DOM tính toán đúng scrollWidth
+
+        text.style.left = '0px';
+        animate();
+    }, 100);
     
-    $('#id-price').text(`$${productData.product_price}`);
+    // $('#id-price').text(`$${productData.product_price}`);
+    const originalPrice = parseFloat(productData.product_price);
+    const discountedPrice = parseFloat(productData.discounted_price);
+
+    if (!isNaN(discountedPrice) && discountedPrice < originalPrice) {
+        $('#id-price').html(`
+            <span class="price-new">$${discountedPrice}</span>
+            <span class="price-old">$${originalPrice}</span> 
+        `);
+    } else {
+        $('#id-price').html(`<span class="price-new">$${originalPrice}</span>`);
+    }
+
+    
     displayProductDesDetails(productData.descriptions);
 
     // displsyImgAbout(images[0]);
