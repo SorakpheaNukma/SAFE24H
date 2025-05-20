@@ -37,7 +37,6 @@ public function getRecommendedProducts(Request $request)
         ->where('category_id', $currentProduct->category_id)
         ->where('product_id', '!=', $request->product_id)
         ->orderBy('created_at', 'desc')
-        ->take(5)
         ->get();
 
         $recommendations = $recommendedProducts->map(function ($p) {

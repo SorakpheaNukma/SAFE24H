@@ -19,7 +19,7 @@ function loadItemsRecommend(items) { //res.data truyền vào đây
     }
 
     const dmain = window.location.origin;
-    const itemsToLoad = items.slice(currentIndex, currentIndex + itemsPerPage);
+    const itemsToLoad = items; // Hiển thị toàn bộ luôn
 
     itemsToLoad.forEach((item, i) => {
         const image = `
@@ -74,15 +74,10 @@ const html = `
         itemsGrid.innerHTML += html;
     });
 
-    currentIndex += itemsPerPage;
-
-    // Handle "View More" button visibility
+    // currentIndex += itemsPerPage;
+    // Ẩn nút View More luôn
     const viewMoreContainer = document.getElementById('view-more-container');
-    if (currentIndex >= items.length) {
-        viewMoreContainer.style.display = 'none';
-    } else {
-        viewMoreContainer.style.display = 'block';
-    }
+    if (viewMoreContainer) viewMoreContainer.style.display = 'none';
 
     // Add click event listener to each product link
     document.querySelectorAll('.product-link').forEach(link => {
@@ -91,7 +86,7 @@ const html = `
             const index = link.getAttribute('data-product-index');
             const item = items[index];
 
-            const productDetailUrl = `/details-page?item=${JSON.stringify(item)}&img=${item.images.join(',')}`;
+            const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${encodeURIComponent(item.images.join(','))}`;
             console.log(productDetailUrl);
             window.location.href = productDetailUrl;
         });
@@ -99,6 +94,7 @@ const html = `
 }
 
 function getProductRecommend(productId) {
+
     const itemsGrid = document.getElementById('recommend-items-grid');
     itemsGrid.innerHTML = '<p>Loading recommendations...</p>';
 
@@ -332,30 +328,56 @@ function displayProductDesDetails(descriptions) {
 }
 
 function displayProductImages(ProductsImages) {
-    var dvProductImages = document.getElementById('id-product-images');
-    var dmain = window.location.origin;
-    dvProductImages.innerHTML = '';
+    const container = document.getElementById('id-product-images');
+    const dmain = window.location.origin;
+    container.innerHTML = '';
 
-    if (ProductsImages.length > 0) {
-        ProductsImages.forEach((image, index) => {
-            const activeClass = index === 0 ? 'active' : '';  // Set first image as active
-            dvProductImages.innerHTML += `
-                <div class="carousel-item ${activeClass}" style="width:273px; height:409px;">
-                    <div class="my-image-container">
-                        <img src="${dmain}/uploads/products/${image}" class="d-block" alt="Product Image">
-                    </div>
-                </div>
-            `;
-        });
-    } else {
-        console.log('No images found.');
-        dvProductImages.innerHTML += `
-            <div>
-                <p>No images found.</p>
-            </div>
-        `;
+    if (!ProductsImages || ProductsImages.length === 0) {
+        container.innerHTML = `<div><p>No images found.</p></div>`;
+        return;
     }
+
+    ProductsImages.forEach(image => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+        slide.innerHTML = `
+            <div class="my-image-container" style="height: 409px; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                <div class="swiper-zoom-container">
+                <img src="${dmain}/uploads/products/${image}" alt="Product Image" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px;">
+                </div>
+            </div>
+            `;
+
+        container.appendChild(slide);
+    });
+
+    // Khởi tạo Swiper sau khi load ảnh
+    if(window.swiperInstance) {
+      window.swiperInstance.destroy(true, true);
+    }
+
+    window.swiperInstance = new Swiper(".mySwiper", {
+        loop: true,
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+        },
+        speed: 600,
+        autoplay: {
+          delay: 4000,
+          disableOnInteraction: false,
+        },
+        effect: "slide", 
+        zoom: {
+            maxRatio: 3, // mức độ zoom tối đa
+            } // bạn có thể thử "fade" hoặc "cube"
+    });
 }
+
 
 function fetchProductComments() {
     const urlParams = new URLSearchParams(window.location.search);

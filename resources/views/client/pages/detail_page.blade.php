@@ -25,23 +25,16 @@
                         <!-- Product Images -->
             <div class="col-12 col-md-3 d-flex flex-column align-items-center mb-3">
             <!-- Carousel hình ảnh chính -->
-            <div id="carouselProductImages" class="carousel slide mb-3" data-ride="carousel">
-                <div class="carousel-inner rounded shadow" id="id-product-images"
-                     style="max-width: 300px; max-height: 450px; margin: 0 auto;">
-                    <!-- JS sẽ chèn ảnh vào đây -->
-                </div>
-                <!-- Controls -->
-                <a class="carousel-control-prev" href="#carouselProductImages" role="button" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                </a>
-                <a class="carousel-control-next" href="#carouselProductImages" role="button" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                </a>
+            <div class="swiper mySwiper" style="max-width: 300px; max-height: 450px; margin: 0 auto;">
+            <div class="swiper-wrapper" id="id-product-images">
             </div>
 
-            <!-- Thumbnail preview -->
-            <div class="d-flex justify-content-center gap-2 flex-wrap" id="carousel-thumbnails">
-                <!-- JS render các thumbnail -->
+            <!-- Nếu muốn nút điều hướng -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+
+            <!-- Nếu muốn pagination (dot navigation) -->
+            <div class="swiper-pagination"></div>
             </div>
             </div>
 
@@ -136,6 +129,11 @@
         </div>
     </div>
 </main>
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 
 <script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
 <script src="{{ asset('assets/js/detail_page.js') }}"></script>

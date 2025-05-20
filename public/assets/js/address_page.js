@@ -67,44 +67,4 @@ $(document).ready(function () {
         updateAddress(address, country);
     });
 
-
-    ////////////////////////////// here for map 
-    // function setMapIframe(lat, lng) {
-    //     const iframe = document.getElementById('google-map-iframe');
-
-    //     document.getElementById('map-message').style.display = 'none';
-    //     iframe.style.display = 'block';
-    // }
-
-    // function showMapOrMessage(accuracy, lat, lng) {
-    //     const iframe = document.getElementById('google-map-iframe');
-    //     const message = document.getElementById('map-message');
-    //     if (accuracy < 350) {
-    //         setMapIframe(lat, lng);
-    //         iframe.style.display = 'block';
-    //         message.style.display = 'none';
-    //     } else {
-    //         iframe.style.display = 'none';
-    //         message.style.display = 'block';
-    //     }
-    // }
-
-    // function goToCurrentLocation() {
-    //     if (navigator.geolocation) {
-    //         navigator.geolocation.getCurrentPosition((position) => {
-    //             const lat = position.coords.latitude;
-    //             const lng = position.coords.longitude;
-    //             const accuracy = position.coords.accuracy;
-    //             showMapOrMessage(accuracy, lat, lng);
-    //         }, (error) => {
-    //             alert("Unable to retrieve your location.");
-    //         });
-    //     } else {
-    //         alert("Geolocation is not supported by this browser.");
-    //     }
-    // }
-
-
-    // goToCurrentLocation();
-    // ////////////////////////////// end of map
 });

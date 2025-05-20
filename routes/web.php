@@ -18,6 +18,7 @@ use App\Http\Controllers\BannerImageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\ABAController;
 
 
 
@@ -112,6 +113,11 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/save-push-notification-sub', [PushNotificationBrowserController::class, 'saveSubscription']);
     Route::post('/send-push-notification', [PushNotificationBrowserController::class, 'sendNotification']);
 
+// NEW
+Route::get('/pay/aba', [ABAController::class, 'createPayment']);
+Route::post('/aba/callback', [ABAController::class, 'callback']);
+
+
 
 });
 
@@ -140,7 +146,6 @@ Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages'
 
 
 Route::get('/getAllProducts', [ProductController::class, 'getAll']);
-Route::get('/products-recommendations', [ProductController::class, 'getRecommendedProducts']);
 Route::get('/getAllCategory', [CategoryController::class, 'getAllCategory']);
 Route::get('/home-page', function () {
     return view('client.pages.home_page');

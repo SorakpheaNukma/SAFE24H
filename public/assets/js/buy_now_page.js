@@ -64,6 +64,7 @@ $(document).ready(function () {
     }
     // Function to dynamically add a single product when detailParam is true
     function addSingleProductItem(product) {
+        console.log('📦 [addSingleProductItem] Product Info:', product); // <-- thêm dòng này
         const productName = product.product_name;
         const quantity = product.quantity;
         const price = product.discount_price !== null ? product.discount_price : product.price;
@@ -97,6 +98,7 @@ $(document).ready(function () {
     }
     // Function to dynamically add product items bookmarrk
     function addProductItem(product) {
+         console.log('🛒 [addProductItem] Product Info:', product); // <-- thêm dòng này
         if (!product || !product.product_name || !product.price) {
             console.warn('Product data invalid or incomplete:', product);
             return;
