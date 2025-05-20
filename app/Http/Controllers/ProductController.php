@@ -29,10 +29,10 @@ public function getRecommendedProducts(Request $request)
             'category',
             'product_images',
             'product_variants',
-            // 'events' => function ($query) use ($now) {
-            //     $query->where('from_date', '<=', $now)
-            //           ->where('to_date', '>=', $now);
-            // }
+            'events' => function ($query) use ($now) {
+                $query->where('from_date', '<=', $now)
+                      ->where('to_date', '>=', $now);
+            }
         ])
         ->where('category_id', $currentProduct->category_id)
         ->where('product_id', '!=', $request->product_id)

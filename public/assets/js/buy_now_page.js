@@ -390,25 +390,43 @@ $(document).ready(function () {
     }    
 
     $('#id-btn-order').on('click', function (e) {
-        e.preventDefault();
-        showSpinner();
-    
-        if (!$('#id-payment-method').is(':checked')) {
+    e.preventDefault();
+    showSpinner();
+
+    if (!$('#id-payment-method').is(':checked')) {
+        hideSpinner();
+        Swal.fire({
+            icon: 'warning',
+            title: 'កំហុស',
+            text: 'សូមជ្រើសរើសវិធីទូទាត់។',
+            confirmButtonText: 'យល់ព្រម'
+        });
+        return false;
+    }
+
+    if (totalPrice === 0) {
+        hideSpinner();
+        Swal.fire({
+            icon: 'info',
+            title: 'ព័ត៌មាន',
+            text: 'ពុំមានការបញ្ជាទិញទេ តម្លៃសរុបគឺសូន្យ។',
+            confirmButtonText: 'យល់ព្រម'
+        });
+        return false;
+    }
+
+    saveOrder(function (orderId) {
+        saveOrderItems(orderId, function () {
             hideSpinner();
-            alert('Please select a payment method.');
-            return false;
-        }
-    
-        if (totalPrice === 0) {
-            hideSpinner();
-            alert('We don\'t have an order now. Total Price is zero.');
-            return false;
-        }
-    
-        saveOrder(function (orderId) {
-            saveOrderItems(orderId, function () {
-                hideSpinner(); // chỉ được gọi sau khi saveOrderItems xong
+            Swal.fire({
+                icon: 'success',
+                title: 'ការបញ្ជាទិញបានរក្សាទុក!',
+                text: 'ការបញ្ជាទិញរបស់អ្នកបានរក្សាទុកដោយជោគជ័យ។',
+                confirmButtonText: 'យល់ព្រម'
             });
-        });        
-    });     
+        });
+    });
+});
+
+
 });

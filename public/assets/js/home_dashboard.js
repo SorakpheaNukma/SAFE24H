@@ -1061,7 +1061,6 @@ function showDashboard() {
     displayProductDescription2();
 }
 
-
     function displayTbProducts() {
                 var tableContainer = document.getElementById("table_product");
                 tableContainer.innerHTML = "";
@@ -1390,7 +1389,7 @@ function showDashboard() {
         proDescription1.innerHTML = "";
 
         var tableHtml = `
-        <table class=" " id="product-table1-des">
+        <table class="table table-hover" id="product-table1-des">
             <thead>
                 <tr class="table-info fw-bold thead-danger">
                     <th class="text-nowrap">Nº</th>

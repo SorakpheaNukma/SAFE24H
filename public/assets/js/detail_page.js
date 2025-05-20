@@ -615,31 +615,42 @@ function btnAddToCart(quantityStock) {
 }
 
 
+$('#id-product-name').text(productData.product_name);
 
-    $('#id-product-name').text(productData.product_name);
+setTimeout(() => {
+    const text = document.getElementById('id-product-name');
+    const container = text.parentElement;
 
-    setTimeout(() => {
-        const text = document.getElementById('id-product-name');
-        const container = text.parentElement;
+    const containerWidth = container.clientWidth;
+    const textWidth = text.scrollWidth;
 
-        const maxScroll = text.scrollWidth - container.clientWidth;
-        if (maxScroll <= 0) return;
+    if (textWidth <= containerWidth) return; // Không cần cuộn nếu chữ không dài hơn khung
 
-        let position = 0;
-        let direction = -1;
+    let position = 0;
+    const speed = 1; // px per frame
 
-        function animate() {
-            position += direction;
-            if (position <= -maxScroll || position >= 0) {
-                direction *= -1;
-            }
-            text.style.left = `${position}px`;
-            requestAnimationFrame(animate);
+    function animate() {
+        position -= speed;
+
+        // Khi chữ đi khuất hoàn toàn bên trái
+        if (position <= -textWidth) {
+            // Reset về ngoài khung bên phải
+            position = containerWidth;
         }
 
-        text.style.left = '0px';
-        animate();
-    }, 100);
+        text.style.transform = `translateX(${position}px)`;
+        requestAnimationFrame(animate);
+    }
+
+    // Khởi tạo
+    text.style.transform = 'translateX(0px)';
+    animate();
+}, 500);
+
+
+
+
+
     
     // $('#id-price').text(`$${productData.product_price}`);
     const originalPrice = parseFloat(productData.product_price);

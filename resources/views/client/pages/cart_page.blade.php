@@ -41,7 +41,7 @@
 
     <!-- Cart Items -->
     <div class="container" id="cartItemsContainer">
-        cart ở đây
+
     </div>
     <!--End Cart Items -->
 

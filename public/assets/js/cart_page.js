@@ -44,8 +44,6 @@ $(document).ready(function () {
         const btncheckOut = document.getElementById('id-check-out');
         btncheckOut.classList.remove('d-none');
     }
-
-
     // Function to create HTML for each cart item
     function createCartItem(item, index) {
         const dmain = window.location.origin;
@@ -67,14 +65,17 @@ $(document).ready(function () {
                     <div class="ms-3">
                         <h5 class="mb-1">${item.product_name || 'No Name'}</h5>
                         <p class="mb-1">
-                            តម្លៃ: 
+                            តម្លៃ:
                             <span style="color: red; font-size: 20px; font-weight: bold;">
                                 $${item.price || 0}
                             </span>
-                            <span style="text-decoration: line-through; color: gray; font-size: 16px;">
-                                $${item.original_price || item.price || 0}
-                            </span>
+                            ${item.original_price && item.original_price != item.price ? `
+                                <span style="text-decoration: line-through; color: gray; font-size: 16px;">
+                                    $${item.original_price}
+                                </span>
+                            ` : ''}
                         </p>
+
 
                         <p class="mb-0">ទំហំ: ${item.size || 'N/A'}</p>
                         <p class="text-primary g-0 p-0 m-0">${item.stock_quantity <= 0 ? 'អស់ស្តុក' : 'មានស្តុកចំនួន: ' + item.stock_quantity}</p>
@@ -147,8 +148,7 @@ $(document).ready(function () {
     }
 
     updateTotalPrice();
-}
-
+    }
 
     // Function to update the total price of selected items
     function updateTotalPrice() {
@@ -182,75 +182,73 @@ $(document).ready(function () {
     });
 
     // Function to delete a single cart item
-function deleteSingleItem(e) {
-    const index = e.currentTarget.dataset.index;
+    function deleteSingleItem(e) {
+        const index = e.currentTarget.dataset.index;
 
-    if (!cartsItemsGL[index]) {
-        console.error(`Cart item at index ${index} does not exist`);
-        return;
-    }
+        if (!cartsItemsGL[index]) {
+            console.error(`Cart item at index ${index} does not exist`);
+            return;
+        }
 
-    const itemId = cartsItemsGL[index].cart_id;
-    const productName = cartsItemsGL[index].product_name || 'this product';
+        const itemId = cartsItemsGL[index].cart_id;
+        const productName = cartsItemsGL[index].product_name || 'this product';
 
-    // Hiển thị dialog xác nhận bằng SweetAlert2
-    Swal.fire({
-        title: 'លុបទំនិញ',
-        html: `តើអ្នកពិតជាចង់លុប <strong>${productName}</strong> ចេញពីកន្ត្រករបស់អ្នកមែនទេ?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'លុប',
-        cancelButtonText: 'បោះបង់',
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        reverseButtons: true,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Gửi AJAX để xoá
-            $.ajax({
-                url: `/remove-from-cart`,
-                method: 'POST',
-                data: {
-                    _method: 'DELETE',
-                    id: itemId
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (res) {
-                    if (res.status === 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '✅ លុបទំនិញជោគជ័យ!',
-                            text: 'ទំនិញត្រូវបានដកចេញពីកន្ត្រករបស់អ្នក។',
-                            confirmButtonText: 'យល់ព្រម' // ✅ Thay đổi text nút xác nhận
-                        });
+        // Hiển thị dialog xác nhận bằng SweetAlert2
+        Swal.fire({
+            title: 'លុបទំនិញ',
+            html: `តើអ្នកពិតជាចង់លុប <strong>${productName}</strong> ចេញពីកន្ត្រករបស់អ្នកមែនទេ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'លុប',
+            cancelButtonText: 'បោះបង់',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gửi AJAX để xoá
+                $.ajax({
+                    url: `/remove-from-cart`,
+                    method: 'POST',
+                    data: {
+                        _method: 'DELETE',
+                        id: itemId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
+                        if (res.status === 200) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '✅ លុបទំនិញជោគជ័យ!',
+                                text: 'ទំនិញត្រូវបានដកចេញពីកន្ត្រករបស់អ្នក។',
+                                confirmButtonText: 'យល់ព្រម' // ✅ Thay đổi text nút xác nhận
+                            });
 
-                        cartsItemsGL.splice(index, 1);
-                        renderCartItems(cartsItemsGL);
-                        updateTotalPrice();
-                    } else {
+                            cartsItemsGL.splice(index, 1);
+                            renderCartItems(cartsItemsGL);
+                            updateTotalPrice();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '❌ មិនអាចលុបបាន!',
+                                text: 'មានបញ្ហាកើតឡើង។'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error deleting the item:', xhr.responseText);
                         Swal.fire({
                             icon: 'error',
-                            title: '❌ មិនអាចលុបបាន!',
-                            text: 'មានបញ្ហាកើតឡើង។'
+                            title: '❌ បរាជ័យ!',
+                            text: 'មិនអាចលុបទំនិញបានទេ។'
                         });
                     }
-                },
-                error: function (xhr) {
-                    console.error('Error deleting the item:', xhr.responseText);
-                    Swal.fire({
-                        icon: 'error',
-                        title: '❌ បរាជ័យ!',
-                        text: 'មិនអាចលុបទំនិញបានទេ។'
-                    });
-                }
-            });
-        }
-    });
-}
-
-
+                });
+            }
+        });
+    }
 
     function MyJConfirmDialog(options) {
         let config = {
@@ -305,68 +303,71 @@ function deleteSingleItem(e) {
         $.confirm(config);
     }
 
-    function btnCheckOut() {
-        $('#id-btn-checkout').on('click', function () {
-            // Filter the checked items
-            const FilterOnlyCartItemsSelected = cartsItemsGL.filter((item, index) => {
-                const checkbox = document.getElementById(`item${index}`);
-                return checkbox && checkbox.checked;
-            });
-
-            // Check for out-of-stock items in the selected list
-            // const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => {
-            //     return cartItem.product && cartItem.product.quantity === 0;
-            // });
-            const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => {
-                return cartItem.variant?.quantity === 0;
-            });
-            
-            if (outOfStockItems.length > 0) {
-                const dmain = window.location.origin;
-
-                const titleDialog = '<strong>These Products Are Out of Stock</strong>';
-
-                const contentDialog = outOfStockItems.map(item => {
-                    const productName = item.variant?.product?.product_name;
-                    const imagePath = item.variant?.product?.product_images?.[0]?.image_path
-                        ? `${dmain}/uploads/products/${item.variant.product.product_images[0].image_path}`
-                        : 'https://via.placeholder.com/100?text=No+Image';
-
-                    return `
-                        <div style="font-size: 14px; color: #555; margin-bottom: 10px;">
-                            Please deselect products that are out of stock:
-                        </div>
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <img width="100px" style="border-radius: 8px; margin-right: 10px;" src="${imagePath}" alt="${productName}">
-                            <span style="font-size: 16px; font-weight: bold;">${productName}</span>
-                        </div>
-                    `;
-                }).join('');
-
-                // Show dialog for out-of-stock items
-                MyJConfirmDialog({
-                    title: titleDialog,
-                    content: contentDialog,
-                    autoClose: 'Cancel|30000',
-                    type: 'red',
-                    onConfirm: function () { },
-                    cancelText: 'Cancel',
-                    onCancel: function () {
-
-                    }
-                });
-
-                return;
-            }
-
-            // If no out-of-stock items are selected
-            if (FilterOnlyCartItemsSelected.length > 0) {
-                window.location.href = `/buy-now-page?items=${JSON.stringify(FilterOnlyCartItemsSelected)}`;
-            } else {
-                showError('No items selected for checkout.');
-            }
+function btnCheckOut() {
+    $('#id-btn-checkout').on('click', function () {
+        // Filter the checked items
+        const FilterOnlyCartItemsSelected = cartsItemsGL.filter((item, index) => {
+            const checkbox = document.getElementById(`item${index}`);
+            return checkbox && checkbox.checked;
         });
-    }
+
+        const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => {
+            return cartItem.variant?.quantity === 0;
+        });
+
+        if (outOfStockItems.length > 0) {
+            const dmain = window.location.origin;
+
+            const contentDialog = outOfStockItems.map(item => {
+                const productName = item.variant?.product?.product_name;
+                const imagePath = item.variant?.product?.product_images?.[0]?.image_path
+                    ? `${dmain}/uploads/products/${item.variant.product.product_images[0].image_path}`
+                    : 'https://via.placeholder.com/100?text=No+Image';
+
+                return `
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <img width="100px" style="border-radius: 8px; margin-right: 10px;" src="${imagePath}" alt="${productName}">
+                        <span style="font-size: 16px; font-weight: bold;">${productName}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Hiển thị SweetAlert2 thay cho MyJConfirmDialog
+            Swal.fire({
+                title: '<strong>ទំនិញខ្លះអស់ស្តុក</strong>', // "These Products Are Out of Stock" bằng tiếng Khmer
+                html: `
+                    <div style="font-size: 14px; color: #555; margin-bottom: 10px;">
+                        សូមកុំជ្រើសរើសទំនិញដែលអស់ស្តុក៖
+                    </div>
+                    ${contentDialog}
+                `,
+                icon: 'warning',
+                confirmButtonText: 'យល់ព្រម',
+                cancelButtonText: 'បោះបង់',
+                showCancelButton: true,
+                reverseButtons: true,
+                allowOutsideClick: false
+            });
+
+            return;
+        }
+
+        // Nếu không có sản phẩm hết hàng
+        if (FilterOnlyCartItemsSelected.length > 0) {
+            const encodedItems = encodeURIComponent(JSON.stringify(FilterOnlyCartItemsSelected));
+            window.location.href = `/buy-now-page?items=${encodedItems}`;
+        } else {
+            // Thay showError bằng SweetAlert2
+            Swal.fire({
+                icon: 'error',
+                title: 'កំហុស',
+                text: 'មិនមានទំនិញណាមួយត្រូវបានជ្រើសសម្រាប់បញ្ជាទិញ។',
+                confirmButtonText: 'យល់ព្រម'
+            });
+        }
+    });
+}
+
 
     btnCheckOut();
 

@@ -23,7 +23,7 @@
     <div class="container-fluid" id="container_detail_page">
         <div class="row">
                         <!-- Product Images -->
-            <div class="col-12 col-md-4 d-flex flex-column align-items-center mb-3">
+            <div class="col-12 col-md-3 d-flex flex-column align-items-center mb-3">
             <!-- Carousel hình ảnh chính -->
             <div id="carouselProductImages" class="carousel slide mb-3" data-ride="carousel">
                 <div class="carousel-inner rounded shadow" id="id-product-images"
@@ -43,16 +43,12 @@
             <div class="d-flex justify-content-center gap-2 flex-wrap" id="carousel-thumbnails">
                 <!-- JS render các thumbnail -->
             </div>
-        </div>
+            </div>
 
             <!-- Product Details -->
-            <div class="col-12 col-md-4 d-flex flex-column justify-content-start align-items-start">
+            <div class="col-12 col-md-6 d-flex flex-column justify-content-start align-items-start">
                 <!-- Product Name -->
-                <div class="marquee-container">
-                    <div class="marquee-text" id="id-product-name">
-                        Đây là một tên sản phẩm cực kỳ dài mà bạn không thể bỏ qua đâu nha!
-                    </div>
-                </div>
+                <div id="id-product-name" class="fw-bold fs-4 mb-2 text-break"></div>
 
 
                 <!-- Price -->
@@ -110,8 +106,8 @@
             </div>
 
             <!-- Product Description -->
-            <div class="Product_Description col-12 col-md-4 d-flex flex-column mb-3 mb-md-0">
-                <div style="font-weight: bold; text-align: left; white-space: nowrap; font-size:40px">អំពីទំនិញ</div>
+            <div class="Product_Description col-12 col-md-3 d-flex flex-column mb-3 mb-md-0">
+                <div style="font-weight: bold; text-align: left; white-space: nowrap; font-size:25px">អំពីទំនិញ</div>
                 <div id="product-detail-id" class="w-100"></div>
             </div>
         </div>
