@@ -48,7 +48,7 @@ class PushNotificationBrowserController extends Controller
             return response()->json(['message' => 'Notification sent successfully'], 200);
         } catch (\Exception $e) {
             // Handle exception here
-            return response()->json(['error' => 'Failed to send notification' + $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to send notification: ' . $e->getMessage()], 500);
         }
     }
 

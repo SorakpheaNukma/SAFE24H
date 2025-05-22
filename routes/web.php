@@ -116,6 +116,13 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
 // NEW
 Route::get('/pay/aba', [ABAController::class, 'createPayment']);
 Route::post('/aba/callback', [ABAController::class, 'callback']);
+Route::get('/payment-success', [ABAController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/payment-cancel', [ABAController::class, 'paymentCancel'])->name('payment.cancel');
+Route::get('/redirect-to-aba', [ABAController::class, 'redirectToAba']);
+
+
+
+
 
 
 
@@ -184,6 +191,7 @@ Route::middleware('MyUserMiddleWare')->group(function () {
 
 
     Route::post('/update-info', [ProfileController::class, 'updateInfo'])->middleware('MyUserMiddleWare');
+   
     
 });
 

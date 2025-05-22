@@ -404,7 +404,7 @@ $(document).ready(function () {
     e.preventDefault();
     showSpinner();
 
-    if (!$('#id-payment-method').is(':checked')) {
+    if (!$('input[name="payment_method"]:checked').length) {
         hideSpinner();
         Swal.fire({
             icon: 'warning',
@@ -426,16 +426,24 @@ $(document).ready(function () {
         return false;
     }
 
+    let paymentMethod = $('input[name="payment_method"]:checked').val();
+    console.log("Selected payment method:", paymentMethod);
+
     saveOrder(function (orderId) {
-        saveOrderItems(orderId, function () {
-            hideSpinner();
-            Swal.fire({
+        if (paymentMethod === 'cod') {
+            saveOrderItems(orderId, function () {
+                hideSpinner();
+                Swal.fire({
                 icon: 'success',
                 title: 'ការបញ្ជាទិញបានរក្សាទុក!',
                 text: 'ការបញ្ជាទិញរបស់អ្នកបានរក្សាទុកដោយជោគជ័យ។',
                 confirmButtonText: 'យល់ព្រម'
             });
-        });
+            });
+        } else if (paymentMethod === 'aba') {
+            // ✅ Redirect đến controller Laravel xử lý ABA
+            window.location.href = `/redirect-to-aba?order_id=${orderId}`;
+        }
     });
 });
 

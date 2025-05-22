@@ -31,12 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
     'aba' => [
-        'merchant_id' => env('ec460301'),
-        'api_key' => env('dc189a49ddb3194366f7b25a2163ab5e1c946550'),
-        'api_url' => env('https://checkout-sandbox.payway.com.kh/api/payment-gateway/v1/payments/purchase'),
-        'private_key_path' => env('ABA_PRIVATE_KEY_PATH', 'storage/app/private.pem'),
-        'public_key_path' => env('ABA_PUBLIC_KEY_PATH', 'storage/app/aba_public.pem'),
-        'return_url' => env('ABA_RETURN_URL'),
-        'cancel_url' => env('ABA_CANCEL_URL'),
-    ],
+    'merchant_id' => env('ABA_MERCHANT_ID'),
+    'api_url' => env('ABA_API_URL'),
+    'return_url' => env('ABA_RETURN_URL'),
+    'cancel_url' => env('ABA_CANCEL_URL'),
+],
+
 ];
