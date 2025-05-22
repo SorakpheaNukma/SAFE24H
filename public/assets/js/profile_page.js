@@ -77,22 +77,25 @@ $(document).ready(function () {
                                 withCredentials: true // <<== thêm dòng này!
                             },
                             success: function (response) {
-                                $.alert('បានរក្សាទុកព័ត៌មានដោយជោគជ័យ!');
-                                $('#profile_name').text(name);
-                                $('#profile_phone').text(phone);
-                                $('#profile_email').text(email);
-                                localStorage.setItem("username", res.username);
-                                if (profileImage) {         
-                                    const reader = new FileReader();
-                                    reader.onload = function (e) {
-                                        // Thay đổi ảnh đại diện trong content chính
-                                        $('img[src*="profile.png"], img[src*="uploads/profile"]').attr('src', e.target.result);
+                                 console.log("RESPONSE:", response);
+                            $.alert('បានរក្សាទុកព័ត៌មានដោយជោគជ័យ!');
                             
-                                        // Thay đổi ảnh đại diện trong navbar
-                                        $('#profile_nav_bar').attr('src', e.target.result);
-                                    };
-                                    reader.readAsDataURL(profileImage);
-                                }
+                            $('#profile_name').text(response.username);
+                            $('#profile_phone').text(response.phone_number);
+                            $('#profile_email').text(response.email);
+
+                            localStorage.setItem("username", response.username);
+                            localStorage.setItem("profileImage", response.profile_image); // nếu có dùng ảnh đại diện
+
+                            if (profileImage) {         
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    $('img[src*="profile.png"], img[src*="uploads/profile"]').attr('src', e.target.result);
+                                    $('#profile_nav_bar').attr('src', e.target.result);
+                                };
+                                reader.readAsDataURL(profileImage);
+                            }
+
 
                             },
                             error: function () {

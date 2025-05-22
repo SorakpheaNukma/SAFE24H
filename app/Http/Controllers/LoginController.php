@@ -62,11 +62,6 @@ class LoginController extends Controller
             session()->forget('token');
             session(['token' => $token]);
 
-            // $sessionLifetime = config('session.lifetime');
-            // $sessionLifetimeInHours = $sessionLifetime / 60;
-            // $sessionLifetimeInDays = $sessionLifetimeInHours / 24;
-
-            // Log::info('Session lifetime is ' . $sessionLifetime . ' minutes (' . $sessionLifetimeInDays . ' days)');
 
             $responseData = [
                 'token' => $token,
@@ -196,31 +191,6 @@ class LoginController extends Controller
         }
     }
 
-
-    // public function refresh()
-    // {
-    //     try {
-    //         // current token
-    //         $token = JWTAuth::getToken();
-    //         $payload = JWTAuth::getPayload($token);
-
-    //         // Convert Unix timestamp to Carbon datetime
-    //         $expiredTime = Carbon::createFromTimestamp($payload->get('exp'));
-
-    //         InvalidatedToken::create([
-    //             'access_tk' => $token,
-    //             'expired_tk' => $expiredTime,
-    //         ]);
-
-    //         $newToken = Auth::refresh();
-    //         return response()->json(['token' => $newToken]);
-    //     } catch (JWTException $e) {
-    //         return response()->json(['error' => 'Could not refresh token', 'message' => $e->getMessage()], 500);
-    //     }
-    // }
-
-
-    //
     public function tokenExpiry()
     {
         try {

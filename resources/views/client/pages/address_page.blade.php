@@ -52,7 +52,7 @@
                         <option value="កែប">កែប</option>
                         <option value="ព្រះសីហនុ">ព្រះសីហនុ</option>
                         <option value="កោះកុង">កោះកុង</option>
-                        <option value="កំពុងស្ពឺ">កំពង់ស្ពឺ</option>
+                        <option value="កំពុងស្ពឺ">កំពុងស្ពឺ</option>
                         <option value="កំពង់ឆ្នាំង">កំពង់ឆ្នាំង</option>
                         <option value="កំពង់ធំ">កំពង់ធំ</option>
                         <option value="កំពង់ចាម">កំពង់ចាម</option>
@@ -72,6 +72,7 @@
                         <option value="ពោធិ៍សាត់">ពោធិ៍សាត់</option>
                     </select>
                 </div>
+                <p id="shippingCost" class="fs-5 text-primary mt-3"></p>
 
                 <!-- Địa chỉ chi tiết -->
                 <div class="mb-3">
@@ -97,7 +98,7 @@
 <script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
 <script src="{{ asset('assets/js/address_page.js') }}"></script>
 <link rel="stylesheet" href="{{ asset('assets/css/address_page.css') }}">
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Font Khmer OS nếu bạn đã chèn file KhmerOS.ttf -->
 <style>
 @font-face {

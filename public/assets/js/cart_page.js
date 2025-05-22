@@ -25,9 +25,11 @@ $(document).ready(function () {
                 showError('Something went wrong!!');
             }
         });
+        
     }
 
     getAllCartItemsInThisJS();
+    
 
     function showSpinner() {
         const spinner = document.getElementById('spinner');
@@ -110,6 +112,21 @@ $(document).ready(function () {
         // Add event listeners for the quantity buttons and checkboxes
         document.querySelectorAll('.minus-btn').forEach(btn => btn.addEventListener('click', handleQuantityChange));
         document.querySelectorAll('.plus-btn').forEach(btn => btn.addEventListener('click', handleQuantityChange));
+        
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('change', function (e) {
+                const index = e.target.dataset.index;
+                let newQty = parseInt(e.target.value);
+                if (isNaN(newQty) || newQty < 1) newQty = 1;
+
+                const item = cartsItemsGL[index];
+                if (newQty > item.stock_quantity) newQty = item.stock_quantity;
+
+                e.target.value = newQty;
+                item.quantity = newQty; 
+                updateTotalPrice();
+            });
+        });
         document.querySelectorAll('.item-checkbox').forEach(checkbox => checkbox.addEventListener('change', updateTotalPrice));
         document.querySelectorAll('.delete-icon').forEach(icon => icon.addEventListener('click', deleteSingleItem));
     
@@ -126,22 +143,22 @@ $(document).ready(function () {
     function updateQuantity(index, change) {
     const item = cartsItemsGL[index];
     const quantityInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
-    if (!quantityInput) return; // Nếu không tìm thấy ô input thì dừng
+    if (!quantityInput) return; 
 
     let quantity = parseInt(quantityInput.value) + change;
     if (quantity < 1) quantity = 1;
 
-    // Giới hạn số lượng không vượt quá stock_quantity (nếu có)
+    
     if (item.stock_quantity !== undefined && quantity > item.stock_quantity) {
         quantity = item.stock_quantity;
     }
 
     quantityInput.value = quantity;
+    item.quantity = quantity;
 
-    // Lấy giá
-    const price = parseFloat(item.price || 0); // vì item.price đã có trong dữ liệu trả về từ controller
+    const price = parseFloat(item.price || 0); 
 
-    // Cập nhật subtotal nếu phần tử tồn tại
+    
     const subtotal = document.getElementById(`subtotal${index}`);
     if (subtotal) {
         subtotal.textContent = `$${(quantity * price).toFixed(2)}`;
@@ -193,7 +210,7 @@ $(document).ready(function () {
         const itemId = cartsItemsGL[index].cart_id;
         const productName = cartsItemsGL[index].product_name || 'this product';
 
-        // Hiển thị dialog xác nhận bằng SweetAlert2
+        
         Swal.fire({
             title: 'លុបទំនិញ',
             html: `តើអ្នកពិតជាចង់លុប <strong>${productName}</strong> ចេញពីកន្ត្រករបស់អ្នកមែនទេ?`,
@@ -206,7 +223,7 @@ $(document).ready(function () {
             reverseButtons: true,
         }).then((result) => {
             if (result.isConfirmed) {
-                // Gửi AJAX để xoá
+                
                 $.ajax({
                     url: `/remove-from-cart`,
                     method: 'POST',
@@ -223,7 +240,7 @@ $(document).ready(function () {
                                 icon: 'success',
                                 title: '✅ លុបទំនិញជោគជ័យ!',
                                 text: 'ទំនិញត្រូវបានដកចេញពីកន្ត្រករបស់អ្នក។',
-                                confirmButtonText: 'យល់ព្រម' // ✅ Thay đổi text nút xác nhận
+                                confirmButtonText: 'យល់ព្រម'  
                             });
 
                             cartsItemsGL.splice(index, 1);

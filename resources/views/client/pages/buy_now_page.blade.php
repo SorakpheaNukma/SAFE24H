@@ -88,7 +88,7 @@
                     </div>
                     <div class="row mb-2">
                         <div class="col-6">ថ្លៃដឹកជញ្ជូន</div>
-                        <div class="col-6 text-end" id="shipping-total"></div>
+                        <div class="col-6 text-end" id="shipping-total">$0.00</div>
                     </div>
                     <hr class="my-2 text-white" />
                     <div class="row">

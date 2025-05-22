@@ -1,7 +1,8 @@
 $(document).ready(function () {
     let totalPrice = 0;
     let itemCount = 0;
-    const shippingFee = 2.00;
+    let shippingFee = 0;
+    // const shippingFee = 2.00;
     var ProductsLsGL = [];
     const user_idGL = document.querySelector('meta[name="user_id"]').content;
     var UserDataGL = [];
@@ -10,7 +11,7 @@ $(document).ready(function () {
         window.location.href = '/address-page';
     });
 
-    $('#shipping-total').text(shippingFee.toFixed(2) + "$");
+    // $('#shipping-total').text(shippingFee.toFixed(2) + "$");
 
     function getItemDataFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -154,16 +155,24 @@ $(document).ready(function () {
     
         updateOrderTotal();
     }
-    // Function to update the order total display
+    // Function to update the order total display ErrorError
     function updateOrderTotal() {
-        const orderTotalElement = document.getElementById('order-total');
+        
         const merchandiseTotal = totalPrice;
+        const FREE_SHIPPING_THRESHOLD = 50;
+            if (merchandiseTotal >= FREE_SHIPPING_THRESHOLD) {
+        shippingFee = 0;
+    }
         const totalPayment = merchandiseTotal + shippingFee;
 
         document.getElementById('merchandise-total').textContent = `$${merchandiseTotal.toFixed(2)}`;
+        document.getElementById('final-total').textContent = `$${totalPayment.toFixed(2)}`;        
         document.getElementById('total-payment').textContent = `$${totalPayment.toFixed(2)}`;
-        document.getElementById('final-total').textContent = `$${totalPayment.toFixed(2)}`;
-
+         // ✅ Nếu muốn hiển thị chữ "Free" thay vì $0.00
+    document.getElementById('shipping-total').textContent =
+        shippingFee === 0 ? 'Free' : `$${shippingFee.toFixed(2)}`;
+        
+        const orderTotalElement = document.getElementById('order-total');
         orderTotalElement.innerHTML = `
     <h6 class="fw-bold mb-2 mb-md-0">សរុបទំនិញ (${itemCount} ទំនិញ):</h6>
     <h6 class="fw-bold text-md-end">$${merchandiseTotal.toFixed(2)}</h6>`;
@@ -428,6 +437,51 @@ $(document).ready(function () {
             });
         });
     });
+});
+
+const shippingFeesByProvince = {
+    "ភ្នំពេញ": 1.00,
+    "កណ្ដាល": 1.50,
+    "តាកែវ": 2.00,
+    "កំពត": 2.50,
+    "កែប": 2.50,
+    "ព្រះសីហនុ": 3.00,
+    "កោះកុង": 3.50,
+    "កំពុងស្ពឺ": 2.00,
+    "កំពង់ឆ្នាំង": 2.50,
+    "កំពង់ធំ": 2.50,
+    "កំពង់ចាម": 2.50,
+    "ត្បូងឃ្មុំ": 2.50,
+    "ព្រៃវែង": 2.00,
+    "ស្វាយរៀង": 2.00,
+    "បាត់ដំបង": 3.00,
+    "បន្ទាយមានជ័យ": 3.00,
+    "ប៉ៃលិន": 3.00,
+    "សៀមរាប": 3.00,
+    "ឧត្តរមានជ័យ": 3.50,
+    "ព្រះវិហារ": 3.50,
+    "ស្ទឹងត្រែង": 3.50,
+    "ក្រចេះ": 3.00,
+    "មណ្ឌលគីរី": 4.00,
+    "រតនគីរី": 4.00,
+    "ពោធិ៍សាត់": 3.00
+};
+
+$(document).ready(function () {
+    const savedProvince = localStorage.getItem('selectedProvince');
+    if (savedProvince) {
+        const baseFee = shippingFeesByProvince[savedProvince] || 0;
+        shippingFee = baseFee;
+        updateOrderTotal();  // hàm này sẽ điều chỉnh lại shippingFee nếu free
+    
+        if (shippingFee === 0) {
+            $('#shipping-total').text('ឥតគិតថ្លៃដឹកជញ្ជូន');
+            $('#shippingCost').text('ថ្លៃដឹកជញ្ជូន៖ Free');
+        } else {
+            $('#shipping-total').text(`$${shippingFee.toFixed(2)}`);
+            $('#shippingCost').text(`ថ្លៃដឹកជញ្ជូន៖ $${shippingFee.toFixed(2)}`);
+        }
+    }
 });
 
 

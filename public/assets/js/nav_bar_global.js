@@ -1,8 +1,17 @@
 $(document).ready(function () {
     var badgeNumberGL = 0;
-
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
+    if (username) {
+    $('#id-username').text(username); // hoặc chỗ nào bạn hiển thị tên người dùng
+}
+    const profileImage = localStorage.getItem('profileImage');
+            if (profileImage) {
+            const avatar = document.getElementById('profile_nav_bar');
+            if (avatar) {
+                avatar.src = profileImage;
+            }
+        }
 
     if (token && username) {
         // Đăng nhập => Hiện profile
@@ -10,6 +19,9 @@ $(document).ready(function () {
         $('#auth-buttons').addClass('d-none');
         $('#id-username').text(username);
         $('#id-cart').removeClass("d-none");
+        if (profileImage) {
+            $('#profile_nav_bar').attr('src', profileImage);
+        }
     } else {
         // Chưa đăng nhập => Hiện login/register
         $('#auth-buttons').removeClass('d-none');

@@ -63,6 +63,7 @@ $(document).ready(function () {
             alert('Please fill More address or country');
             return false;
         }
+        localStorage.setItem('selectedProvince', country);
 
         updateAddress(address, country);
     });

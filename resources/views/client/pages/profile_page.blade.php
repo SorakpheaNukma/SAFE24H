@@ -98,27 +98,6 @@
                 </div>
             </div>
         </div>
-
-        <!--<div class="row mt-3">
-            <div class="col-12 d-flex flex-column">
-                <h5>Recent Viewed</h5>
-
-                <h7>You migth forgot to put these products in to your cart</h7>
-
-                 Custom styled div for horizontal line 
-                <div style="border-bottom: 1px solid #848484; width: 100%; margin-top: 5px;"></div>
-            </div>
-
-            <div class="col-12 d-flex flex-column mt-3 mb-3">
-                <h5>Complain</h5>
-
-                <h7>Experiencing bad things? Tell Us</h7>
-
-                 Custom styled div for horizontal line 
-                <div style="border-bottom: 1px solid #848484; width: 100%; margin-top: 5px;"></div>
-            </div>
-        </div>-->
-
     </div>
 </main>
 

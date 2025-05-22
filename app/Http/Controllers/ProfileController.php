@@ -42,6 +42,13 @@ class ProfileController extends Controller
 
     $user->save();
 
-    return response()->json(['message' => 'Cập nhật thành công!']);
+        return response()->json([
+        'message' => 'Cập nhật thành công!',
+        'username' => $user->username,
+        'phone_number' => $user->phone_number,
+        'email' => $user->email,
+        'profile_image' => $user->user_profile, // nếu cần dùng
+    ]);
+
 }
 }
