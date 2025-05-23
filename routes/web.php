@@ -102,7 +102,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
 
     Route::get('/getall-order-items', [OrderItemController::class, 'getAllOrderItems']);
     Route::post('/save-order-items', [OrderItemController::class, 'addOrderItem']); //book
-    Route::put('/edit-order-items', [OrderItemController::class, 'updateOrderItem']);
+    Route::post('/edit-order-items', [OrderItemController::class, 'updateOrderItem']);
     Route::delete('/delete-order-items', [OrderItemController::class, 'deleteOrderItem']);
 
     Route::get('/address-page', [MapController::class, 'index']);
@@ -113,12 +113,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/save-push-notification-sub', [PushNotificationBrowserController::class, 'saveSubscription']);
     Route::post('/send-push-notification', [PushNotificationBrowserController::class, 'sendNotification']);
 
-// NEW
-Route::get('/pay/aba', [ABAController::class, 'createPayment']);
-Route::post('/aba/callback', [ABAController::class, 'callback']);
-Route::get('/payment-success', [ABAController::class, 'paymentSuccess'])->name('payment.success');
-Route::get('/payment-cancel', [ABAController::class, 'paymentCancel'])->name('payment.cancel');
-Route::get('/redirect-to-aba', [ABAController::class, 'redirectToAba']);
+    // NEW
+    Route::post('/create-payment', [AbaController::class, 'createPayment']);
 
 
 

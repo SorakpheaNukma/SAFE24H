@@ -2,6 +2,7 @@ $(document).ready(function () {
     let totalPrice = 0;
     let itemCount = 0;
     let shippingFee = 0;
+    let totalPayment = 0;
     // const shippingFee = 2.00;
     var ProductsLsGL = [];
     const user_idGL = document.querySelector('meta[name="user_id"]').content;
@@ -163,7 +164,7 @@ $(document).ready(function () {
             if (merchandiseTotal >= FREE_SHIPPING_THRESHOLD) {
         shippingFee = 0;
     }
-        const totalPayment = merchandiseTotal + shippingFee;
+        totalPayment = merchandiseTotal + shippingFee;
 
         document.getElementById('merchandise-total').textContent = `$${merchandiseTotal.toFixed(2)}`;
         document.getElementById('final-total').textContent = `$${totalPayment.toFixed(2)}`;        
@@ -377,7 +378,7 @@ $(document).ready(function () {
                     hideSpinner();
                     setTimeout(function() {
                         // Điều hướng sang trang thành công
-                        window.location.href = `/order-success?Total_Price=${totalPrice.toFixed(2)}&Order_Id=${orderId}`;
+                        window.location.href = `/order-success?Total_Price=${totalPayment.toFixed(2)}&Order_Id=${orderId}`;
                     }, 300); // 300ms delay
                 } else {
                     showError('Failed to save order items.');
@@ -443,6 +444,46 @@ $(document).ready(function () {
         } else if (paymentMethod === 'aba') {
             // ✅ Redirect đến controller Laravel xử lý ABA
             window.location.href = `/redirect-to-aba?order_id=${orderId}`;
+
+
+            // ✅ Gọi API tạo QR ABA PayWay
+            fetch('/create-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json', 
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Server returned status ' + res.status);
+                return res.json();
+            })
+            .then(data => {
+                hideSpinner();
+                if (data.success) {
+                    Swal.fire({
+                        title: 'ស្កេន QR ដើម្បីបង់ប្រាក់',
+                        html: `<img src="${data.qr_image}" width="250"><br><small>សម្រាប់បង់ប្រាក់ ABA PayWay</small>`,
+                        showConfirmButton: false,
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'បរាជ័យ',
+                        text: data.message || 'មិនអាចបង្កើត QR Code',
+                    });
+                }
+            })
+            .catch(err => {
+                hideSpinner();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'កំហុសបណ្តាញ',
+                    text: 'មិនអាចទាក់ទងជាមួយ ABA។ សូមព្យាយាមម្ដងទៀត។',
+                });
+            });
         }
     });
 });

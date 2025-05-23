@@ -78,6 +78,8 @@
 
 
 
+
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <link rel="stylesheet" href="{{asset('assets/css/order_history_page.css')}}" />

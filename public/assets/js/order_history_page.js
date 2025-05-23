@@ -55,14 +55,15 @@ $(document).ready(function () {
         if (order.status === 'processing') {
             actionButtonsHTML = `
                 <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button class="btn btn-sm btn-outline-primary edit-order-btn" data-order-id="${order.order_id}">
+                        ✏️ កែសម្រួល
+                    </button>
                     <button class="btn btn-sm btn-outline-danger cancel-order-btn" data-order-id="${order.order_id}">
                         ❌ ផ្អាកការបញ្ជារទិញ
                     </button>
                 </div>
             `;
         }
-
-
 
         // Build the order card
         return `
@@ -309,9 +310,25 @@ $(document).on('click', '.cancel-order-btn', function () {
     });
 });
 
+$(document).on('click', '.edit-order-btn', function () {
+        const orderId = $(this).data('order-id');
 
+        // Giả sử bạn có biến window.orders chứa danh sách đơn hàng
+        const order = window.orders.find(o => o.order_id === orderId);
 
+        if (order && order.order_items.length > 0) {
+            const firstItem = order.order_items[0];
+            const variantId = firstItem.variant_id;
 
-
-    
+            if (variantId) {
+                // Chuyển sang trang chi tiết của biến thể sản phẩm
+                window.location.href = `/product/detail_page.php?variant_id=${variantId}`;
+            } else {
+                alert("មិនមានព័ត៌មាន Variant ID នេះទេ។");
+            }
+        } else {
+            alert("រកមិនឃើញព័ត៌មានផលិតផលក្នុងការបញ្ជាទិញនេះទេ។");
+        }
+    });
+   
 });

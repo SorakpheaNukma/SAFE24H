@@ -642,7 +642,7 @@ $(document).ready(function() {
                 }
             });
 
-            // formate date
+    // formate date
     function formatDate(inputDate) {
                 const date = new Date(inputDate);
 
@@ -662,7 +662,7 @@ $(document).ready(function() {
                 return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
     }
 
-            //Content Orders
+    //Content Orders
     function displayContentOrders() {
     const dvContentOrder = document.getElementById("id-content-order");
 

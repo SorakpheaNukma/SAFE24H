@@ -30,11 +30,5 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-    'aba' => [
-    'merchant_id' => env('ABA_MERCHANT_ID'),
-    'api_url' => env('ABA_API_URL'),
-    'return_url' => env('ABA_RETURN_URL'),
-    'cancel_url' => env('ABA_CANCEL_URL'),
-],
 
 ];

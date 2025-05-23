@@ -156,10 +156,7 @@ public function addSoldProduct($product_id, $variant_id, $quantity=1 )
         return response()->json(['error' => 'Failed to update sold product: ' . $e->getMessage()], 500);
     }
 }
-
-
-
-    // Update quantity or price of an order item
+// Update quantity or price of an order item
     public function updateOrderItem(Request $request)
     {
         $validatedData = $request->validate([
@@ -177,6 +174,7 @@ public function addSoldProduct($product_id, $variant_id, $quantity=1 )
             'data' => $orderItem
         ]);
     }
+
 
     // Delete an order item
     public function deleteOrderItem(Request $request)
