@@ -32,26 +32,46 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.status === 200) {
-                    showSuccess('update address successfully🎉');
+                    showSuccess('បានធ្វើបច្ចុប្បន្នភាពអាសយដ្ឋានដោយជោគជ័យ🎉');
                 } else {
-                    showError('Failed to update addresss!');
+                    showError('បានធ្វើបច្ចុប្បន្នភាពអាសយដ្ឋានដោយជោគជ័យ');
                 }
             },
             error: function (res) {
-                let errorMessage = 'Something went wrong!';
+                let errorMessage = 'មានបញ្ហាអ្វីមួយកើតឡើង!';
 
                 if (res.status === 422) {
                     let error = res.responseJSON.error;
                     let firstError = Object.values(error)[0][0];
                     errorMessage = firstError;
                 } else if (res.status === 500) {
-                    errorMessage = 'An error occurred. Please try again later.';
+                    errorMessage = 'មានបញ្ហាផ្នែកម៉ាស៊ីនមេ។ សូមព្យាយាមម្តងទៀត!';
                 }
 
                 showError(errorMessage);
             }
         });
     }
+    function showSuccess(message) {
+    Swal.fire({
+        icon: 'success',
+        title: 'ជោគជ័យ!',
+        text: message,
+        confirmButtonText: 'យល់ព្រម',
+        confirmButtonColor: '#3085d6'
+    });
+}
+
+function showError(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'បរាជ័យ!',
+        text: message,
+        confirmButtonText: 'បិទ',
+        confirmButtonColor: '#d33'
+    });
+}
+
 
 
     $('#saveAddressButton').on('click', function (e) {

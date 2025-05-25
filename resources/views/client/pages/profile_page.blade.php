@@ -103,5 +103,6 @@
 
 <script src="{{ asset('assets/js/profile_page.js') }}"></script>
 <script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @endsection

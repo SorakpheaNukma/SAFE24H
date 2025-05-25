@@ -99,6 +99,9 @@
 <script src="{{ asset('assets/js/address_page.js') }}"></script>
 <link rel="stylesheet" href="{{ asset('assets/css/address_page.css') }}">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- CDN SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!-- Font Khmer OS nếu bạn đã chèn file KhmerOS.ttf -->
 <style>
 @font-face {
