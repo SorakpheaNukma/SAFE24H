@@ -674,6 +674,7 @@ $(document).ready(function() {
                             <th>Nº</th>
                             <th>Customer</th>
                             <th>Total Amount</th>
+                            <th>Shipping Fee</th>
                             <th>Status</th>
                             <th>Order Date</th>
                             <th>Actions</th>
@@ -742,6 +743,7 @@ $(document).ready(function() {
             <td>${numberCount}</td>
             <td>${order.users.username}</td>
             <td>$${order.total_amount}</td>
+            <td>${order.shipping_fee}</td>
             <td><span class="badge ${badgeClass}">${order.status}</span></td>
             <td>${formattedDateTime}</td>
             <td>
@@ -803,6 +805,7 @@ $(document).ready(function() {
                                         🛒 ${productName}
                                     </h5>
                                     <p style="margin: 0; color: #888;">💲 Price: $${price}</p>
+                                    
                                     <p style="margin: 0; color: #888;">📦 Quantity: ${quantity}</p>
                                     <p style="margin: 0; color: #888;">📏 Size: ${size}</p>
                                 </div>
@@ -817,7 +820,10 @@ $(document).ready(function() {
                 const address = user.address || 'N/A';
                 const country = user.country || '';
                 const status = orderData.status || 'Pending';
-                const totalAmount = orderData.total_amount ?? '0.00';
+                // const totalAmount = orderData.total_amount ?? '0.00';
+                const shippingFee = orderData.shipping_fee ?? 0;
+                const merchandiseAmount = orderData.total_amount ?? 0;
+                const grandTotal = (merchandiseAmount + shippingFee).toFixed(2);
                 const orderDate = orderData.order_date ? formatDate(orderData.order_date) : 'N/A';
 
                 MyJConfirmDialog({
@@ -827,7 +833,9 @@ $(document).ready(function() {
                             <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
                             <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
                             <p><strong>🔄 Status:</strong> ${status}</p>
-                            <p><strong>💰 Total Amount:</strong> $${totalAmount}</p>
+                            <p><strong>💵 Merchandise:</strong> $${merchandiseAmount.toFixed(2)}</p>
+                            <p><strong>🚚 Shipping Fee:</strong> ${shippingFee === 0 ? 'Free' : `$${shippingFee.toFixed(2)}`}</p>
+                            <p><strong>💰 Total Amount:</strong> <span style="font-size: 1.2em; color: #007bff;">$${grandTotal}</span></p>
                             <p><strong>📅 Order Date:</strong> ${orderDate}</p>
             
                             <hr style="margin: 10px 0; border-top: 1px solid #ddd;">

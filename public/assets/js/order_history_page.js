@@ -66,12 +66,18 @@ $(document).ready(function () {
         }
 
         // Build the order card
+
+        const grandTotal = order.total_amount + (order.shipping_fee ?? 0);
         return `
             <div class="card shadow-sm mb-4 border-0">
                 <div class="card-body">
                     <h5 class="card-title fw-bold">ល.រ #${order.order_id}</h5>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <p class="mb-0 text-muted">តម្លៃសរុប: <span class="fw-bold">$${order.total_amount}</span></p>
+                        <p class="mb-0 text-muted">
+                            តម្លៃសរុប: 
+                            <span class="fw-bold">$${grandTotal.toFixed(2)}</span>
+                            <small class="text-muted d-block">(${order.total_amount.toFixed(2)} + ${order.shipping_fee === 0 ? 'Free' : `$${order.shipping_fee.toFixed(2)}`})</small>
+                        </p>
                         <p class="mb-0 text-muted">កាលបរិច្ឆេទ: ${order.order_date.split('T')[0]}</p>
                     </div>
                     <span class="badge ${order.status === 'processing' ? 'bg-warning text-dark' : 'bg-primary'}">${order.status}</span>

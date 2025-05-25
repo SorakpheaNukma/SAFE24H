@@ -269,6 +269,7 @@ $(document).ready(function () {
             total_amount: parseFloat(totalPrice.toFixed(2)),
             status: 'processing',
             order_date: orderDate,
+            shipping_fee: parseFloat(shippingFee.toFixed(2)),
         };        
 
         $.ajax({

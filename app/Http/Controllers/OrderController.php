@@ -18,7 +18,6 @@ class OrderController extends Controller
         try {
             $orders = Order::with([
                 'users', 
-                'payment', 
                 'orderItems.variant.product.product_images',
                 'orderItems.variant.product.category'
             ])->get();
@@ -95,6 +94,7 @@ class OrderController extends Controller
                     'order_id' => $order->order_id,
                     'order_date' => $order->order_date,
                     'total_amount' => $order->total_amount,
+                    'shipping_fee' => $order->shipping_fee ?? 0,
                     'status' => $order->status,
                     'order_items' => $orderItems,
                 ];
@@ -150,6 +150,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer|exists:users,user_id',
             'total_amount' => 'required|numeric',
+            'shipping_fee' => 'required|numeric',
             'status' => 'required|string|in:processing,shipped,delivered',
             'order_date' => 'required',
         ]);
@@ -162,6 +163,7 @@ class OrderController extends Controller
             $order = new Order();
             $order->user_id = $request->user_id;
             $order->total_amount = $request->total_amount;
+            $order->shipping_fee = $request->shipping_fee;
             $order->status = $request->status;
             $order->order_date = $request->order_date;
             $order->save();
