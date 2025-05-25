@@ -14,6 +14,7 @@ class Payment extends Model
         'order_id',
         'cash_on_delivery',
         'total_amount_paid',
+        'shipping_fee',
     ];
 
     /**

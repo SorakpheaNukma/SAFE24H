@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('payments', function (Blueprint $table) {
+            $table->float('shipping_fee')->default(0);
         });
     }
 
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('events');
+        Schema::table('payments', function (Blueprint $table) {
+            $table->dropColumn('shipping_fee');
+        });
     }
 };
