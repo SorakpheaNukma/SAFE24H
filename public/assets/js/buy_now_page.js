@@ -3,7 +3,6 @@ $(document).ready(function () {
     let itemCount = 0;
     let shippingFee = 0;
     let totalPayment = 0;
-    // const shippingFee = 2.00;
     var ProductsLsGL = [];
     const user_idGL = document.querySelector('meta[name="user_id"]').content;
     var UserDataGL = [];
