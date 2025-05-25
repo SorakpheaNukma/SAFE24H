@@ -1,5 +1,3 @@
-import { exportToExcel1, exportToExcel2 } from "./fun_export_file.js";
-
 $(document).ready(function() {
             $('.sidebar-toggler').click(function() {
                 $('.sidebar, .content').toggleClass("open");
@@ -1021,32 +1019,32 @@ $(document).ready(function() {
     }
 
 
-            productActionLink.addEventListener("click", function(event) {
+    productActionLink.addEventListener("click", function(event) {
                 event.preventDefault();
                 removeActiveClass();
                 this.classList.add('active');
                 prodcut_Content();
-            });
+    });
 
 
-function hideAllTabsContent() {
-    dashboardContent.style.display = "none";
-    orderContent.style.display = "none";
-    productContent.style.display = "none";
-    proImageContent.style.display = "none";
-    proDescription1.style.display = "none";
-    proDescription2.style.display = "none";
-    document.getElementById("id-banner-content").style.display = "none";
-    document.getElementById("event-content").style.display = "none";
-}
+    function hideAllTabsContent() {
+        dashboardContent.style.display = "none";
+        orderContent.style.display = "none";
+        productContent.style.display = "none";
+        proImageContent.style.display = "none";
+        proDescription1.style.display = "none";
+        proDescription2.style.display = "none";
+        document.getElementById("id-banner-content").style.display = "none";
+        document.getElementById("event-content").style.display = "none";
+    }
 
 
-function showDashboard() {
-    hideAllTabsContent(); // Ẩn tất cả tab nội dung trước
+    function showDashboard() {
+        hideAllTabsContent(); // Ẩn tất cả tab nội dung trước
 
-    dashboardContent.style.display = "block"; // Hiện dashboard
-    displayContentDashboard(); // Gọi hàm xử lý nội dung dashboard nếu có
-}
+        dashboardContent.style.display = "block"; // Hiện dashboard
+        displayContentDashboard(); // Gọi hàm xử lý nội dung dashboard nếu có
+    }
 
 
     function prodcut_Content() {
