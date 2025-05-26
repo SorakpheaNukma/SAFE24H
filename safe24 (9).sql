@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 25, 2025 at 06:30 AM
+-- Generation Time: May 26, 2025 at 10:27 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,7 +64,8 @@ CREATE TABLE `carts` (
 --
 
 INSERT INTO `carts` (`id`, `user_id`, `variant_id`, `quantity`, `created_at`, `updated_at`) VALUES
-(24, 2, 133, 1, '2025-05-22 19:11:38', '2025-05-22 19:11:38');
+(25, 2, 138, 1, '2025-05-25 00:37:32', '2025-05-25 00:37:32'),
+(26, 2, 118, 1, '2025-05-25 00:37:48', '2025-05-25 00:37:48');
 
 -- --------------------------------------------------------
 
@@ -111,7 +112,8 @@ CREATE TABLE `events` (
 
 INSERT INTO `events` (`id`, `title`, `from_date`, `to_date`, `discount`, `created_at`, `updated_at`) VALUES
 (14, 'New collection', '2025-05-22', '2025-05-24', 20, '2025-05-22 08:33:30', '2025-05-22 08:33:30'),
-(15, 'MonthTrueDay', '2025-06-06', '2025-06-06', 70, '2025-05-22 08:34:40', '2025-05-22 08:34:40');
+(15, 'MonthTrueDay', '2025-06-06', '2025-06-06', 70, '2025-05-22 08:34:40', '2025-05-22 08:34:40'),
+(16, 'TEST', '2025-05-26', '2025-05-26', 15, '2025-05-25 21:58:58', '2025-05-25 21:58:58');
 
 -- --------------------------------------------------------
 
@@ -149,7 +151,8 @@ INSERT INTO `event_product` (`id`, `event_id`, `product_id`, `created_at`, `upda
 (60, 15, 17, NULL, NULL),
 (61, 15, 16, NULL, NULL),
 (62, 15, 15, NULL, NULL),
-(63, 15, 14, NULL, NULL);
+(63, 15, 14, NULL, NULL),
+(64, 16, 28, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -283,7 +286,13 @@ INSERT INTO `invalidated_tokens` (`id_tk`, `access_tk`, `expired_tk`, `created_a
 (111, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgwMDgxMDQsImV4cCI6MTc3OTU0NDEwNCwibmJmIjoxNzQ4MDA4MTA0LCJqdGkiOiI2NmQzQTNIZDRRUlg3WHpCIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.aX2AktXvpS9O8twAah6TGMtIcqM183WErjZOUQ385-g', '2026-05-23 06:48:24', '2025-05-23 07:43:37', '2025-05-23 07:43:37'),
 (112, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgwMTE0MjEsImV4cCI6MTc3OTU0NzQyMSwibmJmIjoxNzQ4MDExNDIxLCJqdGkiOiIzemxiTllZbmloWHhLdzFTIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.sVeDMGNwYYy2xH1R-tc5mJE5-lRAN23QK5u4QFDcKbE', '2026-05-23 07:43:41', '2025-05-23 07:43:56', '2025-05-23 07:43:56'),
 (113, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgwMTE0NDEsImV4cCI6MTc3OTU0NzQ0MSwibmJmIjoxNzQ4MDExNDQxLCJqdGkiOiJ3V0gzWlZTZ0JVV3ZmdVJ1Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.Ut3UViPweGcZQGPow2InEOkyqIkUey_i9WG8nZ82MXo', '2026-05-23 07:44:01', '2025-05-24 01:48:28', '2025-05-24 01:48:28'),
-(114, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDc5NjU4NDMsImV4cCI6MTc3OTUwMTg0MywibmJmIjoxNzQ3OTY1ODQzLCJqdGkiOiJXUkY5NGFlTU9ZYXhnOVhoIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.tzGuWSjQGA70Z_KjO2gX20vcqSeWTPfmkth2HQeEEqs', '2026-05-22 19:04:03', '2025-05-24 01:51:24', '2025-05-24 01:51:24');
+(114, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDc5NjU4NDMsImV4cCI6MTc3OTUwMTg0MywibmJmIjoxNzQ3OTY1ODQzLCJqdGkiOiJXUkY5NGFlTU9ZYXhnOVhoIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.tzGuWSjQGA70Z_KjO2gX20vcqSeWTPfmkth2HQeEEqs', '2026-05-22 19:04:03', '2025-05-24 01:51:24', '2025-05-24 01:51:24'),
+(115, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgwNzY1MTIsImV4cCI6MTc3OTYxMjUxMiwibmJmIjoxNzQ4MDc2NTEyLCJqdGkiOiJrVGZuRFFLOU9RQnFMdExiIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.CscGvPY1Yh8K8Ohhiw_hlTj-DTWqr7Kc13nxaABUrEE', '2026-05-24 01:48:32', '2025-05-25 00:49:57', '2025-05-25 00:49:57'),
+(116, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgxNTk0MDMsImV4cCI6MTc3OTY5NTQwMywibmJmIjoxNzQ4MTU5NDAzLCJqdGkiOiJ1SVczZXFoTHBaOXhEdXVNIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.cb7HGt3BwJOD38HXT3-1ZXa7eACvf7i-3leAFvE7WwM', '2026-05-25 00:50:03', '2025-05-25 02:35:37', '2025-05-25 02:35:37'),
+(117, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgxNjU3NDIsImV4cCI6MTc3OTcwMTc0MiwibmJmIjoxNzQ4MTY1NzQyLCJqdGkiOiJqalVtemowbjlSQ0JNcGgzIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.V9HGQyGBu_DjP0U-nMoQLGJ-UHDh4sYgyDICN-Ty92k', '2026-05-25 02:35:42', '2025-05-25 03:09:12', '2025-05-25 03:09:12'),
+(118, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgxNjc3NTYsImV4cCI6MTc3OTcwMzc1NiwibmJmIjoxNzQ4MTY3NzU2LCJqdGkiOiJLWUZ6SzB0ZTl1MTFPbVgyIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.GZPIEZwj306bOSFQgs_115C1vNgPK4_qJUI7VyhPYqY', '2026-05-25 03:09:16', '2025-05-25 05:58:11', '2025-05-25 05:58:11'),
+(119, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgxNzc4OTYsImV4cCI6MTc3OTcxMzg5NiwibmJmIjoxNzQ4MTc3ODk2LCJqdGkiOiJOY2l5bDdYSGMxSVpydjdjIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.8TO7TB8rzBQ0LCIDltRWL69R_o9fBhqEW-gX8STkUII', '2026-05-25 05:58:16', '2025-05-25 07:52:33', '2025-05-25 07:52:33'),
+(120, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvbG9naW4iLCJpYXQiOjE3NDgxODQ3NzIsImV4cCI6MTc3OTcyMDc3MiwibmJmIjoxNzQ4MTg0NzcyLCJqdGkiOiJFc0FnZXJsTEdySTN6ZTVmIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.R6IXzcGF9LYsJCevLJmSjGDucOlY0zdlPVpF1iH_lD0', '2026-05-25 07:52:52', '2025-05-25 21:57:14', '2025-05-25 21:57:14');
 
 -- --------------------------------------------------------
 
@@ -322,7 +331,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (68, '2025_05_08_135005_create_reviews_table', 8),
 (69, '2025_05_10_082414_create_comments_table', 8),
 (75, '2025_05_14_030412_create_events_table', 9),
-(76, '2025_05_14_030435_create_event_product_table', 10);
+(76, '2025_05_14_030435_create_event_product_table', 10),
+(77, '2025_05_25_084506_add_shipping_fee_to_payments_table', 11);
 
 -- --------------------------------------------------------
 
@@ -337,17 +347,18 @@ CREATE TABLE `orders` (
   `status` varchar(255) NOT NULL,
   `order_date` datetime NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `shipping_fee` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `order_date`, `created_at`, `updated_at`) VALUES
-(97, 2, 13.00, 'cancelled', '2025-05-24 15:50:16', '2025-05-24 01:50:16', '2025-05-24 01:51:49'),
-(98, 2, 19.20, 'processing', '2025-05-24 16:00:46', '2025-05-24 02:00:46', '2025-05-24 02:00:46'),
-(99, 2, 19.20, 'processing', '2025-05-24 16:09:33', '2025-05-24 02:09:33', '2025-05-24 02:09:33');
+INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `order_date`, `created_at`, `updated_at`, `shipping_fee`) VALUES
+(100, 2, 29.00, 'processing', '2025-05-26 11:57:36', '2025-05-25 21:57:36', '2025-05-25 21:57:36', 1.5),
+(101, 2, 20.40, 'processing', '2025-05-26 11:59:53', '2025-05-25 21:59:54', '2025-05-25 21:59:54', 1.5),
+(102, 2, 20.00, 'processing', '2025-05-26 14:35:56', '2025-05-26 00:35:56', '2025-05-26 00:35:56', 1.5);
 
 -- --------------------------------------------------------
 
@@ -370,24 +381,9 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`item_id`, `order_id`, `variant_id`, `quantity`, `price`, `created_at`, `updated_at`) VALUES
-(87, 97, 69, 1, 13.00, '2025-05-24 01:50:17', '2025-05-24 01:50:17'),
-(88, 98, 138, 1, 24.00, '2025-05-24 02:00:47', '2025-05-24 02:00:47'),
-(89, 99, 139, 1, 24.00, '2025-05-24 02:09:33', '2025-05-24 02:09:33');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `payments`
---
-
-CREATE TABLE `payments` (
-  `payment_id` int(10) UNSIGNED NOT NULL,
-  `order_id` int(10) UNSIGNED NOT NULL,
-  `cash_on_delivery` tinyint(1) NOT NULL,
-  `total_amount_paid` double(8,2) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+(90, 100, 114, 1, 29.00, '2025-05-25 21:57:37', '2025-05-25 21:57:37'),
+(91, 101, 135, 1, 24.00, '2025-05-25 21:59:54', '2025-05-25 21:59:54'),
+(92, 102, 130, 1, 20.00, '2025-05-26 00:35:57', '2025-05-26 00:35:57');
 
 -- --------------------------------------------------------
 
@@ -452,7 +448,7 @@ INSERT INTO `products` (`product_id`, `product_name`, `product_price`, `des_1`, 
 (24, 'VIPឈុតនារីពណ៌សាច់ ម៉ូតចង់ខ្សែរ', 26.00, 'VIPឈុតនារីពណ៌សាច់ ម៉ូតចង់ខ្សែរ', 'VIPឈុតនារីពណ៌សាច់ ម៉ូតចង់ខ្សែរ', 'VIPឈុតនារីពណ៌សាច់ ម៉ូតចង់ខ្សែរ', 'VIPឈុតនារីពណ៌សាច់ ម៉ូតចង់ខ្សែរ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, '2025-05-22 08:02:03', '2025-05-22 08:02:03'),
 (25, 'ឈុតនារីពណ៌ទឹកប៊ិច ឡាយស', 20.00, 'ឈុតនារីពណ៌ទឹកប៊ិច ឡាយស', 'ឈុតនារីពណ៌ទឹកប៊ិច ឡាយស', 'ឈុតនារីពណ៌ទឹកប៊ិច ឡាយស', 'ឈុតនារីពណ៌ទឹកប៊ិច ឡាយស', 'ឈុតនារីពណ៌ទឹកប៊ិច ឡាយស', NULL, NULL, NULL, NULL, NULL, NULL, 5, '2025-05-22 08:03:04', '2025-05-22 08:03:04'),
 (26, 'VIPឈុតនារីពណ៌ស ​ម៉ូតចង់ខ្សែរ', 24.00, 'VIPឈុតនារីពណ៌ស ​ម៉ូតចង់ខ្សែរ', 'VIPឈុតនារីពណ៌ស ​ម៉ូតចង់ខ្សែរ', 'VIPឈុតនារីពណ៌ស ​ម៉ូតចង់ខ្សែរ', 'VIPឈុតនារីពណ៌ស ​ម៉ូតចង់ខ្សែរ', 'VIPឈុតនារីពណ៌ស ​ម៉ូតចង់ខ្សែរ', NULL, NULL, NULL, NULL, NULL, NULL, 5, '2025-05-22 08:09:22', '2025-05-22 08:10:23'),
-(27, 'ឈុតនារីពណ៌ស មានឡាយ', 20.00, 'ឈុតនារីពណ៌ស មានឡាយ', 'ឈុតនារីពណ៌ស មានឡាយ', 'ឈុតនារីពណ៌ស មានឡាយ', 'ឈុតនារីពណ៌ស មានឡាយ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, '2025-05-22 08:11:36', '2025-05-22 08:11:36'),
+(27, 'ឈុតនារីពណ៌ស មានឡាយ', 20.00, 'ឈុតនារីពណ៌ស មានឡាយ', 'ឈុតនារីពណ៌ស មានឡាយ', 'ឈុតនារីពណ៌ស មានឡាយ', 'ឈុតនារីពណ៌ស មានឡាយ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, '2025-05-22 08:11:36', '2025-05-25 21:49:06'),
 (28, 'VIPឈុតនារីពណ៌ក្រហមសូត្រមាស', 24.00, 'VIPឈុតនារីពណ៌ក្រហមសូត្រមាស', 'VIPឈុតនារីពណ៌ក្រហមសូត្រមាស', 'VIPឈុតនារីពណ៌ក្រហមសូត្រមាស', 'VIPឈុតនារីពណ៌ក្រហមសូត្រមាស', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, '2025-05-22 08:12:38', '2025-05-22 08:12:38');
 
 -- --------------------------------------------------------
@@ -606,7 +602,7 @@ INSERT INTO `product_variants` (`id`, `product_id`, `size`, `quantity`, `sold`, 
 (111, 23, 'M', 3, 0, '2025-05-22 08:01:25', '2025-05-22 08:01:25'),
 (112, 23, 'L', 2, 0, '2025-05-22 08:01:25', '2025-05-22 08:01:25'),
 (113, 23, 'XL', 3, 0, '2025-05-22 08:01:25', '2025-05-22 08:01:25'),
-(114, 23, '2XL', 3, 0, '2025-05-22 08:01:25', '2025-05-22 08:01:25'),
+(114, 23, '2XL', 2, 1, '2025-05-22 08:01:25', '2025-05-25 21:57:37'),
 (115, 24, 'S', 2, 0, '2025-05-22 08:02:03', '2025-05-22 08:02:03'),
 (116, 24, 'M', 2, 0, '2025-05-22 08:02:03', '2025-05-22 08:02:03'),
 (117, 24, 'L', 2, 0, '2025-05-22 08:02:03', '2025-05-22 08:02:03'),
@@ -622,12 +618,9 @@ INSERT INTO `product_variants` (`id`, `product_id`, `size`, `quantity`, `sold`, 
 (127, 26, 'L', 2, 0, '2025-05-22 08:09:22', '2025-05-22 08:09:22'),
 (128, 26, 'XL', 2, 0, '2025-05-22 08:09:23', '2025-05-22 08:09:23'),
 (129, 26, '2XL', 2, 0, '2025-05-22 08:09:23', '2025-05-22 08:09:23'),
-(130, 27, 'S', 2, 0, '2025-05-22 08:11:36', '2025-05-22 08:11:36'),
-(131, 27, 'M', -2, 4, '2025-05-22 08:11:36', '2025-05-23 06:48:08'),
+(130, 27, 'S', 1, 1, '2025-05-22 08:11:36', '2025-05-26 00:35:57'),
 (132, 27, 'L', 2, 0, '2025-05-22 08:11:36', '2025-05-22 08:11:36'),
-(133, 27, 'XL', -1, 2, '2025-05-22 08:11:36', '2025-05-23 00:49:48'),
-(134, 27, '2XL', 0, 2, '2025-05-22 08:11:36', '2025-05-23 06:00:18'),
-(135, 28, 'S', 2, 0, '2025-05-22 08:12:38', '2025-05-22 08:12:38'),
+(135, 28, 'S', 1, 1, '2025-05-22 08:12:38', '2025-05-25 21:59:54'),
 (136, 28, 'M', 2, 0, '2025-05-22 08:12:38', '2025-05-22 08:12:38'),
 (137, 28, 'L', 0, 2, '2025-05-22 08:12:38', '2025-05-22 09:32:04'),
 (138, 28, 'XL', 1, 1, '2025-05-22 08:12:38', '2025-05-24 02:00:47'),
@@ -698,7 +691,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `phone_number`, `user_profile`, `user_role`, `otp`, `otp_expired_time`, `created_at`, `updated_at`, `address`, `country`, `more_address`) VALUES
 (1, 'admin', 'admin@gmail.com', '$2y$10$maznh/Ay2DVOmlWHUG/8ku1Snjat3qIHmVMvyVaAuGy0v0.XZhPuW', '093483', NULL, 'admin', NULL, NULL, '2024-09-14 07:17:41', '2024-09-14 07:17:41', NULL, NULL, NULL),
-(2, 'វេងអាន', 'kunvengann@gmail.com', '$2y$10$9Ui7Bo8aGVgzR1ssHiA.muCJAxTUEUi5mQay6cKDsO/b1QtuY5JD2', '087498674', 'uploads/profile/1747926997_profile-pic-vector-cartoon-sticker-but-pic_545336_wh860.png', 'user', NULL, NULL, '2024-09-14 07:15:02', '2025-05-22 08:16:59', 'កែងផ្លូវ២០៨, ផ្លូវលេខ ១១៤', 'កណ្ដាល', NULL),
+(2, 'Ann', 'kunvengann@gmail.com', '$2y$10$9Ui7Bo8aGVgzR1ssHiA.muCJAxTUEUi5mQay6cKDsO/b1QtuY5JD2', '0874986742', 'uploads/profile/1747926997_profile-pic-vector-cartoon-sticker-but-pic_545336_wh860.png', 'user', NULL, NULL, '2024-09-14 07:15:02', '2025-05-25 00:36:40', 'កែងផ្លូវ២០៨, ផ្លូវលេខ ១១៤', 'កណ្ដាល', NULL),
 (3, 'Mao dep chai vkl', 'loginmabachduy2012@gmail.com', '$2y$10$v4CoFLKuZAZ5a7pFLl.5ROj5CuKO/Fph3vAAFOzMTIw02s1F7x4pC', '0123123123', NULL, 'user', NULL, NULL, '2025-05-10 04:10:53', '2025-05-10 04:10:53', NULL, NULL, NULL);
 
 --
@@ -767,13 +760,6 @@ ALTER TABLE `order_items`
   ADD KEY `variant_id` (`variant_id`);
 
 --
--- Indexes for table `payments`
---
-ALTER TABLE `payments`
-  ADD PRIMARY KEY (`payment_id`),
-  ADD KEY `payments_order_id_foreign` (`order_id`);
-
---
 -- Indexes for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
@@ -837,7 +823,7 @@ ALTER TABLE `banner_images`
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -849,43 +835,37 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `event_product`
 --
 ALTER TABLE `event_product`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `invalidated_tokens`
 --
 ALTER TABLE `invalidated_tokens`
-  MODIFY `id_tk` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
+  MODIFY `id_tk` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `order_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
-
---
--- AUTO_INCREMENT for table `payments`
---
-ALTER TABLE `payments`
-  MODIFY `payment_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `item_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -959,12 +939,6 @@ ALTER TABLE `orders`
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `payments`
---
-ALTER TABLE `payments`
-  ADD CONSTRAINT `payments_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `products`

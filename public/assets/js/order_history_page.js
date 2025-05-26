@@ -315,26 +315,9 @@ $(document).on('click', '.cancel-order-btn', function () {
         }
     });
 });
-
-$(document).on('click', '.edit-order-btn', function () {
+    // Edit order button click handler
+    $(document).on('click', '.edit-order-btn', function () {
         const orderId = $(this).data('order-id');
-
-        // Giả sử bạn có biến window.orders chứa danh sách đơn hàng
-        const order = window.orders.find(o => o.order_id === orderId);
-
-        if (order && order.order_items.length > 0) {
-            const firstItem = order.order_items[0];
-            const variantId = firstItem.variant_id;
-
-            if (variantId) {
-                // Chuyển sang trang chi tiết của biến thể sản phẩm
-                window.location.href = `/product/detail_page.php?variant_id=${variantId}`;
-            } else {
-                alert("មិនមានព័ត៌មាន Variant ID នេះទេ។");
-            }
-        } else {
-            alert("រកមិនឃើញព័ត៌មានផលិតផលក្នុងការបញ្ជាទិញនេះទេ។");
-        }
+        window.location.href = `/orders/${orderId}/edit`;
     });
-   
 });
