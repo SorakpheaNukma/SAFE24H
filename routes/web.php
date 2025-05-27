@@ -102,8 +102,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
 
     Route::get('/getall-order-items', [OrderItemController::class, 'getAllOrderItems']);
     Route::post('/save-order-items', [OrderItemController::class, 'addOrderItem']); //book
-    Route::post('/edit-order-items', [OrderItemController::class, 'updateOrderItem']);
     Route::delete('/delete-order-items', [OrderItemController::class, 'deleteOrderItem']);
+
 
     Route::get('/address-page', [MapController::class, 'index']);
     Route::put('/update-address', [LoginController::class, 'updateUserAddress']);
@@ -114,7 +114,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/send-push-notification', [PushNotificationBrowserController::class, 'sendNotification']);
 
     // NEW
-    Route::post('/create-payment', [AbaController::class, 'createPayment']);
+    // Route::post('/create-payment', [AbaController::class, 'createPayment']);
 
 
 

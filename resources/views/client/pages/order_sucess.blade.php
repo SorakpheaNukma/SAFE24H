@@ -34,7 +34,10 @@
             </div>
         </div>
     </div>
+
+
 </main>
+
 
 <script src="{{ asset('assets/js/order_sucess.js') }}"></script>
 @endsection

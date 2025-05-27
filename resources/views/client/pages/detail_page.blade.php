@@ -21,8 +21,8 @@
     </div>
 
     <div class="container-fluid" id="container_detail_page">
-        <div class="row">
-                        <!-- Product Images -->
+        <div class="row g-4">
+            <!-- Product Images -->
             <div class="col-12 col-md-3 d-flex flex-column align-items-center mb-3">
             <!-- Carousel hình ảnh chính -->
             <div class="swiper mySwiper" style="max-width: 300px; max-height: 450px; margin: 0 auto;">

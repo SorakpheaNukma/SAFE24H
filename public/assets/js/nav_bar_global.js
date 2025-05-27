@@ -20,7 +20,9 @@ $(document).ready(function () {
         $('#id-username').text(username);
         $('#id-cart').removeClass("d-none");
         if (profileImage) {
-            $('#profile_nav_bar').attr('src', profileImage);
+            let profileImageUrl = profileImage ? `/uploads/profile/${profileImage}` : '/assets/images/default-avatar.png';
+            $('#avatar-img').attr('src', profileImageUrl);
+
         }
     } else {
         // Chưa đăng nhập => Hiện login/register

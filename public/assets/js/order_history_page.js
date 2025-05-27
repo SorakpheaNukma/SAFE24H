@@ -255,69 +255,67 @@ $(document).ready(function () {
             }
         });
     });
-});
-
-
+    });
 
     //xóa
     $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
-});
-
-$(document).on('click', '.cancel-order-btn', function () {
-    const orderId = $(this).data('order-id');
-
-    Swal.fire({
-        title: 'បោះបង់ការបញ្ជាទិញ?',
-        text: 'តើអ្នកប្រាកដថាចង់បោះបង់ការបញ្ជាទិញនេះមែនទេ?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'យល់ព្រម',
-        cancelButtonText: 'បោះបង់',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: `/orders/${orderId}/cancel`,
-                method: 'POST',
-                success: function () {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'បានបោះបង់ជោគជ័យ!',
-                        text: 'ការបញ្ជាទិញត្រូវបានលុបចោល។'
-                    });
-
-                    // Gọi lại API để cập nhật đơn hàng
-                    $.get('/get-all-orders', function (res) {
-                        if (res.status === 200) {
-                            OrdersLsGL = res.data;
-                            displayContentOrders();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'បរាជ័យ!',
-                                text: 'មិនអាចទាញយកបញ្ជីការបញ្ជាទិញបានទេ។'
-                            });
-                        }
-                    });
-                },
-                error: function (xhr) {
-                    console.error(xhr.responseText);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'បរាជ័យ!',
-                        text: 'មិនអាចបោះបង់ការបញ្ជាទិញបានទេ។'
-                    });
-                }
-            });
-        }
     });
-});
-    // Edit order button click handler
-    $(document).on('click', '.edit-order-btn', function () {
+
+    $(document).on('click', '.cancel-order-btn', function () {
         const orderId = $(this).data('order-id');
-        window.location.href = `/orders/${orderId}/edit`;
+
+        Swal.fire({
+            title: 'បោះបង់ការបញ្ជាទិញ?',
+            text: 'តើអ្នកប្រាកដថាចង់បោះបង់ការបញ្ជាទិញនេះមែនទេ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'យល់ព្រម',
+            cancelButtonText: 'បោះបង់',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/orders/${orderId}/cancel`,
+                    method: 'POST',
+                    success: function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'បានបោះបង់ជោគជ័យ!',
+                            text: 'ការបញ្ជាទិញត្រូវបានលុបចោល។'
+                        });
+
+                        // Gọi lại API để cập nhật đơn hàng
+                        $.get('/get-all-orders', function (res) {
+                            if (res.status === 200) {
+                                OrdersLsGL = res.data;
+                                displayContentOrders();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'បរាជ័យ!',
+                                    text: 'មិនអាចទាញយកបញ្ជីការបញ្ជាទិញបានទេ។'
+                                });
+                            }
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'បរាជ័យ!',
+                            text: 'មិនអាចបោះបង់ការបញ្ជាទិញបានទេ។'
+                        });
+                    }
+                });
+            }
+        });
     });
+
+
+
+
+
 });

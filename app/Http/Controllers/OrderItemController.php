@@ -8,6 +8,8 @@ use App\Models\ProductVariants;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Order;
+
 
 class OrderItemController extends Controller
 {
@@ -126,37 +128,38 @@ class OrderItemController extends Controller
     } catch (\Exception $e) {
         return response()->json(['error' => 'Failed to update stock' . $e->getMessage()], 500);
     }
-}
-//sua
-public function addSoldProduct($product_id, $variant_id, $quantity=1 )
-{
-    try {
-        $product = Product::find($product_id);
-        if (!$product) {
-            return response()->json(['error' => 'Product not found'], 404);
-        }
-
-        if ($variant_id) {
-            $productVariant = ProductVariants::find($variant_id);
-            if ($productVariant) {
-                $productVariant->sold += $quantity;
-                $productVariant->save();
-            }
-        }
-
-        $product->sold += $quantity;
-        $product->save();
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'Sold updated successfully',
-            'data' => $product
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to update sold product: ' . $e->getMessage()], 500);
     }
-}
-// Update quantity or price of an order item
+
+//sua
+    public function addSoldProduct($product_id, $variant_id, $quantity=1 )
+    {
+        try {
+            $product = Product::find($product_id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+
+            if ($variant_id) {
+                $productVariant = ProductVariants::find($variant_id);
+                if ($productVariant) {
+                    $productVariant->sold += $quantity;
+                    $productVariant->save();
+                }
+            }
+
+            $product->sold += $quantity;
+            $product->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Sold updated successfully',
+                'data' => $product
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update sold product: ' . $e->getMessage()], 500);
+        }
+    }
+    // Update quantity or price of an order item
     public function updateOrderItem(Request $request)
     {
         $validatedData = $request->validate([
@@ -174,7 +177,6 @@ public function addSoldProduct($product_id, $variant_id, $quantity=1 )
             'data' => $orderItem
         ]);
     }
-
 
     // Delete an order item
     public function deleteOrderItem(Request $request)

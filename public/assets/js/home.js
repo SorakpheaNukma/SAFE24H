@@ -156,7 +156,6 @@ function getAllProducts(callback) {
 
     // Function to populate the grid, accepts filtered products if provided
 function populateGrid(filteredProducts = productsLsGL) {
-    console.log("Danh sách sản phẩm được truyền vào populateGrid:", filteredProducts);
     const grid = document.getElementById('gridContainer');
     let html = '';
     const dmain = window.location.origin;
@@ -165,7 +164,6 @@ function populateGrid(filteredProducts = productsLsGL) {
 
     for (let i = currentItemsCount; i < end; i++) {
         const item = filteredProducts[i];
-        console.log("Sản phẩm đang xử lý:", item);
 
         const image = `
             <a>
@@ -249,7 +247,7 @@ html += `
 
   //banner images
     $.ajax({
-        url: 'http://127.0.0.1:8000/banner-images', // Địa chỉ API của bạn
+        url: '/banner-images', // Địa chỉ API của bạn
         method: 'GET', // Phương thức GET để lấy dữ liệu
         success: function (res) {
             if (res.status === 200) {
