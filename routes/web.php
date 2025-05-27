@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Home_dashBoard;
 use App\Http\Controllers\PushNotificationBrowserController;
 use App\Models\Product;
+use App\Models\ProductVariants;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignUpController;
@@ -103,6 +104,27 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::get('/getall-order-items', [OrderItemController::class, 'getAllOrderItems']);
     Route::post('/save-order-items', [OrderItemController::class, 'addOrderItem']); //book
     Route::delete('/delete-order-items', [OrderItemController::class, 'deleteOrderItem']);
+    Route::get('/api/product/{id}/variants', function ($id) {
+    try {
+        $variants = ProductVariants::where('product_id', $id)
+            ->select('id', 'size', 'quantity')
+            ->get();
+
+        return response()->json($variants);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Lỗi truy vấn biến thể sản phẩm',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
+Route::post('/orders/user-update', [OrderItemController::class, 'update']);
+
+
+
+
+
 
 
     Route::get('/address-page', [MapController::class, 'index']);

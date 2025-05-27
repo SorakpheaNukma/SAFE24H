@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\Events\MessageSent;
 use App\Models\ProductVariants;
-
+use App\Models\OrderItem;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -285,6 +286,9 @@ class OrderController extends Controller
 
         return response()->json(['message' => 'Đơn hàng đã được huỷ.']);
 }
+
+
+
 
 
 

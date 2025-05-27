@@ -314,7 +314,66 @@ $(document).ready(function () {
         });
     });
 
+    $(document).on('click', '.edit-order-btn', function () {
+    const orderId = $(this).data('order-id');
+    const order = allOrders.find(o => o.order_id == orderId);
+    console.log(order);
+    if (!order) return;
 
+    $('#editOrderForm').prepend(`<input type="hidden" name="order_id" value="${orderId}">`);
+    let html = '';
+
+    order.order_items.forEach((item, index) => {
+        html += `
+        <div class="edit-block border rounded p-3 mb-3">
+            <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
+            <label>ផលិតផល: ${item.product_name}</label>
+            <div class="mb-2">
+                <label>ទំហំ:</label>
+                <select name="items[${index}][variant_id]" class="form-select variant-select" data-product-id="${item.product_id}" data-current="${item.variant_id}" required>
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label>ចំនួន:</label>
+                <input type="number" name="items[${index}][quantity]" class="form-control" value="${item.quantity}" min="1" required>
+            </div>
+        </div>`;
+    });
+
+    $('#editFormContainer').html(html);
+    $('#editModal').modal('show');
+
+    // Load variant size cho từng sản phẩm
+    $('.variant-select').each(function () {
+        const select = $(this);
+        const productId = select.data('product-id');
+        const currentId = select.data('current');
+
+        $.get(`/api/product/${productId}/variants`, function (variants) {
+            select.empty();
+            variants.forEach(variant => {
+                const selected = (variant.variant_id == currentId) ? 'selected' : '';
+                select.append(`<option value="${variant.variant_id}" ${selected}>${variant.size}</option>`);
+            });
+        });
+    });
+});
+$('#editOrderForm').off('submit').on('submit', function (e) {
+    e.preventDefault();
+    const formData = $(this).serialize();
+    console.log(formData);
+
+    $.post('/orders/user-update', formData) 
+        .done(function () {
+            Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
+            $('#editModal').modal('hide');
+            getCompletedOrders();
+        })
+        .fail(function () {
+            Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
+        });
+});
 
 
 

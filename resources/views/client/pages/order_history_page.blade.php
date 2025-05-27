@@ -75,6 +75,24 @@
   </div>
 </div>
 
+<!-- Modal sửa đơn hàng -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form id="editOrderForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">កែសម្រួលការបញ្ជាទិញ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="editFormContainer">
+        <!-- JS sẽ render các item ở đây -->
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បោះបង់</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 
 

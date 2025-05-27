@@ -160,23 +160,27 @@ class OrderItemController extends Controller
         }
     }
     // Update quantity or price of an order item
-    public function updateOrderItem(Request $request)
-    {
-        $validatedData = $request->validate([
-            'quantity' => 'nullable|integer|min:1',
-            'price' => 'nullable|numeric|min:0',
-            'variant_id' => 'nullable|exists:product_variants,id',
-            'id' => 'required|exists:order_items,id',
-        ]);
+public function update(Request $request)
+{
+    $validated = $request->validate([
+        'items' => 'required|array',
+        'items.*.order_item_id' => 'required|exists:order_items,id',
+        'items.*.variant_id' => 'required|exists:product_variants,id',
+        'items.*.quantity' => 'required|integer|min:1',
+    ]);
 
-        $orderItem = OrderItem::findOrFail($request->id);
-        $orderItem->update($validatedData);
-
-        return response()->json([
-            'status' => 200,
-            'data' => $orderItem
-        ]);
+    foreach ($validated['items'] as $item) {
+        $orderItem = OrderItem::find($item['order_item_id']);
+        if ($orderItem) {
+            $orderItem->variant_id = $item['variant_id'];
+            $orderItem->quantity = $item['quantity'];
+            $orderItem->save();
+        }
     }
+
+    return response()->json(['message' => 'Cập nhật thành công']);
+}
+
 
     // Delete an order item
     public function deleteOrderItem(Request $request)
