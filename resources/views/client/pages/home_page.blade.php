@@ -19,4 +19,5 @@
 <script src="{{ asset('assets/js/home.js') }}"></script>
 <script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
 
+
 @endsection

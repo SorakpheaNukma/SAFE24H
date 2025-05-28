@@ -255,86 +255,171 @@ $(document).ready(function () {
             }
         });
     });
-});
-
-
+    });
 
     //xóa
     $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
-});
-
-$(document).on('click', '.cancel-order-btn', function () {
-    const orderId = $(this).data('order-id');
-
-    Swal.fire({
-        title: 'បោះបង់ការបញ្ជាទិញ?',
-        text: 'តើអ្នកប្រាកដថាចង់បោះបង់ការបញ្ជាទិញនេះមែនទេ?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'យល់ព្រម',
-        cancelButtonText: 'បោះបង់',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: `/orders/${orderId}/cancel`,
-                method: 'POST',
-                success: function () {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'បានបោះបង់ជោគជ័យ!',
-                        text: 'ការបញ្ជាទិញត្រូវបានលុបចោល។'
-                    });
-
-                    // Gọi lại API để cập nhật đơn hàng
-                    $.get('/get-all-orders', function (res) {
-                        if (res.status === 200) {
-                            OrdersLsGL = res.data;
-                            displayContentOrders();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'បរាជ័យ!',
-                                text: 'មិនអាចទាញយកបញ្ជីការបញ្ជាទិញបានទេ។'
-                            });
-                        }
-                    });
-                },
-                error: function (xhr) {
-                    console.error(xhr.responseText);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'បរាជ័យ!',
-                        text: 'មិនអាចបោះបង់ការបញ្ជាទិញបានទេ។'
-                    });
-                }
-            });
-        }
     });
-});
 
-$(document).on('click', '.edit-order-btn', function () {
+    $(document).on('click', '.cancel-order-btn', function () {
         const orderId = $(this).data('order-id');
 
-        // Giả sử bạn có biến window.orders chứa danh sách đơn hàng
-        const order = window.orders.find(o => o.order_id === orderId);
+        Swal.fire({
+            title: 'បោះបង់ការបញ្ជាទិញ?',
+            text: 'តើអ្នកប្រាកដថាចង់បោះបង់ការបញ្ជាទិញនេះមែនទេ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'យល់ព្រម',
+            cancelButtonText: 'បោះបង់',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/orders/${orderId}/cancel`,
+                    method: 'POST',
+                    success: function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'បានបោះបង់ជោគជ័យ!',
+                            text: 'ការបញ្ជាទិញត្រូវបានលុបចោល។'
+                        });
 
-        if (order && order.order_items.length > 0) {
-            const firstItem = order.order_items[0];
-            const variantId = firstItem.variant_id;
-
-            if (variantId) {
-                // Chuyển sang trang chi tiết của biến thể sản phẩm
-                window.location.href = `/product/detail_page.php?variant_id=${variantId}`;
-            } else {
-                alert("មិនមានព័ត៌មាន Variant ID នេះទេ។");
+                        // Gọi lại API để cập nhật đơn hàng
+                        $.get('/get-all-orders', function (res) {
+                            if (res.status === 200) {
+                                OrdersLsGL = res.data;
+                                displayContentOrders();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'បរាជ័យ!',
+                                    text: 'មិនអាចទាញយកបញ្ជីការបញ្ជាទិញបានទេ។'
+                                });
+                            }
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'បរាជ័យ!',
+                            text: 'មិនអាចបោះបង់ការបញ្ជាទិញបានទេ។'
+                        });
+                    }
+                });
             }
-        } else {
-            alert("រកមិនឃើញព័ត៌មានផលិតផលក្នុងការបញ្ជាទិញនេះទេ។");
-        }
+        });
     });
-   
+
+    $(document).on('click', '.edit-order-btn', function () {
+        const orderId = $(this).data('order-id');
+        const order = allOrders.find(o => o.order_id == orderId);
+        console.log("Order:", order);
+        if (!order) return;
+
+        // Reset form
+        $('#editOrderForm input[name="order_id"]').remove();
+        $('#editFormContainer').empty();
+        $('#editOrderForm').prepend(`<input type="hidden" name="order_id" value="${orderId}">`);
+
+        // Render UI
+        let html = '';
+        order.order_items.forEach((item, index) => {
+            console.log(`Item ${index}:`, item);
+            html += `
+            <div class="edit-block border rounded p-3 mb-3">
+                <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
+                <label>ផលិតផល: ${item.product_name}</label>
+                <div class="mb-2">
+                    <label>ទំហំ:</label>
+                    <select name="items[${index}][variant_id]" class="form-select variant-select" 
+                            data-product-id="${item.product_id}" 
+                            data-current="${item.variant_id}" required>
+                        <option value="">កំពុងផ្ទុក...</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label>ចំនួន:</label>
+                    <input type="number" name="items[${index}][quantity]" class="form-control" value="${item.quantity}" min="1" required>
+                </div>
+            </div>`;
+        });
+
+        $('#editFormContainer').html(html);
+        $('#editModal').modal('show');
+
+        // Load variants
+        const loadVariantPromises = [];
+        $('.variant-select').each(function () {
+            const select = $(this);
+            const productId = select.data('product-id');
+            const currentId = select.data('current');
+
+            const p = $.get(`/api/product/${productId}/variants`, function (variants) {
+                select.empty();
+                variants.forEach(variant => {
+                    const selected = (variant.variant_id == currentId) ? 'selected' : '';
+                    select.append(`<option value="${variant.variant_id}" ${selected}>${variant.size}</option>`);
+                });
+            });
+
+            loadVariantPromises.push(p);
+        });
+
+        // Chỉ bind submit sau khi load variants xong
+        Promise.all(loadVariantPromises).then(() => {
+        $('#editOrderForm').off('submit').on('submit', function (e) {
+            e.preventDefault();
+
+            // Lấy order_id
+            const order_id = $('input[name="order_id"]').val();
+
+            // Lấy từng item trong form
+            const items = [];
+            $('#editFormContainer .edit-block').each(function () {
+                const order_item_id = $(this).find('input[name$="[order_item_id]"]').val();
+                const variant_id = $(this).find('select[name$="[variant_id]"]').val();
+                const quantityStr = $(this).find('input[name$="[quantity]"]').val();
+
+                // Chuyển quantity thành số nguyên, mặc định 1 nếu không đúng
+                const quantity = parseInt(quantityStr);
+                
+                items.push({
+                    order_item_id: (order_item_id && order_item_id !== 'null' && order_item_id !== 'undefined') ? order_item_id : null,
+                    variant_id: (variant_id && variant_id !== 'null' && variant_id !== 'undefined') ? variant_id : null,
+                    quantity: (quantity > 0) ? quantity : 1,
+                });
+            });
+
+            const postData = {
+                order_id: order_id,
+                items: items,
+            };
+
+            console.log("Dữ liệu gửi đi:", postData);
+
+            $.ajax({
+                url: '/orders/user-update',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(postData),
+                success: function () {
+                    Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
+                    $('#editModal').modal('hide');
+                    getCompletedOrders();
+                },
+                error: function (xhr) {
+                    console.error("Lỗi:", xhr.responseText);
+                    Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
+                }
+            });
+        });
+    });
+
+    });
+
+
 });
