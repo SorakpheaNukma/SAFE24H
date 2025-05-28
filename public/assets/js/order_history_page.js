@@ -318,6 +318,7 @@ $(document).ready(function () {
         const orderId = $(this).data('order-id');
         const order = allOrders.find(o => o.order_id == orderId);
         console.log("Order:", order);
+        console.log("here", orderId);
         if (!order) return;
 
         // Reset form
@@ -354,16 +355,20 @@ $(document).ready(function () {
         // Load variants
         const loadVariantPromises = [];
         $('.variant-select').each(function () {
-            const select = $(this);
+            const select    = $(this);
             const productId = select.data('product-id');
             const currentId = select.data('current');
+        
+            select.prop('disabled', true)
+                  .empty()
+                  .append('<option>Đang tải...</option>');
 
-            const p = $.get(`/api/product/${productId}/variants`, function (variants) {
+            const p = $.get(`/get-value-order/${orderId}`, function (variants) {
                 select.empty();
-                variants.forEach(variant => {
-                    const selected = (variant.variant_id == currentId) ? 'selected' : '';
-                    select.append(`<option value="${variant.variant_id}" ${selected}>${variant.size}</option>`);
+                variants.data.forEach(variant => {
+                    select.append(`<option value="${variant.id}">${variant.size}</option>`);
                 });
+                select.val(currentId);
             });
 
             loadVariantPromises.push(p);
@@ -402,7 +407,7 @@ $(document).ready(function () {
             console.log("Dữ liệu gửi đi:", postData);
 
             $.ajax({
-                url: '/orders/user-update',
+                url: '/orders/user-update-order',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(postData),

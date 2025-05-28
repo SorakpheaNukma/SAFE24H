@@ -40,14 +40,28 @@ class OrderItemController extends Controller
     public function getItemsByOrderId($orderId)
     {
         $orderItems = OrderItem::where('order_id', $orderId)
-        ->with('variant.product','order')
-        ->get();
-
+            ->with([
+                'variant:id,product_id,size,quantity',
+                'variant.product:product_id,product_name', // hoặc các trường bạn cần
+                'order:order_id'
+            ])
+            ->get();
+    
+        $result = $orderItems->map(function ($item) {
+            return [
+                'variant_id' => $item->variant_id ?? null,
+                'size' => $item->variant->size ?? null,
+                'quantity_ordered' => $item->quantity,
+                'variant_stock_quantity' => $item->variant->quantity ?? null,
+            ];
+        });
+    
         return response()->json([
             'status' => 200,
-            'data' => $orderItems
+            'data' => $result
         ]);
     }
+    
 
     // Add a new order item
     public function addOrderItem(Request $request)
@@ -102,32 +116,32 @@ class OrderItemController extends Controller
 
 
     public function MinusStockProduct($product_id, $variant_id, $quantity=1 )
-{
-    try {
-        $product = Product::find($product_id);
-        if ($variant_id) {
-            $variant = ProductVariants::find($variant_id);
-            if ($variant) {
-                $variant->quantity -= $quantity;
-                $variant->save();
-            }
-        } else {
+    {
+        try {
             $product = Product::find($product_id);
-            if ($product) {
-                $product->quantity -= $quantity;
-                $product->save();
+            if ($variant_id) {
+                $variant = ProductVariants::find($variant_id);
+                if ($variant) {
+                    $variant->quantity -= $quantity;
+                    $variant->save();
+                }
+            } else {
+                $product = Product::find($product_id);
+                if ($product) {
+                    $product->quantity -= $quantity;
+                    $product->save();
+                }
             }
+
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Stock updated successfully',
+                'data' => $product
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update stock' . $e->getMessage()], 500);
         }
-
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'Stock updated successfully',
-            'data' => $product
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to update stock' . $e->getMessage()], 500);
-    }
     }
 
 //sua
@@ -160,26 +174,64 @@ class OrderItemController extends Controller
         }
     }
     // Update quantity or price of an order item
-public function update(Request $request)
-{
-    $validated = $request->validate([
-        'items' => 'required|array',
-        'items.*.order_item_id' => 'required|exists:order_items,id',
-        'items.*.variant_id' => 'required|exists:product_variants,id',
-        'items.*.quantity' => 'required|integer|min:1',
-    ]);
+    public function update(Request $request)
+    {
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*.order_item_id' => 'required|exists:order_items,id',
+            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
 
-    foreach ($validated['items'] as $item) {
-        $orderItem = OrderItem::find($item['order_item_id']);
-        if ($orderItem) {
-            $orderItem->variant_id = $item['variant_id'];
-            $orderItem->quantity = $item['quantity'];
-            $orderItem->save();
+        foreach ($validated['items'] as $item) {
+            $orderItem = OrderItem::find($item['order_item_id']);
+            if ($orderItem) {
+                $orderItem->variant_id = $item['variant_id'];
+                $orderItem->quantity = $item['quantity'];
+                $orderItem->save();
+            }
         }
+
+        return response()->json(['message' => 'Cập nhật thành công']);
     }
 
-    return response()->json(['message' => 'Cập nhật thành công']);
-}
+    public function userUpdateOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,order_id',
+            'items' => 'required|array',
+            'items.*.order_item_id' => 'required|exists:order_items,id',
+            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+    
+        $orderId = $validated['order_id'];
+    
+        // Nếu hệ thống có auth: kiểm tra user hiện tại có quyền với order này không
+        $order = Order::findOrFail($orderId);
+        if ($order->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Bạn không có quyền sửa đơn hàng này'], 403);
+        }
+    
+        DB::beginTransaction();
+    
+        try {
+            foreach ($validated['items'] as $item) {
+                $orderItem = OrderItem::findOrFail($item['order_item_id']);
+    
+                // Cập nhật thông tin
+                $orderItem->variant_id = $item['variant_id'];
+                $orderItem->quantity = $item['quantity'];
+                $orderItem->save();
+            }
+    
+            DB::commit();
+            return response()->json(['message' => 'Cập nhật thành công']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Đã xảy ra lỗi khi cập nhật', 'error' => $e->getMessage()], 500);
+        }
+    }
 
 
     // Delete an order item
