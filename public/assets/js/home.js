@@ -249,7 +249,7 @@ html += `
 
   //banner images
     $.ajax({
-        url: 'http://127.0.0.1:8000/banner-images', // Địa chỉ API của bạn
+        url: '/banner-images', // Địa chỉ API của bạn
         method: 'GET', // Phương thức GET để lấy dữ liệu
         success: function (res) {
             if (res.status === 200) {
