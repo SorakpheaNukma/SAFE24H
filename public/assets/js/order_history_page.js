@@ -315,66 +315,111 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '.edit-order-btn', function () {
-    const orderId = $(this).data('order-id');
-    const order = allOrders.find(o => o.order_id == orderId);
-    console.log(order);
-    if (!order) return;
+        const orderId = $(this).data('order-id');
+        const order = allOrders.find(o => o.order_id == orderId);
+        console.log("Order:", order);
+        if (!order) return;
 
-    $('#editOrderForm').prepend(`<input type="hidden" name="order_id" value="${orderId}">`);
-    let html = '';
+        // Reset form
+        $('#editOrderForm input[name="order_id"]').remove();
+        $('#editFormContainer').empty();
+        $('#editOrderForm').prepend(`<input type="hidden" name="order_id" value="${orderId}">`);
 
-    order.order_items.forEach((item, index) => {
-        html += `
-        <div class="edit-block border rounded p-3 mb-3">
-            <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
-            <label>ផលិតផល: ${item.product_name}</label>
-            <div class="mb-2">
-                <label>ទំហំ:</label>
-                <select name="items[${index}][variant_id]" class="form-select variant-select" data-product-id="${item.product_id}" data-current="${item.variant_id}" required>
-                    <option value="">Loading...</option>
-                </select>
-            </div>
-            <div class="mb-2">
-                <label>ចំនួន:</label>
-                <input type="number" name="items[${index}][quantity]" class="form-control" value="${item.quantity}" min="1" required>
-            </div>
-        </div>`;
-    });
+        // Render UI
+        let html = '';
+        order.order_items.forEach((item, index) => {
+            console.log(`Item ${index}:`, item);
+            html += `
+            <div class="edit-block border rounded p-3 mb-3">
+                <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
+                <label>ផលិតផល: ${item.product_name}</label>
+                <div class="mb-2">
+                    <label>ទំហំ:</label>
+                    <select name="items[${index}][variant_id]" class="form-select variant-select" 
+                            data-product-id="${item.product_id}" 
+                            data-current="${item.variant_id}" required>
+                        <option value="">កំពុងផ្ទុក...</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label>ចំនួន:</label>
+                    <input type="number" name="items[${index}][quantity]" class="form-control" value="${item.quantity}" min="1" required>
+                </div>
+            </div>`;
+        });
 
-    $('#editFormContainer').html(html);
-    $('#editModal').modal('show');
+        $('#editFormContainer').html(html);
+        $('#editModal').modal('show');
 
-    // Load variant size cho từng sản phẩm
-    $('.variant-select').each(function () {
-        const select = $(this);
-        const productId = select.data('product-id');
-        const currentId = select.data('current');
+        // Load variants
+        const loadVariantPromises = [];
+        $('.variant-select').each(function () {
+            const select = $(this);
+            const productId = select.data('product-id');
+            const currentId = select.data('current');
 
-        $.get(`/api/product/${productId}/variants`, function (variants) {
-            select.empty();
-            variants.forEach(variant => {
-                const selected = (variant.variant_id == currentId) ? 'selected' : '';
-                select.append(`<option value="${variant.variant_id}" ${selected}>${variant.size}</option>`);
+            const p = $.get(`/api/product/${productId}/variants`, function (variants) {
+                select.empty();
+                variants.forEach(variant => {
+                    const selected = (variant.variant_id == currentId) ? 'selected' : '';
+                    select.append(`<option value="${variant.variant_id}" ${selected}>${variant.size}</option>`);
+                });
+            });
+
+            loadVariantPromises.push(p);
+        });
+
+        // Chỉ bind submit sau khi load variants xong
+        Promise.all(loadVariantPromises).then(() => {
+        $('#editOrderForm').off('submit').on('submit', function (e) {
+            e.preventDefault();
+
+            // Lấy order_id
+            const order_id = $('input[name="order_id"]').val();
+
+            // Lấy từng item trong form
+            const items = [];
+            $('#editFormContainer .edit-block').each(function () {
+                const order_item_id = $(this).find('input[name$="[order_item_id]"]').val();
+                const variant_id = $(this).find('select[name$="[variant_id]"]').val();
+                const quantityStr = $(this).find('input[name$="[quantity]"]').val();
+
+                // Chuyển quantity thành số nguyên, mặc định 1 nếu không đúng
+                const quantity = parseInt(quantityStr);
+                
+                items.push({
+                    order_item_id: (order_item_id && order_item_id !== 'null' && order_item_id !== 'undefined') ? order_item_id : null,
+                    variant_id: (variant_id && variant_id !== 'null' && variant_id !== 'undefined') ? variant_id : null,
+                    quantity: (quantity > 0) ? quantity : 1,
+                });
+            });
+
+            const postData = {
+                order_id: order_id,
+                items: items,
+            };
+
+            console.log("Dữ liệu gửi đi:", postData);
+
+            $.ajax({
+                url: '/orders/user-update',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(postData),
+                success: function () {
+                    Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
+                    $('#editModal').modal('hide');
+                    getCompletedOrders();
+                },
+                error: function (xhr) {
+                    console.error("Lỗi:", xhr.responseText);
+                    Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
+                }
             });
         });
     });
-});
-$('#editOrderForm').off('submit').on('submit', function (e) {
-    e.preventDefault();
-    const formData = $(this).serialize();
-    console.log(formData);
 
-    $.post('/orders/user-update', formData) 
-        .done(function () {
-            Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
-            $('#editModal').modal('hide');
-            getCompletedOrders();
-        })
-        .fail(function () {
-            Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
-        });
-});
-
+    });
 
 
 });

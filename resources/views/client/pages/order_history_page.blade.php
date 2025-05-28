@@ -76,6 +76,7 @@
 </div>
 
 <!-- Modal sửa đơn hàng -->
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <form id="editOrderForm" class="modal-content">

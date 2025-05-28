@@ -119,7 +119,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     }
 });
 
-Route::post('/orders/user-update', [OrderItemController::class, 'update']);
+Route::post('/orders/user-update', [OrderItemController::class, 'userUpdate']);
 
 
 
