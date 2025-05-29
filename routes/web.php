@@ -17,7 +17,7 @@ use App\Http\Controllers\BannerImageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\ABAController;
+
 
 
 
@@ -116,8 +116,6 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/save-push-notification-sub', [PushNotificationBrowserController::class, 'saveSubscription']);
     Route::post('/send-push-notification', [PushNotificationBrowserController::class, 'sendNotification']);
 
-    // NEW
-    // Route::post('/create-payment', [AbaController::class, 'createPayment']);
 
 
 
