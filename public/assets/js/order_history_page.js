@@ -22,7 +22,6 @@ $(document).ready(function () {
         let itemListHTML = '';
 
 
-
         order.order_items.forEach(item => {
 
             const imagePath = item.image_path || 'default.jpg';
@@ -106,6 +105,8 @@ $(document).ready(function () {
 
                 if (res.status === 200 && res.data.length > 0) {
                     // Process and append orders to the correct sections
+                    res.data.sort((a, b) => b.order_id - a.order_id);
+
                     let hasProcessing = false, hasShipped = false, hasDelivered = false;
                     
                     processingCount = 0;
@@ -288,10 +289,10 @@ $(document).ready(function () {
                         });
 
                         // Gọi lại API để cập nhật đơn hàng
-                        $.get('/get-all-orders', function (res) {
+                        $.get('/get-order-current-login', function (res) {
                             if (res.status === 200) {
                                 OrdersLsGL = res.data;
-                                displayContentOrders();
+                                location.reload();
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -314,11 +315,25 @@ $(document).ready(function () {
         });
     });
 
+    function updateTotalPrice() {
+        let total = 0;
+    
+        $('#editFormContainer .edit-block').each(function () {
+            const select = $(this).find('.variant-select');
+            const price = parseFloat(select.find('option:selected').data('price')) || 0;
+            const quantity = parseInt($(this).find('input[name$="[quantity]"]').val()) || 0;
+    
+            total += price * quantity;
+        });
+    
+        $('#total-price').text(total.toFixed(2));
+    }
+
+    
     $(document).on('click', '.edit-order-btn', function () {
         const orderId = $(this).data('order-id');
         const order = allOrders.find(o => o.order_id == orderId);
-        console.log("Order:", order);
-        console.log("here", orderId);
+        //console.log("Order:", order);
         if (!order) return;
 
         // Reset form
@@ -329,102 +344,159 @@ $(document).ready(function () {
         // Render UI
         let html = '';
         order.order_items.forEach((item, index) => {
-            console.log(`Item ${index}:`, item);
+            // console.log("item trong index: ", index, "là: ", item);
             html += `
-            <div class="edit-block border rounded p-3 mb-3">
+            <div class="edit-block border rounded p-3 mb-3" data-product-id="${item.product_id}">>
                 <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
-                <label>ផលិតផល: ${item.product_name}</label>
+                <label>ផលិតផល name: ${item.product_name}</label>
+
                 <div class="mb-2">
-                    <label>ទំហំ:</label>
-                    <select name="items[${index}][variant_id]" class="form-select variant-select" 
-                            data-product-id="${item.product_id}" 
-                            data-current="${item.variant_id}" required>
-                        <option value="">កំពុងផ្ទុក...</option>
+                    <label>ទំហំ size:</label>
+                    <select 
+                        name="items[${index}][variant_id]" 
+                        class="form-select variant-select" 
+                        data-product-id="${item.product_id}"
+                        data-current-size="${item.size}"  <!-- dùng để biết size đang chọn -->
+                        required
+                    >
+                        <option value="${item.variant_id}" selected>${item.size}</option>
                     </select>
                 </div>
+
                 <div class="mb-2">
-                    <label>ចំនួន:</label>
-                    <input type="number" name="items[${index}][quantity]" class="form-control" value="${item.quantity}" min="1" required>
+                    <label>ចំនួន quantity:</label>
+                    <input type="number" name="items[${index}][quantity]" class="form-control" 
+                        value="${item.quantity}" min="1" required>
                 </div>
             </div>`;
         });
-
+        html += `<div id="order-total" class="text-end fw-bold fs-5">តម្លៃសរុប: $<span id="total-price">0</span></div>`;
         $('#editFormContainer').html(html);
         $('#editModal').modal('show');
 
-        // Load variants
-        const loadVariantPromises = [];
-        $('.variant-select').each(function () {
-            const select    = $(this);
-            const productId = select.data('product-id');
-            const currentId = select.data('current');
-        
-            select.prop('disabled', true)
-                  .empty()
-                  .append('<option>Đang tải...</option>');
-
-            const p = $.get(`/get-value-order/${orderId}`, function (variants) {
-                select.empty();
-                variants.data.forEach(variant => {
-                    select.append(`<option value="${variant.id}">${variant.size}</option>`);
-                });
-                select.val(currentId);
-            });
-
-            loadVariantPromises.push(p);
-        });
-
         // Chỉ bind submit sau khi load variants xong
+        const loadVariantPromises = loadVariantsForEachSelect();
         Promise.all(loadVariantPromises).then(() => {
-        $('#editOrderForm').off('submit').on('submit', function (e) {
-            e.preventDefault();
+            updateTotalPrice();
+            // Bind form submit khi tất cả variants đã load xong
+            $('#editOrderForm').off('submit').on('submit', function (e) {
+                e.preventDefault();
 
-            // Lấy order_id
-            const order_id = $('input[name="order_id"]').val();
+                const order_id = $('input[name="order_id"]').val();
 
-            // Lấy từng item trong form
-            const items = [];
-            $('#editFormContainer .edit-block').each(function () {
-                const order_item_id = $(this).find('input[name$="[order_item_id]"]').val();
-                const variant_id = $(this).find('select[name$="[variant_id]"]').val();
-                const quantityStr = $(this).find('input[name$="[quantity]"]').val();
+                const items = [];
+                $('#editFormContainer .edit-block').each(function () {
+                    const product_id = $(this).data('product-id'); // <-- Lấy từ attribute gán sẵn
+                    console.log("pdis: ", product_id);
+                    const variant_id = $(this).find('select[name$="[variant_id]"]').val();
+                    const quantityStr = $(this).find('input[name$="[quantity]"]').val();
+                    const quantity = parseInt(quantityStr) > 0 ? parseInt(quantityStr) : 1;
 
-                // Chuyển quantity thành số nguyên, mặc định 1 nếu không đúng
-                const quantity = parseInt(quantityStr);
-                
-                items.push({
-                    order_item_id: (order_item_id && order_item_id !== 'null' && order_item_id !== 'undefined') ? order_item_id : null,
-                    variant_id: (variant_id && variant_id !== 'null' && variant_id !== 'undefined') ? variant_id : null,
-                    quantity: (quantity > 0) ? quantity : 1,
+                    if (!product_id || !variant_id) {
+                        console.warn("Thiếu product_id hoặc variant_id", { product_id, variant_id });
+                        return;
+                    }
+        
+                    items.push({ product_id, variant_id, quantity });
                 });
-            });
 
-            const postData = {
-                order_id: order_id,
-                items: items,
-            };
+                const postData = { order_id, items };
 
-            console.log("Dữ liệu gửi đi:", postData);
-
-            $.ajax({
-                url: '/orders/user-update-order',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(postData),
-                success: function () {
-                    Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
-                    $('#editModal').modal('hide');
-                    getCompletedOrders();
-                },
-                error: function (xhr) {
-                    console.error("Lỗi:", xhr.responseText);
-                    Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
-                }
+                $.ajax({
+                    url: '/orders/user-update-order',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(postData),
+                    success: function () {
+                        Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
+                        $('#editModal').modal('hide');
+                        getCompletedOrders();
+                    },
+                    error: function (xhr) {
+                        console.error("Lỗi:", xhr.responseText);
+                        Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
+                    }
+                });        
             });
         });
+
+        function loadVariantsForEachSelect() {
+            const promises = [];
+        
+            $('.variant-select').each(function () {
+                const select    = $(this);
+                const productId = select.data('product-id');
+                const currentSize = select.data('current-size');
+                if (!productId) return;
+        
+                const p = $.get(`/get-variants-by-product/${productId}`)
+                    .then(res => {
+                        const data = res.data;
+                        select.empty();
+        
+                        data.variants.forEach(variant => {
+                            const option = $('<option>')
+                                .val(variant.variant_id)
+                                .text(variant.size)
+                                .attr('data-stock', variant.variant_stock_quantity)
+                                .attr('data-price', variant.price);
+        
+                            if (variant.size === currentSize) {
+                                option.prop('selected', true);
+                            }
+                            select.append(option);
+                        });
+        
+                        // Thêm hiển thị stock
+                        const parentBlock = select.closest('.edit-block');
+                        let stockDisplay = parentBlock.find('.variant-stock');
+                        if (stockDisplay.length === 0) {
+                            stockDisplay = $('<div class="variant-stock text-muted mt-1"></div>');
+                            select.after(stockDisplay);
+                        }
+        
+                        const updateStockDisplay = () => {
+                            const stock = select.find('option:selected').data('stock') ?? 'N/A';
+                            stockDisplay.text(`ចំនួនในស្តុក៖ ${stock}`);
+                        };
+                        updateStockDisplay();
+        
+                        // Khi đổi size
+                        select.on('change', () => {
+                            updateStockDisplay();
+                            updateTotalPrice();
+                            const quantityInput = select.closest('.edit-block').find('input[name$="[quantity]"]');
+                            quantityInput.val(0).attr('max', select.find('option:selected').data('stock'));
+                            quantityInput.next('.quantity-error').remove();
+                        });
+        
+                        // Validate quantity
+                        parentBlock.on('input', 'input[name$="[quantity]"]', function () {
+                            const input = $(this);
+                            const val   = Number(input.val());
+                            const max   = Number(input.attr('max'));
+                            input.next('.quantity-error').remove();
+        
+                            if (val > max) {
+                                input.after(
+                                    $('<div class="quantity-error text-danger mt-1">')
+                                        .text(`Số lượng không được vượt quá số lượng trong kho (${max})!`)
+                                );
+                                input.val(max);
+                            } else if (val < 1) {
+                                input.val(1);
+                            }
+                            updateTotalPrice();
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Lỗi load variants cho product', productId, err);
+                    });
+        
+                promises.push(p);
+            });
+        
+            return promises;
+        }
     });
-
-    });
-
-
 });

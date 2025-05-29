@@ -88,7 +88,6 @@ $(document).ready(function () {
                         },
                         success: (response) => {
                             Swal.close();
-
                             $('#profile_name').text(response.username);
                             $('#profile_phone').text(response.phone_number);
                             $('#profile_email').text(response.email);

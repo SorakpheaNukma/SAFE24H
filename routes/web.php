@@ -54,6 +54,8 @@ Route::middleware('MyMiddlewareNavigation')->group(function () {
 Route::middleware('MyMiddleWareAuth')->group(function () {
     //Banner Image
     Route::get('/banner-images', [BannerImageController::class, 'getAllBannerImages']);
+    Route::post('/update-info', [ProfileController::class, 'updateInfo'])->middleware('MyUserMiddleWare');
+    Route::get('/user-info', [ProfileController::class, 'getUserInfo']);
     Route::post('/add-banner-images', [BannerImageController::class, 'createBannerImage']);
     Route::delete('/delete-banner/{id}', [BannerImageController::class, 'clear']);
 
@@ -106,7 +108,7 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/save-order-items', [OrderItemController::class, 'addOrderItem']);
     Route::delete('/delete-order-items', [OrderItemController::class, 'deleteOrderItem']);
 
-    Route::get('/get-value-order/{orderId}', [OrderItemController::class, 'getItemsByOrderId']);//2
+    Route::get('/get-variants-by-product/{productId}', [OrderItemController::class, 'getVariantsByProduct']);//2
 
     Route::get('/address-page', [MapController::class, 'index']);
     Route::put('/update-address', [LoginController::class, 'updateUserAddress']);

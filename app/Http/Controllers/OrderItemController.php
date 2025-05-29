@@ -39,30 +39,46 @@ class OrderItemController extends Controller
         ]);
     }
 
-    public function getItemsByOrderId($orderId)
+    public function getVariantsByProduct($productId)
     {
-        $orderItems = OrderItem::where('order_id', $orderId)
-            ->with([
-                'variant:id,product_id,size,quantity',
-                'variant.product:product_id,product_name', // hoặc các trường bạn cần
-                'order:order_id'
-            ])
+        $variants = ProductVariants::where('product_variants.product_id', $productId)
+            ->join('products', 'product_variants.product_id', '=', 'products.product_id') // ✅ join bảng products
+            ->select(
+                'product_variants.id as variant_id',
+                'product_variants.size',
+                'product_variants.quantity as variant_stock_quantity',
+                'products.product_price as price' // ✅ lấy giá từ bảng products
+            )
             ->get();
     
-        $result = $orderItems->map(function ($item) {
+        if ($variants->isEmpty()) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Không tìm thấy variants cho product_id này.'
+            ], 404);
+        }
+    
+        // Format lại dữ liệu
+        $formattedVariants = $variants->map(function ($v) {
             return [
-                'variant_id' => $item->variant_id ?? null,
-                'size' => $item->variant->size ?? null,
-                'quantity_ordered' => $item->quantity,
-                'variant_stock_quantity' => $item->variant->quantity ?? null,
+                'variant_id' => $v->variant_id,
+                'size' => $v->size,
+                'variant_stock_quantity' => $v->variant_stock_quantity,
+                'price' => $v->price // ✅ giá từ products.product_price
             ];
         });
     
         return response()->json([
             'status' => 200,
-            'data' => $result
+            'data' => [
+                'product_id' => $productId,
+                'variants' => $formattedVariants
+            ]
         ]);
     }
+    
+
+    
     
 
     // Add a new order item
@@ -198,43 +214,65 @@ class OrderItemController extends Controller
 
 
 
-public function userUpdateOrder(Request $request)
+    public function userUpdateOrder(Request $request)
     {
         $validated = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',
-            'items' => 'required|array',
-            'items.*.order_item_id' => 'required|exists:order_items,id',
-            'items.*.variant_id' => 'required|exists:product_variants,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'order_id'             => 'required|exists:orders,order_id',
+            'items'                => 'required|array',
+            'items.*.product_id'   => 'required|exists:products,product_id',
+            'items.*.variant_id'   => 'required|exists:product_variants,id',
+            'items.*.quantity'     => 'required|integer|min:1',
         ]);
     
         $orderId = $validated['order_id'];
     
-        // Nếu hệ thống có auth: kiểm tra user hiện tại có quyền với order này không
+        // Kiểm tra quyền của user
         $order = Order::findOrFail($orderId);
         if ($order->user_id !== Auth::id()) {
             return response()->json(['message' => 'Bạn không có quyền sửa đơn hàng này'], 403);
         }
     
         DB::beginTransaction();
-    
         try {
             foreach ($validated['items'] as $item) {
-                $orderItem = OrderItem::findOrFail($item['order_item_id']);
+                $orderItem = OrderItem::join('product_variants', 'order_items.variant_id', '=', 'product_variants.id')
+                    ->where('order_items.order_id', $orderId)
+                    ->where('product_variants.product_id', $item['product_id'])
+                    ->select('order_items.*')
+                    ->first();
     
-                // Cập nhật thông tin
+                if (! $orderItem) {
+                    // Không tìm thấy thì bỏ qua (hoặc bạn có thể tạo mới tuỳ logic)
+                    continue;
+                }
+    
+                // Cập nhật
                 $orderItem->variant_id = $item['variant_id'];
-                $orderItem->quantity = $item['quantity'];
+                $orderItem->quantity   = $item['quantity'];
                 $orderItem->save();
             }
+
+            // 👉 Tính lại tổng tiền
+            $total = OrderItem::where('order_id', $orderId)
+            ->selectRaw('SUM(quantity * price) as total')
+            ->value('total');
+        
+            $order->total_amount = $total;
+            $order->save();
+
     
             DB::commit();
             return response()->json(['message' => 'Cập nhật thành công']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Đã xảy ra lỗi khi cập nhật', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Đã xảy ra lỗi khi cập nhật',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
     }
+    
+    
 
     // Delete an order item
     public function deleteOrderItem(Request $request)

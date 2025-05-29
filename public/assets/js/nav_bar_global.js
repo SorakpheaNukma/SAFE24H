@@ -4,46 +4,75 @@ $(document).ready(function () {
     const username = localStorage.getItem('username');
     if (username) {
     $('#id-username').text(username); // hoặc chỗ nào bạn hiển thị tên người dùng
+    
 }
-    const profileImage = localStorage.getItem('profileImage');
-            if (profileImage) {
-            const avatar = document.getElementById('profile_nav_bar');
-            if (avatar) {
-                avatar.src = profileImage;
+function ProfileSettings() {
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+
+    if (token) {
+        $.ajax({
+            url: '/user-info',
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            success: function (data) {
+                console.log(data);
+                const fullPath = data.user_profile; // e.g., "uploads/profile/1748513063_arisu.jpg"
+                const filename = fullPath ? fullPath.split('/').pop() : null;
+                // Lưu thông tin avatar vào localStorage nếu cần
+                if (data.profileImage) {
+                    localStorage.setItem('profileImage', data.profileImage);
+                }
+                console.log(filename);
+                // Set avatar vào giao diện
+                const profileImageUrl = filename
+                ? `/uploads/profile/${filename}`
+                : '/uploads/profile/default-avatar.jpg';
+            
+
+                const avatarNav = document.getElementById('profile_nav_bar');
+                if (avatarNav) avatarNav.src = profileImageUrl;
+
+                $('#avatar-img').attr('src', profileImageUrl);
+
+                // Hiển thị giao diện đã đăng nhập
+                $('#profile').removeClass('d-none');
+                $('#auth-buttons').addClass('d-none');
+                $('#id-username').text(username || data.username || '');
+                $('#id-cart').removeClass("d-none");
+
+                // Sự kiện điều hướng và logout
+                $('#id-profile').on('click', function (e) {
+                    e.preventDefault();
+                    window.location.href = '/profile-page';
+                });
+
+                $('#id-logout').on('click', function (e) {
+                    e.preventDefault();
+                    logOut();
+                });
+            },
+            error: function () {
+                console.log("Lỗi khi lấy thông tin người dùng.");
+                showGuestUI();
             }
-        }
-
-    if (token && username) {
-        // Đăng nhập => Hiện profile
-        $('#profile').removeClass('d-none');
-        $('#auth-buttons').addClass('d-none');
-        $('#id-username').text(username);
-        $('#id-cart').removeClass("d-none");
-        if (profileImage) {
-            let profileImageUrl = profileImage ? `/uploads/profile/${profileImage}` : '/assets/images/default-avatar.png';
-            $('#avatar-img').attr('src', profileImageUrl);
-
-        }
+        });
     } else {
-        // Chưa đăng nhập => Hiện login/register
-        $('#auth-buttons').removeClass('d-none');
-        $('#profile').addClass('d-none');
-        $('#id-cart').addClass("d-none");
+        showGuestUI();
     }
+}
+
+function showGuestUI() {
+    $('#auth-buttons').removeClass('d-none');
+    $('#profile').addClass('d-none');
+    $('#id-cart').addClass("d-none");
+}
+
+ProfileSettings();
 
 
-    function ProfileSettings() {
-        $('#id-profile').on('click', function (e) {
-            e.preventDefault();
-
-            window.location.href = '/profile-page';
-        });
-
-        $('#id-logout').on('click', function (e) {
-            logOut();
-        });
-    }
-    ProfileSettings();
 
     function clearAndRemove() {
         localStorage.removeItem('username');
