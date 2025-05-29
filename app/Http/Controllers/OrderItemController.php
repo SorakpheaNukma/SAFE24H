@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariants;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 
 
 class OrderItemController extends Controller
@@ -144,7 +146,6 @@ class OrderItemController extends Controller
         }
     }
 
-//sua
     public function addSoldProduct($product_id, $variant_id, $quantity=1 )
     {
         try {
@@ -195,44 +196,64 @@ class OrderItemController extends Controller
         return response()->json(['message' => 'Cập nhật thành công']);
     }
 
-    public function userUpdateOrder(Request $request)
-    {
-        $validated = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',
-            'items' => 'required|array',
-            'items.*.order_item_id' => 'required|exists:order_items,id',
-            'items.*.variant_id' => 'required|exists:product_variants,id',
-            'items.*.quantity' => 'required|integer|min:1',
-        ]);
-    
-        $orderId = $validated['order_id'];
-    
-        // Nếu hệ thống có auth: kiểm tra user hiện tại có quyền với order này không
-        $order = Order::findOrFail($orderId);
-        if ($order->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Bạn không có quyền sửa đơn hàng này'], 403);
-        }
-    
-        DB::beginTransaction();
-    
-        try {
-            foreach ($validated['items'] as $item) {
-                $orderItem = OrderItem::findOrFail($item['order_item_id']);
-    
-                // Cập nhật thông tin
-                $orderItem->variant_id = $item['variant_id'];
-                $orderItem->quantity = $item['quantity'];
-                $orderItem->save();
-            }
-    
-            DB::commit();
-            return response()->json(['message' => 'Cập nhật thành công']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Đã xảy ra lỗi khi cập nhật', 'error' => $e->getMessage()], 500);
-        }
+
+
+public function userUpdateOrder(Request $request)
+{
+    $validated = $request->validate([
+        'order_id' => 'required|exists:orders,order_id',
+        'items' => 'required|array',
+        'items.*.order_item_id' => 'required|exists:order_items,id',
+        'items.*.variant_id' => 'required|exists:product_variants,id',
+        'items.*.quantity' => 'required|integer|min:1',
+    ]);
+
+    $orderId = $validated['order_id'];
+
+    $order = Order::findOrFail($orderId);
+
+    if ($order->user_id !== Auth::id()) {
+        return response()->json(['message' => 'Bạn không có quyền sửa đơn hàng này'], 403);
     }
 
+    // Chỉ cho phép sửa nếu đang ở trạng thái processing
+    if ($order->status !== 'processing') {
+        return response()->json(['message' => 'Đơn hàng không thể sửa vì không ở trạng thái đang xử lý'], 403);
+    }
+
+    DB::beginTransaction();
+
+    try {
+        foreach ($validated['items'] as $item) {
+            $orderItem = OrderItem::findOrFail($item['order_item_id']);
+
+            // Lấy variant hiện tại trong order
+            $oldVariant = ProductVariants::findOrFail($orderItem->variant_id);
+            $newVariant = ProductVariants::findOrFail($item['variant_id']);
+
+            // Kiểm tra biến thể mới phải cùng product_id
+            if ($oldVariant->product_id !== $newVariant->product_id) {
+                return response()->json([
+                    'message' => 'Không thể thay đổi sang sản phẩm khác. Chỉ được đổi kích cỡ của cùng 1 sản phẩm.'
+                ], 422);
+            }
+
+            // Cập nhật size (variant_id) và số lượng
+            $orderItem->variant_id = $item['variant_id'];
+            $orderItem->quantity = $item['quantity'];
+            $orderItem->save();
+        }
+
+        DB::commit();
+        return response()->json(['message' => 'Cập nhật đơn hàng thành công']);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'message' => 'Đã xảy ra lỗi khi cập nhật đơn hàng',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     // Delete an order item
     public function deleteOrderItem(Request $request)

@@ -441,4 +441,5 @@ public function deleteProductImg(Request $request)
             return response()->json(['error' => $e->getMessage()], 500);
         }
 }
+
 }
