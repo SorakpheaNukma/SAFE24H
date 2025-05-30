@@ -58,6 +58,8 @@ class ProfileController extends Controller
         return response()->json([
             'username' => $user->username,
             'user_profile' => $user->user_profile,
+            'email' => $user->email,
+            'phone' => $user->phone_number
         ]);
     }
     

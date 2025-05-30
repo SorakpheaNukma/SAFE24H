@@ -12,6 +12,27 @@ $(document).ready(function () {
     let processCountGL = 0;
     let toShipCountGL = 0;
 
+    $.ajax({
+        url: '/user-info',
+        method: 'GET',
+        success: function (data) {
+            $('#username').text(data.username);
+            $('#phone').text(data.phone);
+            $('#email').text(data.email);
+    
+            // Cập nhật ảnh nếu có, ngược lại dùng ảnh mặc định
+            let profilePath = data.user_profile 
+                ? '/' + data.user_profile.replace(/\\/g, '/') 
+                : '/assets/images/profile.png';
+            $('#avatar').attr('src', profilePath);
+        },
+        error: function () {
+            console.log("Lỗi khi lấy thông tin người dùng.");
+            showGuestUI();
+        }
+    });
+    
+    
 
     $('#id-edit-info').on('click', function () {
     $.confirm({

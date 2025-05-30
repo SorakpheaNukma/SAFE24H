@@ -780,85 +780,97 @@ $(document).ready(function() {
         viewOrderDialog(orderData);
     });
     }
-
+    
+    function getDiscountByProductId(productId) {
+        return $.get(`/check-discount?product_id=${productId}`).then(res => {
+            const discount = res.data?.discount;
+            return {
+                productId,
+                discount: discount === "none" ? null : parseFloat(discount)
+            };
+        }).catch(() => {
+            return { productId, discount: null };
+        });
+    }
+    
 
     function viewOrderDialog(orderData) {
-            
-                const orderItemsHTML = orderData.order_items.map(item => {
-                    const variant = item.variant || {};
-                    const product = variant.product || {};
-                    const productName = product.product_name || 'No name';
-                    const size = variant.size || 'N/A';
-                    const price = item.price ?? '0.00';
-                    const quantity = item.quantity ?? 0;
-                    const dmain = window.location.origin;
-            
-                    const imagePath = (product.product_images && product.product_images.length > 0)
-                        ? `${dmain}/uploads/products/${product.product_images[0].image_path}`
-                        : `https://via.placeholder.com/50x50?text=No+Image`;
-                        return `
-                            <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
-                                <img src="${imagePath}" 
-                                    style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
-                                <div>
-                                    <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center;">
-                                        🛒 ${productName}
-                                    </h5>
-                                    <p style="margin: 0; color: #888;">💲 Price: $${price}</p>
-                                    
-                                    <p style="margin: 0; color: #888;">📦 Quantity: ${quantity}</p>
-                                    <p style="margin: 0; color: #888;">📏 Size: ${size}</p>
-                                </div>
-                            </div>
-                        `;
-                }).join('');
+        console.log(orderData);
+        const orderItemsHTML = orderData.order_items.map(item => {
+            const variant = item.variant || {};
+            const product = variant.product || {};
+            const productName = product.product_name || 'No name';
+            const size = variant.size || 'N/A';
+            const price = item.price ?? '0.00';
+            const quantity = item.quantity ?? 0;
+            const dmain = window.location.origin;
 
-                const user = orderData.users || {};
-                const username = user.username || 'Unknown';
-                const email = user.email || 'N/A';
-                const phone = user.phone_number || 'N/A';
-                const address = user.address || 'N/A';
-                const country = user.country || '';
-                const status = orderData.status || 'Pending';
-                // const totalAmount = orderData.total_amount ?? '0.00';
-                const shippingFee = orderData.shipping_fee ?? 0;
-                const merchandiseAmount = orderData.total_amount ?? 0;
-                const grandTotal = (merchandiseAmount + shippingFee).toFixed(2);
-                const orderDate = orderData.order_date ? formatDate(orderData.order_date) : 'N/A';
-
-                MyJConfirmDialog({
-                    title: `<strong>👁️ View Order #${orderData.order_id}</strong>`,
-                    content: `
-                        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                            <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
-                            <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
-                            <p><strong>🔄 Status:</strong> ${status}</p>
-                            <p><strong>💵 Merchandise:</strong> $${merchandiseAmount.toFixed(2)}</p>
-                            <p><strong>🚚 Shipping Fee:</strong> ${shippingFee === 0 ? 'Free' : `$${shippingFee.toFixed(2)}`}</p>
-                            <p><strong>💰 Total Amount:</strong> <span style="font-size: 1.2em; color: #007bff;">$${grandTotal}</span></p>
-                            <p><strong>📅 Order Date:</strong> ${orderDate}</p>
-            
-                            <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
-            
-                            <h4 style="color: #333; margin-bottom: 10px;">👤 Customer Info</h4>
-                            <p><strong>📛 Name:</strong> ${username}</p>
-                            <p><strong>📞 Phone:</strong> ${phone}</p>
-                            <p><strong>🏠 Address:</strong> ${address}${country ? ', ' + country : ''}</p>
-            
-                            <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
-            
-                            <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
-                            <div style="max-height: 200px; overflow-y: auto;">
-                                ${orderItemsHTML}
-                            </div>
+            const imagePath = (product.product_images && product.product_images.length > 0)
+                ? `${dmain}/uploads/products/${product.product_images[0].image_path}`
+                : `https://via.placeholder.com/50x50?text=No+Image`;
+                return `
+                    <div class="order-item" style="border-bottom: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
+                        <img src="${imagePath}" 
+                            style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                        <div>
+                            <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center;">
+                                🛒 ${productName}
+                            </h5>
+                            <p style="margin: 0; color: #888;">💲 Price: $${price}</p>
+                            
+                            <p style="margin: 0; color: #888;">📦 Quantity: ${quantity}</p>
+                            <p style="margin: 0; color: #888;">📏 Size: ${size}</p>
                         </div>
-                    `,
-                    confirmText: "Close",
-                    confirmBtnClass: "btn-info",
-                    columnClass: "m",
-                    type: "blue",
-                    onConfirm: function () { /* Đóng dialog */ }
-                });
+                    </div>
+                `;
+        }).join('');
+
+        const user = orderData.users || {};
+        const username = user.username || 'Unknown';
+        const email = user.email || 'N/A';
+        const phone = user.phone_number || 'N/A';
+        const address = user.address || 'N/A';
+        const country = user.country || '';
+        const status = orderData.status || 'Pending';
+        // const totalAmount = orderData.total_amount ?? '0.00';
+        const shippingFee = orderData.shipping_fee ?? 0;
+        const merchandiseAmount = orderData.total_amount ?? 0;
+        const grandTotal = (merchandiseAmount + shippingFee).toFixed(2);
+        const orderDate = orderData.order_date ? formatDate(orderData.order_date) : 'N/A';
+
+        MyJConfirmDialog({
+            title: `<strong>👁️ View Order #${orderData.order_id}</strong>`,
+            content: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h4 style="color: #333; margin-bottom: 10px;">📃 Order Summary</h4>
+                    <p><strong>🆔 Order ID:</strong> ${orderData.order_id}</p>
+                    <p><strong>🔄 Status:</strong> ${status}</p>
+                    <p><strong>💵 Merchandise:</strong> $${merchandiseAmount.toFixed(2)}</p>
+                    <p><strong>🚚 Shipping Fee:</strong> ${shippingFee === 0 ? 'Free' : `$${shippingFee.toFixed(2)}`}</p>
+                    <p><strong>💰 Total Amount:</strong> <span style="font-size: 1.2em; color: #007bff;">$${grandTotal}</span></p>
+                    <p><strong>📅 Order Date:</strong> ${orderDate}</p>
+    
+                    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+    
+                    <h4 style="color: #333; margin-bottom: 10px;">👤 Customer Info</h4>
+                    <p><strong>📛 Name:</strong> ${username}</p>
+                    <p><strong>📞 Phone:</strong> ${phone}</p>
+                    <p><strong>🏠 Address:</strong> ${address}${country ? ', ' + country : ''}</p>
+    
+                    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+    
+                    <h4 style="color: #333; margin-bottom: 10px;">📦 Order Items</h4>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        ${orderItemsHTML}
+                    </div>
+                </div>
+            `,
+            confirmText: "Close",
+            confirmBtnClass: "btn-info",
+            columnClass: "m",
+            type: "blue",
+            onConfirm: function () { /* Đóng dialog */ }
+        });
     }
             
     function editOrderDialog(orderId, status) {

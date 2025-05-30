@@ -222,6 +222,7 @@ class OrderItemController extends Controller
             'items.*.product_id'   => 'required|exists:products,product_id',
             'items.*.variant_id'   => 'required|exists:product_variants,id',
             'items.*.quantity'     => 'required|integer|min:1',
+            'items.*.discount'    => 'nullable|numeric|min:0|max:100',
         ]);
     
         $orderId = $validated['order_id'];
@@ -234,29 +235,32 @@ class OrderItemController extends Controller
     
         DB::beginTransaction();
         try {
+            $total = 0;
+
             foreach ($validated['items'] as $item) {
                 $orderItem = OrderItem::join('product_variants', 'order_items.variant_id', '=', 'product_variants.id')
-                    ->where('order_items.order_id', $orderId)
-                    ->where('product_variants.product_id', $item['product_id'])
-                    ->select('order_items.*')
-                    ->first();
+                ->join('products', 'product_variants.product_id', '=', 'products.product_id')
+                ->where('order_items.order_id', $orderId)
+                ->where('product_variants.product_id', $item['product_id'])
+                ->select('order_items.*', 'products.product_price as price')
+                ->first();
+            
     
-                if (! $orderItem) {
-                    // Không tìm thấy thì bỏ qua (hoặc bạn có thể tạo mới tuỳ logic)
-                    continue;
-                }
+                if (! $orderItem) continue;
     
-                // Cập nhật
+                // Cập nhật variant và quantity
                 $orderItem->variant_id = $item['variant_id'];
                 $orderItem->quantity   = $item['quantity'];
                 $orderItem->save();
+
+                $price = $orderItem->price;
+                $quantity = $orderItem->quantity;
+                $discount = isset($item['discount']) ? floatval($item['discount']) : 0;
+                $discountedPrice = $price * (1 - $discount / 100);
+                $total += $discountedPrice * $quantity;
+
             }
 
-            // 👉 Tính lại tổng tiền
-            $total = OrderItem::where('order_id', $orderId)
-            ->selectRaw('SUM(quantity * price) as total')
-            ->value('total');
-        
             $order->total_amount = $total;
             $order->save();
 

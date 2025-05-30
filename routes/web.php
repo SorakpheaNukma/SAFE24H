@@ -62,6 +62,8 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     //comment and rate
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
+    //event in edit donhang
+    Route::get('/check-discount', [EventController::class, 'getActiveEventProducts']);
 
 
     //Product

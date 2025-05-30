@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
-     public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -48,34 +48,34 @@ class EventController extends Controller
             'events' => $events
         ]);
     }
-public function show($id)
-{
-    $event = Event::with(['products.category', 'products.product_images', 'products.product_variants'])
-        ->findOrFail($id);
+    public function show($id)
+    {
+        $event = Event::with(['products.category', 'products.product_images', 'products.product_variants'])
+            ->findOrFail($id);
 
-    $products = $event->products->map(function ($p) use ($event) {
-        return [
-            'product_id' => $p->product_id,
-            'product_name' => $p->product_name,
-            'product_price' => $p->product_price,
-            'category_name' => $p->category->category_name ?? '',
-            'images' => $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [],
-            'discount_percent' => $event->discount,  // Lấy discount từ event, không dùng pivot
-        ];
-    });
+        $products = $event->products->map(function ($p) use ($event) {
+            return [
+                'product_id' => $p->product_id,
+                'product_name' => $p->product_name,
+                'product_price' => $p->product_price,
+                'category_name' => $p->category->category_name ?? '',
+                'images' => $p->product_images ? $p->product_images->pluck('image_path')->toArray() : [],
+                'discount_percent' => $event->discount,  // Lấy discount từ event, không dùng pivot
+            ];
+        });
 
-    return response()->json([
-        'status' => true,
-        'event' => [
-            'id' => $event->id,
-            'title' => $event->title,
-            'from_date' => $event->from_date,
-            'to_date' => $event->to_date,
-            'discount' => $event->discount,
-            'products' => $products,
-        ]
-    ]);
-}
+        return response()->json([
+            'status' => true,
+            'event' => [
+                'id' => $event->id,
+                'title' => $event->title,
+                'from_date' => $event->from_date,
+                'to_date' => $event->to_date,
+                'discount' => $event->discount,
+                'products' => $products,
+            ]
+        ]);
+    }
 
 // Cập nhật sự kiện
     public function update(Request $request, $id)
@@ -110,5 +110,35 @@ public function show($id)
         return response()->json(['status' => true, 'message' => 'Event deleted successfully']);
     }
 
+    public function getActiveEventProducts(Request $request)
+    {
+        $productId = $request->query('product_id');
+        $today = now()->toDateString();
+    
+        $product = DB::table('events')
+            ->join('event_product', 'events.id', '=', 'event_product.event_id')
+            ->where('event_product.product_id', $productId)
+            ->whereDate('from_date', '<=', $today)
+            ->whereDate('to_date', '>=', $today)
+            ->select('event_product.product_id', 'events.discount')
+            ->first();
+    
+        if ($product) {
+            return response()->json([
+                'data' => [
+                    'product_id' => $product->product_id,
+                    'discount' => $product->discount
+                ]
+            ]);
+        }
+    
+        return response()->json([
+            'data' => [
+                'product_id' => $productId,
+                'discount' => 'none'
+            ]
+        ]);
+    }
+    
 
 }

@@ -27,35 +27,34 @@
         <h5 class="fw-bold mb-3">ព័ត៌មានរបស់អ្នក</h5>
 
         <div class="row">
-            <!-- Cột chính -->
-            <div class="col-12 d-flex align-items-start">
+    <div class="col-12 d-flex align-items-start">
 
-                <!-- Ảnh đại diện -->
-                <div class="me-3">
-                    <img width="100px" src="{{ asset(Auth::user()->user_profile ?? 'assets/images/profile.png') }}" />
-                </div>
-
-                <!-- Thông tin + nút Edit -->
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-start w-100">
-                        
-                        <!-- Thông tin người dùng -->
-                        <div class="d-flex flex-column">
-                            <p class="mb-2">ឈ្មោះ ៖ {{ Auth::user()->username }}</p>
-                            <p class="mb-1 mt-1">លេខទូរស័ព្ទ ៖ {{ Auth::user()->phone_number }}</p>
-                            <p class="mb-1 mt-1">អ៊ីម៉ែល ៖ {{ Auth::user()->email }}</p>
-                        </div>
-
-                        <!-- Nút Edit -->
-                        <div class="fw-bold text-primary ms-3" style="cursor: pointer;" id="id-edit-info">
-                            កែសម្រួល
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
+        <!-- Ảnh đại diện -->
+        <div class="me-3">
+            <img id="avatar" width="100px" src="{{ asset(Auth::user()->user_profile ?? 'assets/images/profile.png') }}" />
         </div>
+
+        <!-- Thông tin + nút Edit -->
+        <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start w-100">
+
+                <!-- Thông tin người dùng -->
+                <div class="d-flex flex-column">
+                    <p class="mb-2">ឈ្មោះ ៖ <span id="username">{{ Auth::user()->username }}</span></p>
+                    <p class="mb-1 mt-1">លេខទូរស័ព្ទ ៖ <span id="phone">{{ Auth::user()->phone_number }}</span></p>
+                    <p class="mb-1 mt-1">អ៊ីម៉ែល ៖ <span id="email">{{ Auth::user()->email }}</span></p>
+                </div>
+
+                <!-- Nút Edit -->
+                <div class="fw-bold text-primary ms-3" style="cursor: pointer;" id="id-edit-info">
+                    កែសម្រួល
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 
 
         <div class="row mt-3">

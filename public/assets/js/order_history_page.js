@@ -21,12 +21,12 @@ $(document).ready(function () {
         const dmain = window.location.origin;
         let itemListHTML = '';
 
-
         order.order_items.forEach(item => {
 
             const imagePath = item.image_path || 'default.jpg';
             const productName = item.product_name || 'No name';
             const size = item.size || '';
+            
             itemListHTML += `
                 <div class="order-item d-flex align-items-center mb-2">
                     <img src="${imagePath}" alt="Product Image" class="order-image-small me-3 rounded" style="width: 70px; height: 70px; object-fit: cover;">
@@ -34,10 +34,14 @@ $(document).ready(function () {
                         <p class="mb-1 fw-bold">${productName}</p>
                         <p class="text-muted mb-0">ចំនួន: ${item.quantity}</p>
                         <p class="text-muted mb-0">ទំហំ: ${size || ''}</p>
+                        <p> 
                     </div>
                 </div>
             `;
         });
+
+
+        
         //bookmark
         let ratingButtonHTML = '';
         if (order.status === 'delivered') {
@@ -319,16 +323,42 @@ $(document).ready(function () {
         let total = 0;
     
         $('#editFormContainer .edit-block').each(function () {
-            const select = $(this).find('.variant-select');
-            const price = parseFloat(select.find('option:selected').data('price')) || 0;
-            const quantity = parseInt($(this).find('input[name$="[quantity]"]').val()) || 0;
+            const block = $(this);
+            const quantity = parseInt(block.find('input[name$="[quantity]"]').val()) || 0;
+            const selectedOption = block.find('select[name$="[variant_id]"] option:selected');
+            const price = parseFloat(selectedOption.data('price')) || 0;
+            const productId = parseInt(block.data('product-id'));
     
-            total += price * quantity;
+            let discountedPrice = price;
+    
+            // ✅ SỬA Ở ĐÂY: Nếu có discount thì áp dụng
+            if (discountedProducts[productId]) {
+                const discount = discountedProducts[productId];
+                discountedPrice = price * (1 - discount / 100);
+            }
+    
+            total += discountedPrice * quantity;
         });
     
         $('#total-price').text(total.toFixed(2));
     }
+    
+    
+    let discountedProducts = {}; // key: product_id, value: discount %
 
+    function getDiscountByProductId(productId) {
+        return $.get(`/check-discount?product_id=${productId}`).then(res => {
+            const discount = res.data?.discount;
+            return {
+                productId,
+                discount: discount === "none" ? null : parseFloat(discount)
+            };
+        }).catch(() => {
+            return { productId, discount: null };
+        });
+    }
+    
+    
     
     $(document).on('click', '.edit-order-btn', function () {
         const orderId = $(this).data('order-id');
@@ -381,50 +411,69 @@ $(document).ready(function () {
             // Bind form submit khi tất cả variants đã load xong
             $('#editOrderForm').off('submit').on('submit', function (e) {
                 e.preventDefault();
-
+            
                 const order_id = $('input[name="order_id"]').val();
-
                 const items = [];
+            
                 $('#editFormContainer .edit-block').each(function () {
-                    const product_id = $(this).data('product-id'); // <-- Lấy từ attribute gán sẵn
-                    console.log("pdis: ", product_id);
+                    const product_id = $(this).data('product-id');
                     const variant_id = $(this).find('select[name$="[variant_id]"]').val();
                     const quantityStr = $(this).find('input[name$="[quantity]"]').val();
                     const quantity = parseInt(quantityStr) > 0 ? parseInt(quantityStr) : 1;
-
+            
                     if (!product_id || !variant_id) {
                         console.warn("Thiếu product_id hoặc variant_id", { product_id, variant_id });
                         return;
                     }
-        
+            
                     items.push({ product_id, variant_id, quantity });
                 });
-
-                const postData = { order_id, items };
-
-                $.ajax({
-                    url: '/orders/user-update-order',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(postData),
-                    success: function () {
-                        Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
-                        $('#editModal').modal('hide');
-                        getCompletedOrders();
-                    },
-                    error: function (xhr) {
-                        console.error("Lỗi:", xhr.responseText);
-                        Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
-                    }
-                });        
+            
+                // Gọi API discount cho từng sản phẩm
+                const discountPromises = items.map(item => {
+                    return $.get(`/check-discount?product_id=${item.product_id}`)
+                        .then(res => {
+                            const discount = res.data?.discount;
+                            item.discount = discount === "none" ? 0 : parseFloat(discount);
+                            return item;
+                        })
+                        .catch(() => {
+                            item.discount = 0;
+                            return item;
+                        });
+                });
+            
+                Promise.all(discountPromises).then(discountedItems => {
+                    const postData = {
+                        order_id,
+                        items: discountedItems // mỗi item giờ có thêm item.discount
+                    };
+            
+                    $.ajax({
+                        url: '/orders/user-update-order',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(postData),
+                        success: function () {
+                            Swal.fire('ជោគជ័យ', 'បានធ្វើបច្ចុប្បន្នភាព', 'success');
+                            $('#editModal').modal('hide');
+                            getCompletedOrders();
+                        },
+                        error: function (xhr) {
+                            console.error("Lỗi:", xhr.responseText);
+                            Swal.fire('បរាជ័យ', 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ', 'error');
+                        }
+                    });
+                });
             });
+            
         });
 
         function loadVariantsForEachSelect() {
             const promises = [];
         
             $('.variant-select').each(function () {
-                const select    = $(this);
+                const select = $(this);
                 const productId = select.data('product-id');
                 const currentSize = select.data('current-size');
                 if (!productId) return;
@@ -457,7 +506,7 @@ $(document).ready(function () {
         
                         const updateStockDisplay = () => {
                             const stock = select.find('option:selected').data('stock') ?? 'N/A';
-                            stockDisplay.text(`ចំនួនในស្តុក៖ ${stock}`);
+                            stockDisplay.text(`ចំនួនក្នុងស្តុក៖ ${stock}`);
                         };
                         updateStockDisplay();
         
@@ -473,8 +522,8 @@ $(document).ready(function () {
                         // Validate quantity
                         parentBlock.on('input', 'input[name$="[quantity]"]', function () {
                             const input = $(this);
-                            const val   = Number(input.val());
-                            const max   = Number(input.attr('max'));
+                            const val = Number(input.val());
+                            const max = Number(input.attr('max'));
                             input.next('.quantity-error').remove();
         
                             if (val > max) {
@@ -488,6 +537,13 @@ $(document).ready(function () {
                             }
                             updateTotalPrice();
                         });
+        
+                        // 🟡 SỬA ĐOẠN NÀY: Gọi API check discount sau khi load xong variant
+                        return getDiscountByProductId(productId).then(res => {
+                            if (res.discount !== null) {
+                                discountedProducts[productId] = res.discount;
+                            }
+                        });
                     })
                     .catch(err => {
                         console.error('Lỗi load variants cho product', productId, err);
@@ -497,6 +553,6 @@ $(document).ready(function () {
             });
         
             return promises;
-        }
+        }        
     });
 });
