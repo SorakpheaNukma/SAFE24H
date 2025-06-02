@@ -228,12 +228,26 @@ main {
 
 .card {
     transition: all 0.3s ease-in-out;
+      overflow: visible !important;
+    position: relative;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+.card-img-top {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  transition: all 0.4s ease;
+  display: block;
 }
+
+/* Khi hover, show ảnh gốc theo tỉ lệ gốc, nhưng bè ra và không crop */
+.card:hover .card-img-top {
+  object-fit: contain;     /* show full ảnh, không crop */
+  height: 300px;           /* bè cao hơn chút nếu muốn */
+  background-color: #fff;  /* hoặc màu khác nếu ảnh không đủ rộng */
+}
+
+
 
 /* Styles for screens > 992px */
 @media (min-width: 992px) {
@@ -444,12 +458,16 @@ main {
 }
 @font-face {
     font-family: 'Khmer OS';
-    src: url('/assets/fonts/KhmerOS.ttf') format('truetype'); /* Đường dẫn tới file font */
+    src: url('/assets/fonts/KhmerOS.ttf') format('truetype'); 
     font-weight: normal;
     font-style: normal;
 }
 
-/* Áp dụng font Khmer OS cho toàn bộ website */
+
 body {
     font-family: 'Khmer OS', Arial, sans-serif;
 }
+
+
+
+

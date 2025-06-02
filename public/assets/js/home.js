@@ -155,94 +155,96 @@ function getAllProducts(callback) {
 
 
     // Function to populate the grid, accepts filtered products if provided
-function populateGrid(filteredProducts = productsLsGL) {
-    const grid = document.getElementById('gridContainer');
-    let html = '';
-    const dmain = window.location.origin;
+    function populateGrid(filteredProducts = productsLsGL) {
+        const grid = document.getElementById('gridContainer');
+        let html = '';
+        const dmain = window.location.origin;
 
-    const end = Math.min(currentItemsCount + itemsPerPage, filteredProducts.length);
+        const end = Math.min(currentItemsCount + itemsPerPage, filteredProducts.length);
 
-    for (let i = currentItemsCount; i < end; i++) {
-        const item = filteredProducts[i];
+        for (let i = currentItemsCount; i < end; i++) {
+            const item = filteredProducts[i];
 
-        const image = `
-            <a>
-                <img src="${dmain}/uploads/products/${item.images[0]}" alt="${item.product_name}">
-            </a>
-        `;
+            const image = `
+                <a>
+                    <img src="${dmain}/uploads/products/${item.images[0]}" alt="${item.product_name}">
+                </a>
+            `;
 
-        const hasDiscount = item.discount_percent > 0;
-        const discountPercent = Number(item.discount_percent) || 0;
-        const discountedPrice = hasDiscount
-            ? (item.product_price - (item.product_price * discountPercent / 100))
-            : item.product_price;
+            const hasDiscount = item.discount_percent > 0;
+            const discountPercent = Number(item.discount_percent) || 0;
+            const discountedPrice = hasDiscount
+                ? (item.product_price - (item.product_price * discountPercent / 100))
+                : item.product_price;
 
 
-html += `
-    <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
-        <div class="card" data-product-index="${i}" style="border-radius: 16px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden;max-height: 420px;">
-            
-            ${hasDiscount ? `
-                <div class="badge bg-light text-danger fw-bold" style="position: absolute; top: 12px; left: 12px; font-size: 12px;">
-                    ${discountPercent}% OFF
-                </div>
-            ` : ''}
-
-            <img src="${dmain}/uploads/products/${item.images[0]}" class="card-img-top" alt="${item.product_name}" style="max-height: 240px; object-fit: cover;">
-
-            <div class="card-body" style="padding: 12px;">
-                <h5 class="card-title text-primary fw-semibold mb-1" style="font-family: 'Khmer OS', sans-serif;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;">${item.product_name}</h5>
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        ${hasDiscount
-                            ? `
-                                <div class="text-danger fw-bold fs-3">\$${discountedPrice.toFixed(2)}</div>
-                                <div style="text-decoration: line-through; color: #aaa; font-size: 16px;">\$${item.product_price.toFixed(2)}</div>
-                            `
-                            : `<div class="text-danger fw-bold fs-3">\$${item.product_price.toFixed(2)}</div>`
-                        }
+    html += `
+        <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
+            <div class="card" data-product-index="${i}" style="border-radius: 16px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden;max-height: 420px;">
+                
+                ${hasDiscount ? `
+                    <div class="badge bg-light text-danger fw-bold" style="position: absolute; top: 12px; left: 12px; font-size: 12px;">
+                        ${discountPercent}% OFF
                     </div>
-                    <div style="font-family: 'Khmer OS', sans-serif; 
-                        white-space: nowrap; 
-                        overflow: hidden; 
-                        text-overflow: ellipsis; 
-                        margin-top: 8px; 
-                        margin-left: 12px;">
-                        ${item.descriptions.des_1 || ''}
+                ` : ''}
+
+<img src="${dmain}/uploads/products/${item.images[0]}" 
+     class="card-img-top" 
+     alt="${item.product_name}">
+
+                <div class="card-body" style="padding: 12px;">
+                    <h5 class="card-title text-primary fw-semibold mb-1" style="font-family: 'Khmer OS', sans-serif;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;">${item.product_name}</h5>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            ${hasDiscount
+                                ? `
+                                    <div class="text-danger fw-bold fs-3">\$${discountedPrice.toFixed(2)}</div>
+                                    <div style="text-decoration: line-through; color: #aaa; font-size: 16px;">\$${item.product_price.toFixed(2)}</div>
+                                `
+                                : `<div class="text-danger fw-bold fs-3">\$${item.product_price.toFixed(2)}</div>`
+                            }
+                        </div>
+                        <div style="font-family: 'Khmer OS', sans-serif; 
+                            white-space: nowrap; 
+                            overflow: hidden; 
+                            text-overflow: ellipsis; 
+                            margin-top: 8px; 
+                            margin-left: 12px;">
+                            ${item.descriptions.des_1 || ''}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-`;
+    `;
 
+
+        }
+
+        grid.innerHTML = html;
+        currentItemsCount = end;
+
+        // Rebind click event
+        grid.addEventListener('click', function (e) {
+            e.preventDefault();
+            let gridItem = e.target.closest('.grid-item');
+            if (!gridItem) {
+                gridItem = e.target.closest('.card'); // fallback nếu bạn quên thêm grid-item
+            }
+
+            if (gridItem) {
+                const index = gridItem.getAttribute('data-product-index');
+                const item = filteredProducts[index];
+                const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${item.images.join(',')}`;
+                console.log("home-page sang:", productDetailUrl);
+                window.location.href = productDetailUrl;
+            }
+        });
 
     }
-
-    grid.innerHTML = html;
-    currentItemsCount = end;
-
-    // Rebind click event
-    grid.addEventListener('click', function (e) {
-        e.preventDefault();
-        let gridItem = e.target.closest('.grid-item');
-        if (!gridItem) {
-            gridItem = e.target.closest('.card'); // fallback nếu bạn quên thêm grid-item
-        }
-
-        if (gridItem) {
-            const index = gridItem.getAttribute('data-product-index');
-            const item = filteredProducts[index];
-            const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${item.images.join(',')}`;
-            console.log("home-page sang:", productDetailUrl);
-            window.location.href = productDetailUrl;
-        }
-    });
-
-}
 
 
   //banner images

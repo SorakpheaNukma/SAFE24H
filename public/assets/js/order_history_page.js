@@ -378,10 +378,10 @@ $(document).ready(function () {
             html += `
             <div class="edit-block border rounded p-3 mb-3" data-product-id="${item.product_id}">>
                 <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
-                <label>ផលិតផល name: ${item.product_name}</label>
+                <label>ផលិតផល: ${item.product_name}</label>
 
                 <div class="mb-2">
-                    <label>ទំហំ size:</label>
+                    <label>ទំហំ:</label>
                     <select 
                         name="items[${index}][variant_id]" 
                         class="form-select variant-select" 
@@ -394,7 +394,7 @@ $(document).ready(function () {
                 </div>
 
                 <div class="mb-2">
-                    <label>ចំនួន quantity:</label>
+                    <label>ចំនួន:</label>
                     <input type="number" name="items[${index}][quantity]" class="form-control" 
                         value="${item.quantity}" min="1" required>
                 </div>

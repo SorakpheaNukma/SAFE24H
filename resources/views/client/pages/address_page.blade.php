@@ -18,16 +18,19 @@
         <span class="fs-5">ត្រឡប់ក្រោយ</span>
     </div>
 
-    <!-- Thông tin người dùng -->
+    <!-- Hàng chính gồm 2 cột -->
     <div class="row">
-        <div class="col-sm-12 col-md-6">
+        <!-- Cột trái: ទំនាក់ទំនង + អាស័យដ្ឋាន -->
+        <div class="col-md-6">
             <!-- Phần: ទំនាក់ទំនង -->
-            <div class="bg-light p-2 rounded">
+            <div class="bg-light p-2 rounded mb-4">
                 <h4 class="mb-3" style="font-weight: bold;">ទំនាក់ទំនង</h4>
 
                 <div class="d-flex justify-content-between mb-2">
                     <h5>ឈ្មោះ:</h5>
-                    <h5  style="font-weight: bold; text-decoration: underline;"">{{ Auth::user()->username }}</h5>
+                    <h5 style="font-weight: bold; text-decoration: underline;">
+                        {{ Auth::user()->username }}
+                    </h5>
                 </div>
 
                 <div class="d-flex justify-content-between mb-3">
@@ -37,10 +40,9 @@
             </div>
 
             <!-- Phần: អាស័យដ្ឋាន -->
-            <div class="bg-light p-2 rounded mt-4">
+            <div class="bg-light p-3 rounded">
                 <h4 class="mb-3" style="font-weight: bold;">អាស័យដ្ឋាន</h4>
 
-                <!-- Chọn tỉnh/thành -->
                 <div class="mb-3">
                     <label class="form-label fs-5" for="country">ខេត្ត/រាជធានី</label>
                     <select class="form-control" id="country">
@@ -72,9 +74,9 @@
                         <option value="ពោធិ៍សាត់">ពោធិ៍សាត់</option>
                     </select>
                 </div>
+
                 <p id="shippingCost" class="fs-5 text-primary mt-3"></p>
 
-                <!-- Địa chỉ chi tiết -->
                 <div class="mb-3">
                     <label class="form-label fs-5" for="more-address">
                         បន្ថែមព័ត៌មាន <span class="fs-6">(ទីតាំងជាក់លាក់......)</span>
@@ -83,13 +85,21 @@
                            class="form-control" />
                 </div>
 
-                <!-- Nút lưu -->
-                <div class="d-flex justify-content-end">
+                <div class="d-flex justify-content-end mt-3">
                     <button id="saveAddressButton" class="btn btn-primary px-4 py-2">
                         យល់ព្រមរក្សាទុក
                     </button>
                 </div>
             </div>
+        </div>
+
+        <!-- Cột phải: Bản đồ Map -->
+        <div class="col-md-6">
+            <label class="form-label fs-5">📍 សូមជ្រើសទីតាំងលើផែនទី</label>
+            <button id="getLocationBtn" class="btn btn-outline-primary w-100 mb-2">
+                យកទីតាំងបច្ចុប្បន្ន
+            </button>
+            <div id="map" style="width: 100%; height: 452px; border: 1px solid #ccc; border-radius: 10px;"></div>
         </div>
     </div>
 </div>
@@ -99,10 +109,16 @@
 <script src="{{ asset('assets/js/address_page.js') }}"></script>
 <link rel="stylesheet" href="{{ asset('assets/css/address_page.css') }}">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- CDN SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet Reverse Geocoding Plugin -->
+<script src="https://unpkg.com/esri-leaflet-geocoder/dist/esri-leaflet-geocoder.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css" />
 
-<!-- Font Khmer OS nếu bạn đã chèn file KhmerOS.ttf -->
+<!-- Custom Khmer Font -->
 <style>
 @font-face {
     font-family: 'KhmerOS';

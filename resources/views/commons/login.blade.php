@@ -5,7 +5,7 @@
     <div class="row g0" style="--bs-gutter-x: 0; --bs-gutter-y: 0;">
         <div class="col-md-6">
             <img id="welcomeImage" src="{{ asset('assets/images/24h.png') }}" alt="Welcome Image"
-                style="width: 100%; object-fit: fill;">
+                style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 50%;">
         </div>
 
         <div

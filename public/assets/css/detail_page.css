@@ -2,16 +2,50 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap; /* để responsive tốt */
+    flex-wrap: wrap; 
 }
 
 @media (min-width: 850px) and (max-width: 1200px),
 (min-width: 1200px) {
     .quantity-container {
-        width: auto; /* bỏ width: 100% */
-        justify-content: flex-start; /* không space-between */
+        width: auto; 
+        justify-content: flex-start; 
     }
 }
+
+.card {
+    transition: all 0.3s ease-in-out;
+      overflow: visible !important;
+    position: relative;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  transition: all 0.4s ease;
+  display: block;
+}
+
+/* Khi hover, show ảnh gốc theo tỉ lệ gốc, nhưng bè ra và không crop */
+.card:hover .card-img-top {
+  object-fit: contain;     /* show full ảnh, không crop */
+  height: 300px;           /* bè cao hơn chút nếu muốn */
+  background-color: #fff;  /* hoặc màu khác nếu ảnh không đủ rộng */
+}
+.card-title {
+    font-family: 'Khmer OS', sans-serif;
+    white-space: nowrap;              /* Không xuống dòng */
+    overflow: hidden;                 /* Ẩn phần vượt quá */
+    text-overflow: ellipsis;          /* Hiện dấu ... */
+    display: block;                   /* Đảm bảo hoạt động với thẻ h5 */
+    line-height: 1.3;
+    padding-top: 4px;
+}
+
+
+
+
 
 /* CSS to truncate the title text after 2 lines */
 .d-flex.flex-column p {

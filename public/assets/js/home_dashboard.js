@@ -293,7 +293,11 @@ $(document).ready(function() {
                                 callback(null, res);
                             }
                         } else {
-                            $.alert('Failed to update product');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Update Failed',
+                                text: res.message || 'Failed to update product.',
+                            });
 
                             if (typeof callback === 'function') {
                                 callback('Failed to update product', null);
@@ -302,14 +306,19 @@ $(document).ready(function() {
                     },
                     error: function(res) {
                         let errorMessage = 'An error occurred. Please try again later.';
-                        if (res.status === 422) {
+
+                        if (res.status === 422 && res.responseJSON?.error) {
                             let error = res.responseJSON.error;
                             errorMessage = Object.values(error)[0][0];
                         } else if (res.status === 500) {
                             errorMessage = 'A server error occurred.';
                         }
 
-                        showError(errorMessage);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Update Failed',
+                            text: errorMessage,
+                        });
 
                         if (typeof callback === 'function') {
                             callback(errorMessage, null);
@@ -317,6 +326,7 @@ $(document).ready(function() {
                     }
                 });
             }
+
 
 
             function deleteProduct(formData, callback) {
@@ -330,7 +340,11 @@ $(document).ready(function() {
                                 callback(null, res);
                             }
                         } else {
-                            $.alert('Failed to delete product');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed to delete product',
+                                text: res.message || 'Unknown error occurred.',
+                            });
 
                             if (typeof callback === 'function') {
                                 callback('Failed to delete product', null);
@@ -339,7 +353,8 @@ $(document).ready(function() {
                     },
                     error: function(res) {
                         let errorMessage = 'An error occurred. Please try again later.';
-                        if (res.status === 422) {
+
+                        if (res.status === 422 && res.responseJSON?.error) {
                             let error = res.responseJSON.error;
                             errorMessage = Object.values(error)[0][0];
                         } else if (res.status === 404) {
@@ -348,7 +363,11 @@ $(document).ready(function() {
                             errorMessage = 'A server error occurred.';
                         }
 
-                        showError(errorMessage);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Delete Failed',
+                            text: errorMessage,
+                        });
 
                         if (typeof callback === 'function') {
                             callback(errorMessage, null);
@@ -356,6 +375,7 @@ $(document).ready(function() {
                     }
                 });
             }
+
 
 
             function addProduct(formData) {
@@ -460,7 +480,7 @@ $(document).ready(function() {
                 for (let i = 0; i < images.length; i++) {
                     fd.append(`images[]`, images[i]);
                 }
-
+            
                 $.ajax({
                     url: '/edit-product-img',
                     method: 'POST',
@@ -475,25 +495,40 @@ $(document).ready(function() {
                                 displayProductDescription1,
                                 displayProductDescription2
                             ]);
-
-                            showSuccess(res.message);
+            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: res.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
                         } else {
-                            $.alert('Failed to add Product image');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed',
+                                text: 'Failed to add Product image'
+                            });
                         }
                     },
                     error: function(res) {
+                        let errorMessage = 'Something went wrong. Please try again later!';
                         if (res.status === 422) {
                             let error = res.responseJSON.error;
-                            let firstError = Object.values(error)[0][0];
-                            showError(firstError);
+                            errorMessage = Object.values(error)[0][0];
                         } else if (res.status === 500) {
-                            showError(res.responseJSON.error);
-                        } else {
-                            showError('Something went wrong. Please try again later!');
+                            errorMessage = res.responseJSON.error || errorMessage;
                         }
+            
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMessage
+                        });
                     }
                 });
             }
+
 
             function deleteProductImg(id) {
                 $.ajax({
@@ -511,7 +546,7 @@ $(document).ready(function() {
                                 displayProductDescription2
                             ]);
 
-                            showSuccess1('Product deleted successfully🎉');
+                            // showSuccess1('Product deleted successfully🎉');
                         } else {
                             $.alert('Failed to delete product');
                         }
@@ -873,170 +908,199 @@ $(document).ready(function() {
         });
     }
             
-    function editOrderDialog(orderId, status) {
-                MyJConfirmDialog({
-                    title: '<strong><i class="fas fa-sync-alt" style="color: orange; margin-right: 5px;"></i> Update Order</strong>',
-                    confirmText: 'Update',
-                    content: `
-                <div style="margin-top: 10px;">
+    function editOrderDialog(orderId, currentStatus) {
+        Swal.fire({
+            title: '<strong><i class="fas fa-sync-alt" style="color: orange; margin-right: 5px;"></i> Update Order</strong>',
+            html: `
+                <div style="margin-top: 10px; text-align: left;">
                     <label for="orderStatus" style="font-weight: bold;">Order Status:</label>
                     <select id="orderStatus" class="form-control mt-2">
-                        <option value="processing" >Processing</option>
+                        <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                     </select>
                 </div>
             `,
-                    confirmBtnClass: 'btn-warning',
-                    columnClass: 'm',
-                    type: 'orange',
-                    onConfirm: function() {
-                        const selectedStatus = document.getElementById("orderStatus").value;
-
-                        updateOrder(orderId, selectedStatus);
-                    },
-                    cancelText: 'Cancel',
-                    onCancel: function() {
-
-                    },
-                    onOpenBefore: function() {
-
-                    },
-                });
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-warning',
+                cancelButton: 'btn btn-secondary ml-2'
+            },
+            buttonsStyling: false,
+            didOpen: () => {
+                // Set current selected status (nếu có)
+                document.getElementById("orderStatus").value = currentStatus;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const selectedStatus = document.getElementById("orderStatus").value;
+                updateOrder(orderId, selectedStatus);
+            }
+        });
     }
 
+
     function updateOrder(order_id, status) {
-                $.ajax({
-                    url: '/edit-order',
-                    method: 'PUT',
-                    data: {
-                        "order_id": order_id,
-                        "status": status,
-                    },
-                    success: function(res) {
-                        if (res.status === 200) {
-                            getAllOrders();
+        $.ajax({
+            url: '/edit-order',
+            method: 'PUT',
+            data: {
+                "order_id": order_id,
+                "status": status,
+            },
+            success: function (res) {
+                if (res.status === 200) {
+                    getAllOrders();
 
-                            showSuccess("Order updated successfully🎉");
-                        } else {
-                            $.alert('Failed to update order');
-                        }
-                    },
-                    error: function(res) {
-                        let errorMessage = 'An error occurred. Please try again later.';
-                        if (res.status === 422) {
-                            let error = res.responseJSON.error;
-                            errorMessage = Object.values(error)[0][0];
-                        } else if (res.status === 500) {
-                            errorMessage = 'A server error occurred.';
-                        }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Order updated successfully 🎉',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: 'Failed to update order'
+                    });
+                }
+            },
+            error: function (res) {
+                let errorMessage = 'An error occurred. Please try again later.';
 
-                        showError(errorMessage);
-                    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                if (res.status === 422) {
+                    let error = res.responseJSON.error;
+                    errorMessage = Object.values(error)[0][0];
+                } else if (res.status === 500) {
+                    errorMessage = 'A server error occurred.';
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage
                 });
+            }
+        });
     }
 
     function deleteOrderDialog(orderData) {
-                const { order_id, total_amount, status, order_date, order_items, users } = orderData;
-                const { username, email, phone_number, address, country } = users;
+        const { order_id, total_amount, status, order_date, order_items, users } = orderData;
+        const { username, email, phone_number, address, country } = users;
 
-                // Create HTML for order items (products with their images, names, and quantities)
-                const orderItemsHTML = order_items.map(item => `
-                    <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0;">
-                        <img src="${window.location.origin}/uploads/products/${item.variant.product.product_images[0]?.image_path}" 
-                            style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
-                        <div>
-                            <h5 style="margin: 0; font-weight: bold;">🛒 ${item.variant.product.product_name}</h5>
-                            <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
-                        </div>
-                    </div>
-                `).join('');
-
-                // Confirm Dialog for Deleting Order
-                MyJConfirmDialog({
-                    title: '<strong><i class="fas fa-trash-alt" style="color: red; margin-right: 5px;"></i> Delete Order</strong>',
-                    confirmText: 'Delete Order',
-                    content: `
-                <div style="text-align: center; padding: 10px;">
-                    <p style="font-size: 16px; color: #555;">
-                        Are you sure you want to delete this order for customer: <strong>${username}</strong>?
-                    </p>
-                    <div style="margin: 10px 0; font-size: 14px; color: #333;">
-                        <strong>Order ID:</strong> ${order_id}<br>
-                        <strong>Status:</strong> ${status}<br>
-                        <strong>Total Amount:</strong> $${total_amount}<br>
-                        <strong>Order Date:</strong> ${formatDate(order_date)}
-                    </div>
-                    <hr style="margin: 15px 0;">
-                    
-                    <h4 style="font-size: 16px; color: #333; margin-bottom: 10px;">Order Items</h4>
-                    <div style="max-height: 200px; overflow-y: auto; font-size: 14px; color: #555;">
-                        ${orderItemsHTML}
-                    </div>
-                    
-                    <hr style="margin: 15px 0;">
-                    
-                    <div style="font-size: 14px; color: #555;">
-                        <p><i class="fas fa-user-circle" style="color: #007bff; margin-right: 5px;"></i> <strong>Customer:</strong> ${username}</p>
-                        <p><i class="fas fa-envelope" style="color: #007bff; margin-right: 5px;"></i> <strong>Email:</strong> ${email}</p>
-                        <p><i class="fas fa-phone" style="color: #007bff; margin-right: 5px;"></i> <strong>Phone:</strong> ${phone_number}</p>
-                        <p><i class="fas fa-map-marker-alt" style="color: #007bff; margin-right: 5px;"></i> <strong>Address:</strong> ${address ? address : 'N/A'}, ${country}</p>
-                    </div>
-                    
-                    <hr style="margin: 15px 0;">
-                    <p style="font-size: 14px; color: #888;">
-                        This action cannot be undone. Please confirm if you want to proceed.
-                    </p>
-                    <i class="fas fa-exclamation-triangle" style="color: orange; font-size: 40px; margin-top: 15px;"></i>
+        const orderItemsHTML = order_items.map(item => `
+            <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0;">
+                <img src="${window.location.origin}/uploads/products/${item.variant.product.product_images[0]?.image_path}" 
+                    style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 5px;">
+                <div>
+                    <h5 style="margin: 0; font-weight: bold;">🛒 ${item.variant.product.product_name}</h5>
+                    <p style="margin: 0; color: #888;">📦 Quantity: ${item.quantity}</p>
                 </div>
-            `,
-                    confirmBtnClass: 'btn-danger',
-                    cancelBtnClass: 'btn-secondary',
-                    autoClose: 'Cancel|50000',
-                    columnClass: 'm',
-                    type: 'red',
-                    onConfirm: function() {
-                        deleteOrder(order_id); // Function to delete the order
-                    },
-                    cancelText: 'Cancel',
-                    onCancel: function() {
-                        // Handle cancel action
-                    },
-                    onOpenBefore: function() {
-                        // Optional: Action to take before the dialog opens
-                    },
-                });
+            </div>
+        `).join('');
+
+        const htmlContent = `
+            <p style="font-size: 16px; color: #555;">
+                Are you sure you want to delete this order for customer: <strong>${username}</strong>?
+            </p>
+            <div style="margin: 10px 0; font-size: 14px; color: #333;">
+                <strong>Order ID:</strong> ${order_id}<br>
+                <strong>Status:</strong> ${status}<br>
+                <strong>Total Amount:</strong> $${total_amount}<br>
+                <strong>Order Date:</strong> ${formatDate(order_date)}
+            </div>
+            <hr style="margin: 15px 0;">
+            <h4 style="font-size: 16px; color: #333; margin-bottom: 10px;">Order Items</h4>
+            <div style="max-height: 200px; overflow-y: auto; font-size: 14px; color: #555;">
+                ${orderItemsHTML}
+            </div>
+            <hr style="margin: 15px 0;">
+            <div style="font-size: 14px; color: #555;">
+                <p><strong>Customer:</strong> ${username}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Phone:</strong> ${phone_number}</p>
+                <p><strong>Address:</strong> ${address ? address : 'N/A'}, ${country}</p>
+            </div>
+            <hr style="margin: 15px 0;">
+            <p style="font-size: 14px; color: #888;">
+                This action cannot be undone. Please confirm if you want to proceed.
+            </p>
+            <i class="fas fa-exclamation-triangle" style="color: orange; font-size: 40px; margin-top: 15px;"></i>
+        `;
+
+        Swal.fire({
+            title: '<strong><i class="fas fa-trash-alt" style="color: red;"></i> Delete Order</strong>',
+            html: htmlContent,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete Order',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            width: 700,
+            allowOutsideClick: false,
+            scrollbarPadding: false,
+            didOpen: () => {
+                // custom logic if needed
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteOrder(order_id);
+            }
+        });
     }
+
 
     function deleteOrder(order_id) {
-                $.ajax({
-                    url: '/delete-order',
-                    method: 'DELETE',
-                    data: {
-                        "order_id": order_id
-                    },
-                    success: function(res) {
-                        if (res.status === 200) {
-                            getAllOrders();
+        $.ajax({
+            url: '/delete-order',
+            method: 'DELETE',
+            data: {
+                "order_id": order_id
+            },
+            success: function (res) {
+                if (res.status === 200) {
+                    getAllOrders();
 
-                            showSuccess("Order deleted successfully🎉");
-                        } else {
-                            $.alert('Failed to delete order');
-                        }
-                    },
-                    error: function(res) {
-                        let errorMessage = 'An error occurred. Please try again later.';
-                        if (res.status === 422) {
-                            let error = res.responseJSON.error;
-                            errorMessage = Object.values(error)[0][0];
-                        } else if (res.status === 500) {
-                            errorMessage = 'A server error occurred.';
-                        }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'Order deleted successfully 🎉',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: 'Failed to delete order'
+                    });
+                }
+            },
+            error: function (res) {
+                let errorMessage = 'An error occurred. Please try again later.';
 
-                        showError(errorMessage);
-                    }
+                if (res.status === 422) {
+                    let error = res.responseJSON.error;
+                    errorMessage = Object.values(error)[0][0];
+                } else if (res.status === 500) {
+                    errorMessage = 'A server error occurred.';
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage
                 });
+            }
+        });
     }
+
 
 
     productActionLink.addEventListener("click", function(event) {
@@ -1060,15 +1124,15 @@ $(document).ready(function() {
 
 
     function showDashboard() {
-        hideAllTabsContent(); // Ẩn tất cả tab nội dung trước
+        hideAllTabsContent(); 
 
-        dashboardContent.style.display = "block"; // Hiện dashboard
-        displayContentDashboard(); // Gọi hàm xử lý nội dung dashboard nếu có
+        dashboardContent.style.display = "block"; 
+        displayContentDashboard();
     }
 
 
     function prodcut_Content() {
-    hideAllTabsContent(); // Ẩn tất cả trước
+    hideAllTabsContent(); 
     productContent.style.display = "block";
     proImageContent.style.display = "block";
     proDescription1.style.display = "block";
@@ -1273,8 +1337,18 @@ $(document).ready(function() {
 
                 updateProduct(formData, function (error, res) {
                     if (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Update Failed',
+                            text: 'There was an error updating the product. Please try again.',
+                        });
                     } else {
                         updateProductImg(product_id, imageFiles);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Update Successful',
+                            text: 'The product was updated successfully!',
+                        });
                     }
                 });
             },
@@ -1336,27 +1410,39 @@ $(document).ready(function() {
         let fd = {
             product_id: id
         }
-        MyJConfirmDialog({
-            title: 'Delete Product',
-            content: `Are you sure you want to delete product name 👉${product_name} ?`,
-            confirmText: 'Delete',
-            confirmBtnClass: 'btn-warning',
-            columnClass: 'm',
-            autoClose: 'Cancel|30000',
-            onConfirm: function () {
-                deleteProduct(
-                    fd, function (error, res) {
-                        if (res) {
-                            deleteProductImg(id);
-                        }
-                    },
-                );
-            },
-            cancelText: 'Cancel',
-            onCancel: function () {
-            }
-        });
-    }
+         Swal.fire({
+        title: 'Delete Product',
+        text: `Are you sure you want to delete product name 👉 ${product_name}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        allowOutsideClick: false,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let fd = { product_id: id };
+            deleteProduct(fd, function (error, res) {
+                if (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Delete Failed',
+                        text: 'There was an error deleting the product.',
+                    });
+                } else {
+                    deleteProductImg(id);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted Successfully',
+                        text: `Product "${product_name}" was deleted.`,
+                    });
+                }
+            });
+        }
+    });
+}
 
     function displayProductImages() {
         var proImageTb = document.getElementById('table_product_imgs');
@@ -1695,47 +1781,60 @@ $(document).ready(function() {
                 typeAnimated: true,
                 type: 'blue',
                 content: `
-               <div>
-                    <form  class="formName" >
-                        <div class="form-group">
-                            <label>Category Name</label>
-                            <input type="text" id="categoryName" placeholder="Enter category name" class="form-control" required />
-                        </div>
-                    </form >
-               </div>
-
-                <div class="mt-3">
-                    <div class="IdTableCategory">
-                    </div>
+                <div>
+                        <form class="formName">
+                            <div class="form-group">
+                                <label>Category Name</label>
+                                <input type="text" id="categoryName" placeholder="Enter category name" class="form-control" required />
+                            </div>
+                        </form>
                 </div>
-            `,
 
+                    <div class="mt-3">
+                        <div class="IdTableCategory">
+                        </div>
+                    </div>
+                `,
                 buttons: {
                     formSubmit: {
                         text: 'Add Category',
                         btnClass: 'btn-blue',
                         action: function () {
-                            var categoryName = $('#categoryName').val();
+                            var categoryName = $('#categoryName').val().trim();
 
                             if (!categoryName) {
-                                $.alert('Please enter a category name!');
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Missing Field',
+                                    text: 'Please enter a category name!',
+                                });
                                 return false;
                             }
 
                             const formData = {
                                 'category_name': categoryName
-                            }
+                            };
 
                             addCategory(formData, function (success) {
                                 if (success) {
                                     $('#categoryName').val('');
-                                    showSuccess('category added successfully🎉');
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Success',
+                                        text: 'Category added successfully 🎉',
+                                    }).then(() => {
+                                        displayCategoriesTable();
+                                    });
                                 } else {
-                                    $.alert('Error adding category!');
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Error adding category!',
+                                    });
                                 }
                             });
 
-                            return false; // Prevent close confirm dialog
+                            return false; // Prevent closing the dialog
                         }
                     },
                     cancel: function () { }
@@ -1746,6 +1845,7 @@ $(document).ready(function() {
             });
         });
     }
+
 
     btnAddCategory();
 
@@ -1932,16 +2032,16 @@ $(document).ready(function() {
         }
 
         $(tableId).DataTable({
-            "info": false,                  // Disable table information display
-            "lengthChange": false,           // Allow users to change the number of rows per page
-            "pageLength": pageLength,       // Set the initial page length (default 10)
-            "paging": true,                 // Enable pagination
-            "searching": true,              // Enable search functionality
-            "ordering": true,               // Enable sorting functionality
+            "info": false,                  
+            "lengthChange": false,           
+            "pageLength": pageLength,       
+            "paging": true,                
+            "searching": true,              
+            "ordering": true,              
             "language": {
                 "paginate": {
-                    "previous": "<i class='fas fa-arrow-left'></i>",  // Previous button icon
-                    "next": "<i class='fas fa-arrow-right'></i>"      // Next button icon
+                    "previous": "<i class='fas fa-arrow-left'></i>",  
+                    "next": "<i class='fas fa-arrow-right'></i>"      
                 }
             },
         });
@@ -2153,8 +2253,10 @@ $(document).ready(function() {
     const ordersTableBody = document.getElementById("orders-table-body");
     ordersTableBody.innerHTML = '';
     let index = 1;
-    for (const customerName in customerSummaryMap) {
-        const summary = customerSummaryMap[customerName];
+    const sortedCustomers = Object.entries(customerSummaryMap)
+    .sort(([, a], [, b]) => b.totalAmount - a.totalAmount);
+
+    sortedCustomers.forEach(([customerName, summary]) => {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${index}</td>
@@ -2165,7 +2267,7 @@ $(document).ready(function() {
         `;
         ordersTableBody.appendChild(row);
         index++;
-    }
+    });
 
     // Pie Chart for Top Product Categories
     const pieChartCtx = document.getElementById('pieChart').getContext('2d');
@@ -3144,9 +3246,5 @@ function formatCurrencyKHR(amount) {
         minimumFractionDigits: 0
     }).format(amount);
 }
-
-
-
-
-    
+  
 });

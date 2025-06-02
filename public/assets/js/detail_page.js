@@ -39,7 +39,7 @@ const html = `
             }
 
             <a href="javascript:void(0);" class="product-link" data-product-index="${i}">
-                <img src="${dmain}/uploads/products/${item.images[0] || 'default-image.jpg'}" class="card-img-top" alt="${item.product_name}" style="max-height: 240px; object-fit: cover;">
+                <img src="${dmain}/uploads/products/${item.images[0] || 'default-image.jpg'}" class="card-img-top" alt="${item.product_name}">
             </a>
 
             <div class="card-body" style="padding: 12px;">

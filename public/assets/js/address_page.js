@@ -87,5 +87,75 @@ function showError(message) {
 
         updateAddress(address, country);
     });
+    // Khởi tạo bản đồ Leaflet tại phần tử có id="map"
+const map = L.map('map').setView([11.5564, 104.9282], 13); // Phnom Penh mặc định
+
+// Tile từ OpenStreetMap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+}).addTo(map);
+
+// Tạo biến để chứa marker
+let marker;
+
+// Nếu trình duyệt hỗ trợ định vị, dùng vị trí thật
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        map.setView([lat, lon], 16);
+        marker = L.marker([lat, lon]).addTo(map);
+
+        reverseGeocode(lat, lon);
+    });
+}
+
+// Click để chọn vị trí trên bản đồ
+map.on('click', function (e) {
+    const { lat, lng } = e.latlng;
+
+    if (marker) {
+        marker.setLatLng([lat, lng]);
+    } else {
+        marker = L.marker([lat, lng]).addTo(map);
+    }
+
+    reverseGeocode(lat, lng);
+});
+
+// Nút lấy vị trí hiện tại
+$('#getLocationBtn').on('click', function () {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            map.setView([lat, lon], 16);
+            if (marker) {
+                marker.setLatLng([lat, lon]);
+            } else {
+                marker = L.marker([lat, lon]).addTo(map);
+            }
+
+            reverseGeocode(lat, lon);
+        });
+    } else {
+        alert('Browser does not support geolocation.');
+    }
+});
+
+// Lấy địa chỉ từ toạ độ (reverse geocode)
+function reverseGeocode(lat, lng) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+        .then(res => res.json())
+        .then(data => {
+            const address = data.display_name || '';
+            $('#more-address').val(address);
+        })
+        .catch(err => {
+            console.error('Reverse geocoding failed:', err);
+        });
+}
 
 });
