@@ -53,6 +53,7 @@ public function getRecommendedProducts(Request $request)
 
             $variants = $p->product_variants ? $p->product_variants->map(function ($v) {
                 return [
+                    'variant_id' => $v->id,
                     'size' => $v->size,
                     'quantity' => $v->quantity,
                     'sold' => $v->sold,

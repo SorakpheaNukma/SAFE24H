@@ -85,7 +85,6 @@ const html = `
             const item = items[index];
 
             const productDetailUrl = `/details-page?item=${encodeURIComponent(JSON.stringify(item))}&img=${encodeURIComponent(item.images.join(','))}`;
-            console.log(productDetailUrl);
             window.location.href = productDetailUrl;
         });
     });
