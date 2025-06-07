@@ -77,7 +77,6 @@ class EventController extends Controller
         ]);
     }
 
-// Cập nhật sự kiện
     public function update(Request $request, $id)
     {
         $event = Event::find($id);

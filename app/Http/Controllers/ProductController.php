@@ -24,14 +24,15 @@ public function getRecommendedProducts(Request $request)
             return response()->json(['error' => 'Product not found'], 404);
         }
 
-        $now = now();
+        $todayStart = now()->startOfDay();
+        $todayEnd = now()->endOfDay();
         $recommendedProducts = Product::with([
             'category',
             'product_images',
             'product_variants',
-            'events' => function ($query) use ($now) {
-                $query->where('from_date', '<=', $now)
-                      ->where('to_date', '>=', $now);
+            'events' => function ($query) use ($todayStart, $todayEnd) {
+                $query->where('from_date', '<=', $todayEnd)
+                      ->where('to_date', '>=', $todayStart);
             }
         ])
         ->where('category_id', $currentProduct->category_id)

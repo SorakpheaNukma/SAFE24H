@@ -74,12 +74,10 @@ const html = `
         itemsGrid.innerHTML += html;
     });
 
-    // currentIndex += itemsPerPage;
-    // Ẩn nút View More luôn
     const viewMoreContainer = document.getElementById('view-more-container');
     if (viewMoreContainer) viewMoreContainer.style.display = 'none';
 
-    // Add click event listener to each product link
+
     document.querySelectorAll('.product-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();

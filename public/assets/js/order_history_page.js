@@ -376,29 +376,42 @@ $(document).ready(function () {
         order.order_items.forEach((item, index) => {
             // console.log("item trong index: ", index, "là: ", item);
             html += `
-            <div class="edit-block border rounded p-3 mb-3" data-product-id="${item.product_id}">>
-                <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
-                <label>ផលិតផល: ${item.product_name}</label>
+<div class="edit-block border rounded shadow-sm p-4 mb-4 bg-white" data-product-id="${item.product_id}" style="border-left: 5px solid #0d6efd;">
+    <input type="hidden" name="items[${index}][order_item_id]" value="${item.order_item_id}">
 
-                <div class="mb-2">
-                    <label>ទំហំ:</label>
-                    <select 
-                        name="items[${index}][variant_id]" 
-                        class="form-select variant-select" 
-                        data-product-id="${item.product_id}"
-                        data-current-size="${item.size}"  <!-- dùng để biết size đang chọn -->
-                        required
-                    >
-                        <option value="${item.variant_id}" selected>${item.size}</option>
-                    </select>
-                </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0 text-primary fw-bold" style="font-family: 'Khmer OS', sans-serif;">ទំនិញ: ${item.product_name}</h6>
+    </div>
 
-                <div class="mb-2">
-                    <label>ចំនួន:</label>
-                    <input type="number" name="items[${index}][quantity]" class="form-control" 
-                        value="${item.quantity}" min="1" required>
-                </div>
-            </div>`;
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">ទំហំ:</label>
+            <select 
+                name="items[${index}][variant_id]" 
+                class="form-select variant-select" 
+                data-product-id="${item.product_id}" 
+                data-current-size="${item.size}" 
+                required
+            >
+                <option value="${item.variant_id}" selected>${item.size}</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">ចំនួន:</label>
+            <input 
+                type="number" 
+                name="items[${index}][quantity]" 
+                class="form-control" 
+                value="${item.quantity}" 
+                min="1" 
+                required
+            >
+        </div>
+    </div>
+</div>
+`;
+
         });
         html += `<div id="order-total" class="text-end fw-bold fs-5">តម្លៃសរុប: $<span id="total-price">0</span></div>`;
         $('#editFormContainer').html(html);
@@ -529,7 +542,7 @@ $(document).ready(function () {
                             if (val > max) {
                                 input.after(
                                     $('<div class="quantity-error text-danger mt-1">')
-                                        .text(`Số lượng không được vượt quá số lượng trong kho (${max})!`)
+                                        .text(`ចំនួនមិនអាចលើសពីស្តុកបានទេ (${max})!`)
                                 );
                                 input.val(max);
                             } else if (val < 1) {
