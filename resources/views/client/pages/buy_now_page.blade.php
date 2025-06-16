@@ -70,10 +70,10 @@
                     <input id="id-payment-cod" name="payment_method" type="radio" value="cod" style="width: 20px; height: 20px;" checked />
                     <label for="id-payment-cod" class="ms-2" style="font-size: 16px; margin-bottom: 0;">ទូរទាត់តាមរយៈអ្នកដឹកជញ្ជូន (COD)</label>
                 </div>
-                <!-- <div class="mx-3 d-flex align-items-center mt-2">
+                <div class="mx-3 d-flex align-items-center mt-2">
                     <input id="id-payment-aba" name="payment_method" type="radio" value="aba" style="width: 20px; height: 20px;" />
                     <label for="id-payment-aba" class="ms-2" style="font-size: 16px; margin-bottom: 0;">ABA PayWay</label>
-                </div> -->
+                </div>
             </div>
         </div>
 

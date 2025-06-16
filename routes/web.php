@@ -121,7 +121,12 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
     Route::post('/send-push-notification', [PushNotificationBrowserController::class, 'sendNotification']);
 
 
-
+    Route::post('/create-payment', [\App\Http\Controllers\PaymentController::class, 'createPayment']);
+    Route::get('/redirect-to-aba', function (Illuminate\Http\Request $request) {
+    $orderId = $request->query('order_id');
+    // Redirect đến trang hiển thị thông tin QR hoặc trạng thái đơn hàng
+    return redirect('/show-qr?order_id=' . $orderId);
+});
 
 
 

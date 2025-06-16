@@ -442,41 +442,56 @@ $(document).ready(function () {
             });
             });
         } else if (paymentMethod === 'aba') {
-            // ✅ Redirect đến controller Laravel xử lý ABA
-            window.location.href = `/redirect-to-aba?order_id=${orderId}`;
 
+            let payload = {
+                tran_id: "INV" + new Date().getTime(), // hoặc lấy mã đơn hàng thực tế
+                amount: totalPrice
+            };
 
             // ✅ Gọi API tạo QR ABA PayWay
             fetch('/create-payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json', 
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ tran_id: "INV" + new Date().getTime(), amount: totalPrice })
             })
             .then(res => {
-                if (!res.ok) throw new Error('Server returned status ' + res.status);
+                if (!res.ok) {
+                    console.error('Lỗi từ server:', res.status, res.statusText);
+                    throw new Error('Server trả về lỗi');
+                }
                 return res.json();
             })
             .then(data => {
                 hideSpinner();
                 if (data.success) {
                     Swal.fire({
-                        title: 'ស្កេន QR ដើម្បីបង់ប្រាក់',
-                        html: `<img src="${data.qr_image}" width="250"><br><small>សម្រាប់បង់ប្រាក់ ABA PayWay</small>`,
-                        showConfirmButton: false,
+                        title: 'សូមបង់ប្រាក់ជាមួយ ABA',
+                        html: `<img src="${data.qr_image}" style="width: 200px;" />`,
+                        confirmButtonText: 'បានបង់រួច',
+                    }).then(() => {
+                        // Save order items sau khi người dùng xác nhận đã thanh toán
+                        saveOrderItems(orderId, function () {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'បានបញ្ជាទិញជោគជ័យ',
+                                text: 'សូមអរគុណ!',
+                            });
+                        });
                     });
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'បរាជ័យ',
-                        text: data.message || 'មិនអាចបង្កើត QR Code',
+                        text: data.message || 'មិនអាចទទួលបាន QR code!',
                     });
                 }
             })
+
             .catch(err => {
+                console.error('Chi tiết lỗi:', err);
                 hideSpinner();
                 Swal.fire({
                     icon: 'error',
