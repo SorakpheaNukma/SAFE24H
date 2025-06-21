@@ -18,14 +18,12 @@ function ProfileSettings() {
                 'Authorization': 'Bearer ' + token
             },
             success: function (data) {
-                console.log(data);
                 const fullPath = data.user_profile; // e.g., "uploads/profile/1748513063_arisu.jpg"
                 const filename = fullPath ? fullPath.split('/').pop() : null;
                 // Lưu thông tin avatar vào localStorage nếu cần
                 if (data.profileImage) {
                     localStorage.setItem('profileImage', data.profileImage);
                 }
-                console.log(filename);
                 // Set avatar vào giao diện
                 const profileImageUrl = filename
                 ? `/uploads/profile/${filename}`

@@ -129,6 +129,19 @@ Route::middleware('MyMiddleWareAuth')->group(function () {
 });
 
 
+Route::post('/initiate-payway-payment', [\App\Http\Controllers\PaymentController::class, 'initiatePayment'])->name('payway.initiate');
+Route::post('/webhook/payway', [\App\Http\Controllers\PaymentController::class, 'handleWebhook'])->name('payway.callback'); // សម្រាប់ Webhook
+Route::get('/checkout/success/{order_id}', function ($order_id) {
+    // អ្នកអាចស្វែងរក order នៅក្នុង database ហើយបង្ហាញព័ត៌មានលម្អិត
+    // ឧទាហរណ៍: $order = \App\Models\Order::find($order_id);
+    return view('checkout.success', ['order_id' => $order_id]); // បង្ហាញទំព័រជោគជ័យ
+})->name('checkout.success');
+
+Route::get('/checkout/cancel/{order_id}', function ($order_id) {
+    // អ្នកអាចស្វែងរក order នៅក្នុង database ហើយបង្ហាញព័ត៌មានលម្អិត
+    // ឧទាហរណ៍: $order = \App\Models\Order::find($order_id);
+    return view('checkout.cancel', ['order_id' => $order_id]); // បង្ហាញទំព័រលុបចោល
+})->name('checkout.cancel');
 
 
 

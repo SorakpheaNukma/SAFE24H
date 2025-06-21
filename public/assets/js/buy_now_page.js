@@ -58,14 +58,12 @@ $(document).ready(function () {
                 variant_id: productData.variant_id
             });
         }
-        console.log("Loaded ProductsLsGL (detail):", ProductsLsGL);
+        
     } else {
         ProductsLsGL = Array.isArray(productData) ? productData : [productData];
-        console.log("Loaded ProductsLsGL (bulk):", ProductsLsGL);
     }
     // Function to dynamically add a single product when detailParam is true
     function addSingleProductItem(product) {
-        console.log('📦 [addSingleProductItem] Product Info:', product); // <-- thêm dòng này
         const productName = product.product_name;
         const quantity = product.quantity;
         const price = product.discount_price !== null ? product.discount_price : product.price;
@@ -263,14 +261,16 @@ $(document).ready(function () {
 
     function saveOrder(callback) {
         const orderDate = getCurrentDateTime();
-
+        const paymentMethod = $('input[name="payment_method"]:checked').val();
+        
         const orderData = {
             user_id: user_idGL,
             total_amount: parseFloat(totalPrice.toFixed(2)),
             status: 'processing',
             order_date: orderDate,
             shipping_fee: parseFloat(shippingFee.toFixed(2)),
-        };        
+            payment_method: paymentMethod
+        };
 
         $.ajax({
             url: '/save-order',
@@ -441,67 +441,63 @@ $(document).ready(function () {
                 confirmButtonText: 'យល់ព្រម'
             });
             });
-        } else if (paymentMethod === 'aba') {
-
-            let payload = {
-                tran_id: "INV" + new Date().getTime(), // hoặc lấy mã đơn hàng thực tế
-                amount: totalPrice
-            };
-
-            // ✅ Gọi API tạo QR ABA PayWay
-            fetch('/create-payment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ tran_id: "INV" + new Date().getTime(), amount: totalPrice })
-            })
-            .then(res => {
-                if (!res.ok) {
-                    console.error('Lỗi từ server:', res.status, res.statusText);
-                    throw new Error('Server trả về lỗi');
-                }
-                return res.json();
-            })
-            .then(data => {
-                hideSpinner();
-                if (data.success) {
-                    Swal.fire({
-                        title: 'សូមបង់ប្រាក់ជាមួយ ABA',
-                        html: `<img src="${data.qr_image}" style="width: 200px;" />`,
-                        confirmButtonText: 'បានបង់រួច',
-                    }).then(() => {
-                        // Save order items sau khi người dùng xác nhận đã thanh toán
-                        saveOrderItems(orderId, function () {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'បានបញ្ជាទិញជោគជ័យ',
-                                text: 'សូមអរគុណ!',
-                            });
-                        });
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'បរាជ័យ',
-                        text: data.message || 'មិនអាចទទួលបាន QR code!',
-                    });
-                }
-            })
-
-            .catch(err => {
-                console.error('Chi tiết lỗi:', err);
-                hideSpinner();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'កំហុសបណ្តាញ',
-                    text: 'មិនអាចទាក់ទងជាមួយ ABA។ សូមព្យាយាមម្ដងទៀត។',
-                });
-            });
+        } else {
+            // សម្រាប់ការទូទាត់តាមអនឡាញ ចាប់ផ្តើមដំណើរការទូទាត់ជាមួយ ABA Payway
+            initiateOnlinePayment(orderId, paymentMethod, totalPrice); // បញ្ជូន orderId និងចំនួនទឹកប្រាក់
         }
     });
 });
+function initiateOnlinePayment(orderId, paymentMethod, amount) {
+    $.ajax({
+        url: '/initiate-payway-payment', // Endpoint Laravel ថ្មី
+        method: 'POST',
+        data: {
+            order_id: orderId,
+            payment_method_type: paymentMethod,
+            amount: amount
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (res) {
+            hideSpinner();
+            if (res.status === 200) {
+                // ដោះស្រាយការឆ្លើយតបពី Payway: ប្តូរទិសដៅ បង្ហាញ QR ឬ deep link
+                if (res.redirect_url) {
+                    window.location.href = res.redirect_url; // ប្តូរទិសដៅទៅទំព័រទូទាត់របស់ Payway
+                } else if (res.qr_image_url) {
+                    // បង្ហាញ QR code ដល់អ្នកប្រើប្រាស់
+                    Swal.fire({
+                        title: 'ស្កេន QR ដើម្បីទូទាត់',
+                        imageUrl: res.qr_image_url,
+                        imageWidth: 200,
+                        imageHeight: 200,
+                        imageAlt: 'KHQR Code',
+                        html: '<p>សូមប្រើកម្មវិធី ABA Mobile ឬកម្មវិធីធនាគារផ្សេងទៀតដើម្បីស្កេន និងទូទាត់។</p>',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
+                } else if (res.deeplink_url) {
+                    window.location.href = res.deeplink_url; // ព្យាយាមបើកកម្មវិធីទូរស័ព្ទ
+                }
+            } else {
+                Swal.fire({ icon: 'error', title: 'កំហុស', text: res.message || 'បរាជ័យក្នុងការចាប់ផ្តើមការទូទាត់។', confirmButtonText: 'យល់ព្រម' });
+            }
+        },
+        error: function (res) {
+            hideSpinner();
+            if (res.status === 422) {
+                let errors = res.responseJSON.errors;
+                let firstError = Object.values(errors);
+                Swal.fire({ icon: 'error', title: 'កំហុស', text: firstError, confirmButtonText: 'យល់ព្រម' });
+            } else if (res.status === 500) {
+                Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាក្នុងការភ្ជាប់ទៅប្រព័ន្ធទូទាត់។', confirmButtonText: 'យល់ព្រម' });
+            } else {
+                Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាមួយចំនួនបានកើតឡើង!', confirmButtonText: 'យល់ព្រម' });
+            }
+        }
+    });
+}
 
 const shippingFeesByProvince = {
     "ភ្នំពេញ": 1.00,
