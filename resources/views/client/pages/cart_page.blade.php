@@ -3,7 +3,7 @@
 @section('content')
 @include('client.layouts.nav_bar')
 
-<main class="mx-3 mb-3">
+<main class="container mb-5">
     <!-- Back Icon and Text Home lỗi chưa back được -->
     <div class="container_back" style="display: flex; align-items: center; padding-left: 12px; gap: 8px;">
         <div class="d-flex justify-content-center align-items-center rounded-circle"

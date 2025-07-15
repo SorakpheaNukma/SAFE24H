@@ -63,38 +63,54 @@ $(document).ready(function () {
         ProductsLsGL = Array.isArray(productData) ? productData : [productData];
     }
     // Function to dynamically add a single product when detailParam is true
-    function addSingleProductItem(product) {
-        const productName = product.product_name;
-        const quantity = product.quantity;
-        const price = product.discount_price !== null ? product.discount_price : product.price;
-        const dmain = window.location.origin;
-        const imagePath = product.image_path ? product.image_path : 'default.jpg';
-        const size = product.size;
+function addSingleProductItem(product) {
+    if (!product || !product.product_name || !product.quantity || (!product.price && !product.discount_price)) {
+        console.error('Thiếu thông tin sản phẩm:', product);
+        return;
+    }
 
-        totalPrice += price * quantity;
-        itemCount++;
+    const productName = product.product_name;
+    const quantity = product.quantity;
+    const price = parseFloat(product.discount_price !== null ? product.discount_price : product.price) || 0;
+    const size = product.size || 'N/A';
+    const dmain = window.location.origin;
+    const imagePath = product.image_path ? product.image_path : 'default.jpg';
 
-        const productHTML = `
-        <div class="container m-2 product-item">
-            <div class="row d-flex align-items-center flex-column flex-md-row">
-                <div class="col-12 col-md-2 mb-3 mb-md-0">
-                    <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
+    totalPrice += price * quantity;
+    itemCount++;
+
+    const productId = `product-${product.variant_id ? product.variant_id : Date.now()}`;
+
+    const productHTML = `
+        <div id="${productId}" class="product-item" style="border: 1px solid #ccc; padding: 12px; margin: 12px 0; border-radius: 8px;">
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+                <div style="flex: 0 0 100px;">
+                    <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" style="width: 100px; height: auto; object-fit: cover; border-radius: 4px;" />
                 </div>
-                <div class="col-12 col-md-8 d-flex flex-column">
-                    <h6 class="fw-semibold"> ${productName}</h6>
-                    <p class="mb-0">ចំនួន: ${quantity}</p>
-                    <p class="mb-0">Size: ${size}</p>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h6 style="margin: 0; font-weight: 600;">${productName}</h6>
+                            <p style="margin: 2px 0;">ចំនួន: ${quantity}</p>
+                            <p style="margin: 2px 0;">Size: ${size}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h6 style="margin: 0;">តម្លៃរាយ</h6>
+                        <h6 style="margin: 0; font-weight: bold;">$${price.toFixed(2)}</h6>
+                    </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+    `;
 
-        // Insert the new product item before the "Order Total" section
-        const productList = document.getElementById('product-list');
-        productList.insertAdjacentHTML('beforeend', productHTML);
+    const productList = document.getElementById('product-list');
+    productList.insertAdjacentHTML('beforeend', productHTML);
 
-        // Update the order total display
-        updateOrderTotal();
-    }
+    updateOrderTotal();
+}
+
+
     // Function to dynamically add product items bookmarrk
     function addProductItem(product) {
          console.log('🛒 [addProductItem] Product Info:', product); // <-- thêm dòng này
@@ -172,7 +188,7 @@ $(document).ready(function () {
         
         const orderTotalElement = document.getElementById('order-total');
         orderTotalElement.innerHTML = `
-    <h6 class="fw-bold mb-2 mb-md-0">សរុបទំនិញ (${itemCount} ទំនិញ):</h6>
+    <h6 class="fw-bold mb-2 mb-md-0 fs-5">សរុបទំនិញ (${itemCount} ទំនិញ):</h6>
     <h6 class="fw-bold text-md-end">$${merchandiseTotal.toFixed(2)}</h6>`;
     }
 

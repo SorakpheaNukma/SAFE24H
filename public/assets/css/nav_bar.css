@@ -36,3 +36,24 @@
 body {
     font-family: 'Khmer OS', Arial, sans-serif;
 }
+/* mới thêm vào đây */
+.my-Bg {
+    background-color: #e9f7fe; /* Giống màu nền ảnh */
+    padding: 10px 0;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 24px;
+    color: black;
+    text-align: center;
+}
+
+.navbar a {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}

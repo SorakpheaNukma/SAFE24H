@@ -6,43 +6,38 @@
 @section('content')
 @include('client.layouts.nav_bar')
 
-<div class="container mt-3" style="font-family: 'KhmerOS', sans-serif;">
+<main class="container mb-5" style="font-family: 'KhmerOS', sans-serif;">
     <!-- Nút trở lại -->
-    <div class="d-flex align-items-center mb-3 gap-2 ps-2">
+    <div class="d-flex align-items-center mb-3" style="gap: 8px;">
         <div class="d-flex justify-content-center align-items-center rounded-circle"
              style="width: 40px; height: 40px; background-color: #F3F3F3;">
-            <a href="{{ url()->previous() }}" class="text-blue text-decoration-none">
+            <a href="{{ url()->previous() }}" class="text-blue text-decoration-none d-flex align-items-center justify-content-center">
                 <i class="fa-solid fa-arrow-left fa-lg"></i>
             </a>
         </div>
-        <span class="fs-5">ត្រឡប់ក្រោយ</span>
+        <span class="text" style="font-size: 16px;">ត្រឡប់ក្រោយ</span>
     </div>
 
-    <!-- Hàng chính gồm 2 cột -->
-    <div class="row">
-        <!-- Cột trái: ទំនាក់ទំនង + អាស័យដ្ឋាន -->
+    <!-- Layout 2 cột -->
+    <div class="row g-4">
+        <!-- Cột trái -->
         <div class="col-md-6">
-            <!-- Phần: ទំនាក់ទំនង -->
-            <div class="bg-light p-2 rounded mb-4">
-                <h4 class="mb-3" style="font-weight: bold;">ទំនាក់ទំនង</h4>
-
+            <!-- Thông tin liên hệ -->
+            <div class="bg-light p-3 rounded mb-4">
+                <h4 class="fw-bold mb-3">ទំនាក់ទំនង</h4>
                 <div class="d-flex justify-content-between mb-2">
                     <h5>ឈ្មោះ:</h5>
-                    <h5 style="font-weight: bold; text-decoration: underline;">
-                        {{ Auth::user()->username }}
-                    </h5>
+                    <h5 class="fw-bold text-decoration-underline">{{ Auth::user()->username }}</h5>
                 </div>
-
-                <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex justify-content-between mb-0">
                     <h5>លេខទូរស័ព្ទ:</h5>
                     <h5>{{ Auth::user()->phone_number }}</h5>
                 </div>
             </div>
 
-            <!-- Phần: អាស័យដ្ឋាន -->
+            <!-- Địa chỉ -->
             <div class="bg-light p-3 rounded">
-                <h4 class="mb-3" style="font-weight: bold;">អាស័យដ្ឋាន</h4>
-
+                <h4 class="fw-bold mb-3">អាស័យដ្ឋាន</h4>
                 <div class="mb-3">
                     <label class="form-label fs-5" for="country">ខេត្ត/រាជធានី</label>
                     <select class="form-control" id="country">
@@ -74,15 +69,13 @@
                         <option value="ពោធិ៍សាត់">ពោធិ៍សាត់</option>
                     </select>
                 </div>
-
-                <p id="shippingCost" class="fs-5 text-primary mt-3"></p>
+                <p id="shippingCost" class="fs-5 text-primary mt-2"></p>
 
                 <div class="mb-3">
                     <label class="form-label fs-5" for="more-address">
                         បន្ថែមព័ត៌មាន <span class="fs-6">(ទីតាំងជាក់លាក់......)</span>
                     </label>
-                    <input id="more-address" type="text" placeholder="ឧទាហរណ៍៖ លេខផ្ទះ, ភូមិ ..........."
-                           class="form-control" />
+                    <input id="more-address" type="text" placeholder="ឧទាហរណ៍៖ លេខផ្ទះ, ភូមិ ..........." class="form-control" />
                 </div>
 
                 <div class="d-flex justify-content-end mt-3">
@@ -93,7 +86,7 @@
             </div>
         </div>
 
-        <!-- Cột phải: Bản đồ Map -->
+        <!-- Cột phải: Map -->
         <div class="col-md-6">
             <label class="form-label fs-5">📍 សូមជ្រើសទីតាំងលើផែនទី</label>
             <button id="getLocationBtn" class="btn btn-outline-primary w-100 mb-2">
@@ -102,7 +95,8 @@
             <div id="map" style="width: 100%; height: 452px; border: 1px solid #ccc; border-radius: 10px;"></div>
         </div>
     </div>
-</div>
+</main>
+
 
 <!-- Scripts và CSS -->
 <script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>

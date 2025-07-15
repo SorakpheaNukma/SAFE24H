@@ -9,9 +9,9 @@ if (user_idGL) {
 const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
 
 
-function loadItemsRecommend(items) { //res.data truyền vào đây
+function loadItemsRecommend(items) { 
     const itemsGrid = document.getElementById('recommend-items-grid');
-    itemsGrid.innerHTML = ''; // Clear existing content
+    itemsGrid.innerHTML = ''; 
 
     if (!items || items.length === 0) {
         itemsGrid.innerHTML = `<p>មិនមានទំនិញស្រដៀងៗគ្នា.</p>`;
@@ -19,7 +19,7 @@ function loadItemsRecommend(items) { //res.data truyền vào đây
     }
 
     const dmain = window.location.origin;
-    const itemsToLoad = items; // Hiển thị toàn bộ luôn
+    const itemsToLoad = items; 
 
     itemsToLoad.forEach((item, i) => {
         const image = `
@@ -169,7 +169,7 @@ function checkAddress(callback) {
             if (res.status === 200 && res.data) {
                 const user = res.data;
 
-                // Check if the address field is null or empty
+                
                 if (user.address === null || user.address === '') {
                     console.log('User does not have an address.');
                     callback(false);
@@ -243,10 +243,10 @@ function btnBuyNow(quantityStock) {
             return;
         }
 
-        // Kiểm tra địa chỉ
+       
         checkAddress(function (hasAddress) {
             if (hasAddress) {
-                // Nếu có địa chỉ, tiếp tục
+                
                 var { productData, images } = getItemDataFromUrl();
                 var firstImage = images.length > 0 ? images[0] : 'default.jpg';
 
@@ -271,7 +271,7 @@ function btnBuyNow(quantityStock) {
                 const productStr = encodeURIComponent(JSON.stringify(newProduct));
                 window.location.href = `/buy-now-page?detail=true&items=${productStr}&images=${encodeURIComponent(firstImage)}`;
             } else {
-                // Hiển thị SweetAlert2 confirm box thay vì jQuery Confirm
+                
                 Swal.fire({
                     title: 'មិនមានទីតាំងទទួល',
                     text: 'អ្នកមិនទាន់បានបញ្ចាក់ទីតាំងទទួលទេ។ ចង់បញ្ជាក់ឥឡូវនេះទេ?',
@@ -296,7 +296,7 @@ function getItemDataFromUrl() {
 
     let productData = {};
     try {
-        productData = JSON.parse(decodeURIComponent(itemData)); // 👈 Thêm decode ở đây
+        productData = JSON.parse(decodeURIComponent(itemData)); 
     } catch (err) {
         console.error("Lỗi parse JSON:", err);
     }
@@ -348,7 +348,7 @@ function displayProductImages(ProductsImages) {
         container.appendChild(slide);
     });
 
-    // Khởi tạo Swiper sau khi load ảnh
+    
     if(window.swiperInstance) {
       window.swiperInstance.destroy(true, true);
     }
@@ -370,8 +370,8 @@ function displayProductImages(ProductsImages) {
         },
         effect: "slide", 
         zoom: {
-            maxRatio: 3, // mức độ zoom tối đa
-            } // bạn có thể thử "fade" hoặc "cube"
+            maxRatio: 3, 
+            } 
     });
 }
 
@@ -394,14 +394,14 @@ function fetchProductComments() {
 
             if (reviews.length === 0) {
                 $commentList.append('<p>មិនទាន់មានការបញ្ចេញមតិយោបល់.</p>');
-                $(".rating-stars").html(renderStars(0)); // Gán 0 sao
+                $(".rating-stars").html(renderStars(0)); 
                 return;
             }
-                // ✅ Tính trung bình rating
+                
                 const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
                 const avgRating = totalRating / reviews.length;
 
-                // ✅ Gán phần sao trung bình vào giao diện
+                
                 $(".rating-stars").html(renderStars(avgRating));
                 $(".avg-rating-text").text(`${avgRating.toFixed(1)} ពី  ${reviews.length} វាយតម្លៃ`);
 
@@ -467,9 +467,9 @@ $(document).ready(function () {
         const variant = productData.variants.find(v => v.size === selectedSize);
         if (variant) {
             $('#id-sold').text(`លក់បានចំនួន ${variant.sold} `);
-            $('#id-stock').text(`មានក្នុងស្តុកចំនួន ${variant.quantity} `); // Số lượng trong kho
+            $('#id-stock').text(`មានក្នុងស្តុកចំនួន ${variant.quantity} `); 
             $('#id-quantityInput')
-                .val(0) // 👈 Reset về 0 mỗi lần chọn size mới
+                .val(0) 
                 .attr('max', variant.quantity);
         }
     });
@@ -486,7 +486,7 @@ function addItemToCarts(payload) {
     $.ajax({
         url: '/add-to-cart',
         method: 'POST',
-        data: payload,          // gửi toàn bộ object
+        data: payload,          
         success: function (res) {
             if (res.status == 200) {
                 getAllCartItems();

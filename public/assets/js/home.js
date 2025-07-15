@@ -56,7 +56,7 @@ $(document).ready(function () {
         const selectedCategoryName = $(this).find('option:selected').data('category-name');
         isSearchActive = false;
 
-        currentHeaderTitle = selectedCategoryId === "all" ? 'All Products' : selectedCategoryName;
+        currentHeaderTitle = selectedCategoryId === "all" ? 'ទំនិញទាំងអស់' : selectedCategoryName;
         $('#id-title-header').text(currentHeaderTitle);
         currentItemsCount = 0;
         selectedCategoryId === "all" ? populateGrid() : filterProductsByCategory(selectedCategoryId);
@@ -100,58 +100,58 @@ $(document).ready(function () {
         spinner.style.opacity = '0';
         spinner.style.visibility = 'hidden';
     }
-function getAllProducts(callback) {
-    showSpinner();
+    function getAllProducts(callback) {
+        showSpinner();
 
-    $.ajax({
-        url: '/getAllProducts',
-        method: 'GET',
-        success: function (res) {
-            if (res.status == 200) {
-                productsLsGL = [];
+        $.ajax({
+            url: '/getAllProducts',
+            method: 'GET',
+            success: function (res) {
+                if (res.status == 200) {
+                    productsLsGL = [];
 
-                res.data.forEach(function (p) {
-                    productsLsGL.push({
-                        product_id: p.product_id,
-                        product_name: p.product_name,
-                        product_price: parseFloat(p.product_price), // ép về số
-                        discounted_price: parseFloat(p.discounted_price), // NEW: từ server
-                        category_id: p.category_id,
-                        category_name: p.category_name,
-                        images: p.images && Array.isArray(p.images) ? p.images : [],
-                        descriptions: p.descriptions || {},
-                        variants: p.variants || [],
-                        discount_percent: p.discount_percent || 0
+                    res.data.forEach(function (p) {
+                        productsLsGL.push({
+                            product_id: p.product_id,
+                            product_name: p.product_name,
+                            product_price: parseFloat(p.product_price), // ép về số
+                            discounted_price: parseFloat(p.discounted_price), // NEW: từ server
+                            category_id: p.category_id,
+                            category_name: p.category_name,
+                            images: p.images && Array.isArray(p.images) ? p.images : [],
+                            descriptions: p.descriptions || {},
+                            variants: p.variants || [],
+                            discount_percent: p.discount_percent || 0
+                        });
                     });
-                });
 
-                setTimeout(() => {
+                    setTimeout(() => {
+                        hideSpinner();
+                    }, 200);
+
+                    populateGrid();
+                    initializeDefaultCategory();
+
+                    if (callback) callback();
+                } else {
                     hideSpinner();
-                }, 200);
-
-                populateGrid();
-                initializeDefaultCategory();
-
-                if (callback) callback();
-            } else {
+                    $.alert('Failed to get product!');
+                }
+            },
+            error: function (res) {
                 hideSpinner();
-                $.alert('Failed to get product!');
+                if (res.status === 422) {
+                    let error = res.responseJSON.error;
+                    let firstError = Object.values(error)[0][0];
+                    showError(firstError);
+                } else if (res.status === 500) {
+                    showError('An error occurred. Please try again later.');
+                } else {
+                    showError('Something went wrong!!');
+                }
             }
-        },
-        error: function (res) {
-            hideSpinner();
-            if (res.status === 422) {
-                let error = res.responseJSON.error;
-                let firstError = Object.values(error)[0][0];
-                showError(firstError);
-            } else if (res.status === 500) {
-                showError('An error occurred. Please try again later.');
-            } else {
-                showError('Something went wrong!!');
-            }
-        }
-    });
-}
+        });
+    }
 
 
     // Function to populate the grid, accepts filtered products if provided
@@ -159,18 +159,15 @@ function getAllProducts(callback) {
         const grid = document.getElementById('gridContainer');
         let html = '';
         const dmain = window.location.origin;
-
         const end = Math.min(currentItemsCount + itemsPerPage, filteredProducts.length);
 
         for (let i = currentItemsCount; i < end; i++) {
             const item = filteredProducts[i];
-
             const image = `
                 <a>
                     <img src="${dmain}/uploads/products/${item.images[0]}" alt="${item.product_name}">
                 </a>
             `;
-
             const hasDiscount = item.discount_percent > 0;
             const discountPercent = Number(item.discount_percent) || 0;
             const discountedPrice = hasDiscount
@@ -179,47 +176,40 @@ function getAllProducts(callback) {
 
 
     html += `
-        <div class="col-12 col-sm-6 col-md-4 col-lg-5-custom">
-            <div class="card" data-product-index="${i}" style="border-radius: 16px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden;max-height: 420px;">
-                
-                ${hasDiscount ? `
-                    <div class="badge bg-light text-danger fw-bold" style="position: absolute; top: 12px; left: 12px; font-size: 12px;">
-                        ${discountPercent}% OFF
-                    </div>
-                ` : ''}
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3-per-row">
+        <div class="grid-item" data-product-index="${i}">
+            ${hasDiscount ? `
+                <div class="badge bg-light text-danger fw-bold" style="position: absolute; top: 12px; left: 12px; font-size: 12px;">
+                    ${discountPercent}% OFF
+                </div>
+            ` : ''}
 
-<img src="${dmain}/uploads/products/${item.images[0]}" 
-     class="card-img-top" 
-     alt="${item.product_name}">
+            <div class="img-hover-wrapper image-container">
+                <img src="${dmain}/uploads/products/${item.images[0]}" 
+                    class="main-img" 
+                    alt="${item.product_name}">
+                <img src="${dmain}/uploads/products/${item.images[1] || item.images[0]}" 
+                    class="hover-img" 
+                    alt="${item.product_name}">
+            </div>
 
-                <div class="card-body" style="padding: 12px;">
-                    <h5 class="card-title text-primary fw-semibold mb-1" style="font-family: 'Khmer OS', sans-serif;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;">${item.product_name}</h5>
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            ${hasDiscount
-                                ? `
-                                    <div class="text-danger fw-bold fs-3">\$${discountedPrice.toFixed(2)}</div>
-                                    <div style="text-decoration: line-through; color: #aaa; font-size: 16px;">\$${item.product_price.toFixed(2)}</div>
-                                `
-                                : `<div class="text-danger fw-bold fs-3">\$${item.product_price.toFixed(2)}</div>`
-                            }
-                        </div>
-                        <div style="font-family: 'Khmer OS', sans-serif; 
-                            white-space: nowrap; 
-                            overflow: hidden; 
-                            text-overflow: ellipsis; 
-                            margin-top: 8px; 
-                            margin-left: 12px;">
-                            ${item.descriptions.des_1 || ''}
-                        </div>
-                    </div>
+            <div class="item-description">
+                <div class="product-title">${item.product_name}</div>
+                <div class="text-start text-danger fw-bold fs-3 product-price">
+                    ${hasDiscount
+                        ? `
+                            <span>\$${discountedPrice.toFixed(2)}</span>
+                            <span class="product-original-price">\$${item.product_price.toFixed(2)}</span>
+                            <span class="product-discount">(${discountPercent}% OFF)</span>
+                        `
+                        : `\$${item.product_price.toFixed(2)}`
+                    }
                 </div>
             </div>
         </div>
-    `;
+    </div>
+`;
+
 
 
         }

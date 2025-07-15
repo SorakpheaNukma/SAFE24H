@@ -12,7 +12,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
-<main class="mx-2">
+<main class="container mb-5">
     <div class="container d-flex justify-content-start align-items-center mb-3" style="margin-left: 0;">
         <div class="d-flex justify-content-center align-items-center rounded-circle"
             style="width: 40px; height: 40px; background-color: #F3F3F3;">
@@ -24,7 +24,7 @@
     </div>
 
     <div class="container">
-        <h5 class="fw-bold mb-3">ព័ត៌មានរបស់អ្នក</h5>
+        <h5 class="fw-bold mb-3 fs-3">ព័ត៌មានរបស់អ្នក</h5>
 
         <div class="row">
     <div class="col-12 d-flex align-items-start">
@@ -40,9 +40,9 @@
 
                 <!-- Thông tin người dùng -->
                 <div class="d-flex flex-column">
-                    <p class="mb-2">ឈ្មោះ ៖ <span id="username">{{ Auth::user()->username }}</span></p>
-                    <p class="mb-1 mt-1">លេខទូរស័ព្ទ ៖ <span id="phone">{{ Auth::user()->phone_number }}</span></p>
-                    <p class="mb-1 mt-1">អ៊ីម៉ែល ៖ <span id="email">{{ Auth::user()->email }}</span></p>
+                    <p class="mb-2 fs-5">ឈ្មោះ ៖ <span id="username">{{ Auth::user()->username }}</span></p>
+                    <p class="mb-1 mt-1 fs-5">លេខទូរស័ព្ទ ៖ <span id="phone">{{ Auth::user()->phone_number }}</span></p>
+                    <p class="mb-1 mt-1 fs-5">អ៊ីម៉ែល ៖ <span id="email">{{ Auth::user()->email }}</span></p>
                 </div>
 
                 <!-- Nút Edit -->
@@ -60,7 +60,7 @@
         <div class="row mt-3">
             <div>
                 <div>
-                    <h5 class="fw-bold mb-3">ប្រតិបត្តិការទំនិញរបស់អ្នក</h5>
+                    <h5 class="fw-bold mb-3 fs-3">ប្រតិបត្តិការទំនិញរបស់អ្នក</h5>
                 </div>
 
                 <div class="col-12 d-flex justify-content-around py-4">
