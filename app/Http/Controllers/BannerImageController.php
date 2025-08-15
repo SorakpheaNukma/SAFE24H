@@ -12,13 +12,12 @@ class BannerImageController extends Controller
     public function getAllBannerImages()
     {
         try {
-            // Giả sử bạn lấy các banner images từ bảng `banner_images`
+            
             $bannerImages = BannerImage::all();
                     // Gắn thêm đường dẫn ảnh đầy đủ
             foreach ($bannerImages as $banner) {
                 $banner->image_url = asset('upload/' . $banner->image_path);
             }
-
 
             // Chuyển dữ liệu thành mảng và trả về response JSON
             return response()->json([
