@@ -63,52 +63,52 @@ $(document).ready(function () {
         ProductsLsGL = Array.isArray(productData) ? productData : [productData];
     }
     // Function to dynamically add a single product when detailParam is true
-function addSingleProductItem(product) {
-    if (!product || !product.product_name || !product.quantity || (!product.price && !product.discount_price)) {
-        console.error('Thiếu thông tin sản phẩm:', product);
-        return;
-    }
+    function addSingleProductItem(product) {
+        if (!product || !product.product_name || !product.quantity || (!product.price && !product.discount_price)) {
+            console.error('Thiếu thông tin sản phẩm:', product);
+            return;
+        }
 
-    const productName = product.product_name;
-    const quantity = product.quantity;
-    const price = parseFloat(product.discount_price !== null ? product.discount_price : product.price) || 0;
-    const size = product.size || 'N/A';
-    const dmain = window.location.origin;
-    const imagePath = product.image_path ? product.image_path : 'default.jpg';
+        const productName = product.product_name;
+        const quantity = product.quantity;
+        const price = parseFloat(product.discount_price !== null ? product.discount_price : product.price) || 0;
+        const size = product.size || 'N/A';
+        const dmain = window.location.origin;
+        const imagePath = product.image_path ? product.image_path : 'default.jpg';
 
-    totalPrice += price * quantity;
-    itemCount++;
+        totalPrice += price * quantity;
+        itemCount++;
 
-    const productId = `product-${product.variant_id ? product.variant_id : Date.now()}`;
+        const productId = `product-${product.variant_id ? product.variant_id : Date.now()}`;
 
-    const productHTML = `
-        <div id="${productId}" class="product-item" style="border: 1px solid #ccc; padding: 12px; margin: 12px 0; border-radius: 8px;">
-            <div style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
-                <div style="flex: 0 0 100px;">
-                    <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" style="width: 100px; height: auto; object-fit: cover; border-radius: 4px;" />
-                </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div>
-                            <h6 style="margin: 0; font-weight: 600;">${productName}</h6>
-                            <p style="margin: 2px 0;">ចំនួន: ${quantity}</p>
-                            <p style="margin: 2px 0;">Size: ${size}</p>
-                        </div>
+        const productHTML = `
+            <div id="${productId}" class="product-item" style="border: 1px solid #ccc; padding: 12px; margin: 12px 0; border-radius: 8px;">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+                    <div style="flex: 0 0 100px;">
+                        <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" style="width: 100px; height: auto; object-fit: cover; border-radius: 4px;" />
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h6 style="margin: 0;">តម្លៃរាយ</h6>
-                        <h6 style="margin: 0; font-weight: bold;">$${price.toFixed(2)}</h6>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h6 style="margin: 0; font-weight: 600;">${productName}</h6>
+                                <p style="margin: 2px 0;">ចំនួន: ${quantity}</p>
+                                <p style="margin: 2px 0;">Size: ${size}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h6 style="margin: 0;">តម្លៃរាយ</h6>
+                            <h6 style="margin: 0; font-weight: bold;">$${price.toFixed(2)}</h6>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
 
-    const productList = document.getElementById('product-list');
-    productList.insertAdjacentHTML('beforeend', productHTML);
+        const productList = document.getElementById('product-list');
+        productList.insertAdjacentHTML('beforeend', productHTML);
 
-    updateOrderTotal();
-}
+        updateOrderTotal();
+    }
 
 
     // Function to dynamically add product items bookmarrk
@@ -245,23 +245,33 @@ function addSingleProductItem(product) {
     initializeData();
 
     function showSpinner() {
-        const spinner = document.getElementById('spinner');
+    const spinner = document.getElementById('spinner');
+    if (spinner) {
         spinner.style.visibility = 'visible';
         spinner.style.opacity = '1';
         spinner.style.backgroundColor = 'white';
+    }
 
-        const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
         mainContent.style.display = 'none';
     }
+}
+
 
     function hideSpinner() {
-        const spinner = document.getElementById('spinner');
+    const spinner = document.getElementById('spinner');
+    if (spinner) {
         spinner.style.opacity = '0';
         spinner.style.visibility = 'hidden';
+    }
 
-        const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
         mainContent.style.display = 'block';
     }
+}
+
 
     function getCurrentDateTime() {
         const now = new Date();
@@ -463,57 +473,57 @@ function addSingleProductItem(product) {
         }
     });
 });
-function initiateOnlinePayment(orderId, paymentMethod, amount) {
-    $.ajax({
-        url: '/initiate-payway-payment', // Endpoint Laravel ថ្មី
-        method: 'POST',
-        data: {
-            order_id: orderId,
-            payment_method_type: paymentMethod,
-            amount: amount
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (res) {
-            hideSpinner();
-            if (res.status === 200) {
-                // ដោះស្រាយការឆ្លើយតបពី Payway: ប្តូរទិសដៅ បង្ហាញ QR ឬ deep link
-                if (res.redirect_url) {
-                    window.location.href = res.redirect_url; // ប្តូរទិសដៅទៅទំព័រទូទាត់របស់ Payway
-                } else if (res.qr_image_url) {
-                    // បង្ហាញ QR code ដល់អ្នកប្រើប្រាស់
-                    Swal.fire({
-                        title: 'ស្កេន QR ដើម្បីទូទាត់',
-                        imageUrl: res.qr_image_url,
-                        imageWidth: 200,
-                        imageHeight: 200,
-                        imageAlt: 'KHQR Code',
-                        html: '<p>សូមប្រើកម្មវិធី ABA Mobile ឬកម្មវិធីធនាគារផ្សេងទៀតដើម្បីស្កេន និងទូទាត់។</p>',
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    });
-                } else if (res.deeplink_url) {
-                    window.location.href = res.deeplink_url; // ព្យាយាមបើកកម្មវិធីទូរស័ព្ទ
+    function initiateOnlinePayment(orderId, paymentMethod, amount) {
+        $.ajax({
+            url: '/initiate-payway-payment', // Endpoint Laravel ថ្មី
+            method: 'POST',
+            data: {
+                order_id: orderId,
+                payment_method_type: paymentMethod,
+                amount: amount
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
+                hideSpinner();
+                if (res.status === 200) {
+                    // ដោះស្រាយការឆ្លើយតបពី Payway: ប្តូរទិសដៅ បង្ហាញ QR ឬ deep link
+                    if (res.redirect_url) {
+                        window.location.href = res.redirect_url; // ប្តូរទិសដៅទៅទំព័រទូទាត់របស់ Payway
+                    } else if (res.qr_image_url) {
+                        // បង្ហាញ QR code ដល់អ្នកប្រើប្រាស់
+                        Swal.fire({
+                            title: 'ស្កេន QR ដើម្បីទូទាត់',
+                            imageUrl: res.qr_image_url,
+                            imageWidth: 200,
+                            imageHeight: 200,
+                            imageAlt: 'KHQR Code',
+                            html: '<p>សូមប្រើកម្មវិធី ABA Mobile ឬកម្មវិធីធនាគារផ្សេងទៀតដើម្បីស្កេន និងទូទាត់។</p>',
+                            showConfirmButton: false,
+                            allowOutsideClick: false
+                        });
+                    } else if (res.deeplink_url) {
+                        window.location.href = res.deeplink_url; // ព្យាយាមបើកកម្មវិធីទូរស័ព្ទ
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: res.message || 'បរាជ័យក្នុងការចាប់ផ្តើមការទូទាត់។', confirmButtonText: 'យល់ព្រម' });
                 }
-            } else {
-                Swal.fire({ icon: 'error', title: 'កំហុស', text: res.message || 'បរាជ័យក្នុងការចាប់ផ្តើមការទូទាត់។', confirmButtonText: 'យល់ព្រម' });
+            },
+            error: function (res) {
+                hideSpinner();
+                if (res.status === 422) {
+                    let errors = res.responseJSON.errors;
+                    let firstError = Object.values(errors);
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: firstError, confirmButtonText: 'យល់ព្រម' });
+                } else if (res.status === 500) {
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាក្នុងការភ្ជាប់ទៅប្រព័ន្ធទូទាត់។', confirmButtonText: 'យល់ព្រម' });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាមួយចំនួនបានកើតឡើង!', confirmButtonText: 'យល់ព្រម' });
+                }
             }
-        },
-        error: function (res) {
-            hideSpinner();
-            if (res.status === 422) {
-                let errors = res.responseJSON.errors;
-                let firstError = Object.values(errors);
-                Swal.fire({ icon: 'error', title: 'កំហុស', text: firstError, confirmButtonText: 'យល់ព្រម' });
-            } else if (res.status === 500) {
-                Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាក្នុងការភ្ជាប់ទៅប្រព័ន្ធទូទាត់។', confirmButtonText: 'យល់ព្រម' });
-            } else {
-                Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាមួយចំនួនបានកើតឡើង!', confirmButtonText: 'យល់ព្រម' });
-            }
-        }
-    });
-}
+        });
+    }
 
 const shippingFeesByProvince = {
     "ភ្នំពេញ": 1.00,

@@ -57,18 +57,6 @@
                 <p id="id-sold"></p>
                 <p id="id-stock"></p>
             </div>
-
-            <!-- Quantity -->
-            <div class="quantity-container mb-3 mt-2">
-                <span class="fw-medium">ចំនួន:</span>
-                <div class="quantity_count d-flex align-items-center gap-2">
-                    <button class="btn btn-secondary" id="minusBtn">-</button>
-                    <input type="number" class="form-control text-center" id="id-quantityInput" value="0" min="0"
-                        style="width: 60px;">
-                    <button class="btn btn-secondary" id="plusBtn">+</button>
-                </div>
-            </div>
-
             <!-- Size -->
             <div class="product-line d-flex align-items-center">
                 <label for="id-sizeSelect" class="fw-medium mb-0 me-2">ទំហំ:</label>
@@ -82,17 +70,24 @@
                 </select>
             </div>
 
-            <!-- Buttons -->
-            <div class="product-line d-flex w-100 justify-content-start gap-4 mt-3">
-                <button id="id-btn-buy-now" class="btn-glow">ទិញឥឡូវនេះ
-                    <span></span><span></span><span></span><span></span>
-                </button>
-
-                <button id="id-btn-add-to-cart" class="btn-glow">បន្ថែមទុកក្នុងកន្ត្រក
-                    <span></span><span></span><span></span><span></span>
-                </button>
+            <!-- Quantity -->
+            <div class="quantity-container mb-3 mt-2">
+                <span class="fw-medium">ចំនួន:</span>
+                <div class="quantity_count d-flex align-items-center gap-2">
+                    <button class="btn btn-secondary" id="minusBtn">-</button>
+                    <input type="number" class="form-control text-center" id="id-quantityInput" value="0" min="0"
+                        style="width: 60px;">
+                    <button class="btn btn-secondary" id="plusBtn">+</button>
+                </div>
             </div>
-        </div>
+
+
+            <!-- Buttons -->
+                <div class="product-line d-flex w-100 justify-content-start gap-4">
+                    <button id="id-btn-buy-now" class="btn-add btn btn-primary" style="width: 226px; height: 49px;">ទិញឥឡូវនេះ</button> 
+                    <button id="id-btn-add-to-cart" class="btn-add btn btn-secondary" style="width: 226px; height: 49px;">បន្ថែមទុកក្នុងកន្ត្រក</button>
+                </div>
+            </div>
 
         <!-- Product Description -->
         <div class="col-12 col-md-3 d-flex flex-column mb-3">

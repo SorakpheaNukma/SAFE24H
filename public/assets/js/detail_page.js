@@ -580,7 +580,7 @@ function btnAddToCart(quantityStock) {
         /* -------------------------------------------------
            5) Chuẩn bị dữ liệu giống nút Buy Now
         ---------------------------------------------------*/
-        const { productData } = getItemDataFromUrl();   // hàm bạn đã có
+        const { productData } = getItemDataFromUrl();   
         const size = selectedSize;
 
         // Tìm variant_id tương ứng size
@@ -666,11 +666,6 @@ setTimeout(() => {
     animate();
 }, 500);
 
-
-
-
-
-    
     // $('#id-price').text(`$${productData.product_price}`);
     const originalPrice = parseFloat(productData.product_price);
     const discountedPrice = parseFloat(productData.discounted_price);
