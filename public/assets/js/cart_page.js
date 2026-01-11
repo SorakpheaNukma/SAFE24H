@@ -11,22 +11,25 @@ $(document).ready(function () {
                 hideSpinner();
                 if (res.status === 200 && res.data && res.data.length > 0) {
                     cartsItemsGL = res.data;
-                    //console.log('in cartPage: ' + JSON.stringify(cartsItemsGL));
-
-                    // Render items if available
                     renderCartItems(cartsItemsGL);
+                } else if (res.status === 204 || (res.data && res.data.length === 0)) {
+                    $('#cartItemsContainer').html('<p>គ្មានទំនិញក្នុងកន្រ្តករបស់អ្នក</p>');
                 } else {
-                    console.log('No items in cart');
+                    console.warn('Unexpected response:', res);
+                    showError('Unable to load cart data');
                 }
-            },
-            error: function () {
+            },            
+            error: function (xhr) {
                 hideSpinner();
+                console.error('Error fetching cart items:', xhr.responseText);
                 showError('Something went wrong!!');
             }
         });
+        
     }
 
     getAllCartItemsInThisJS();
+    
 
     function showSpinner() {
         const spinner = document.getElementById('spinner');
@@ -43,13 +46,11 @@ $(document).ready(function () {
         const btncheckOut = document.getElementById('id-check-out');
         btncheckOut.classList.remove('d-none');
     }
-
-
     // Function to create HTML for each cart item
     function createCartItem(item, index) {
         const dmain = window.location.origin;
-        const imagePath = item.product.product_image.length > 0 ? item.product.product_image[0].image_path : 'default.jpg';
-
+        const imagePath = item.images || `${dmain}/uploads/products/default.jpg`;
+    
         return `
             <div class="row align-items-center mb-4">
                 <div class="col-1">
@@ -58,56 +59,79 @@ $(document).ready(function () {
                         <i class="fa-solid fa-trash-can" style="cursor: pointer;"></i>
                     </label>
                 </div>
-                <div class="col-4 col-md-2">
-                    <img width="100px" src="${dmain}/uploads/products/${imagePath}" alt="${item.product.product_name}">
-                </div>
-                <div id="idInfoProduct${index}" class="col-7 col-md-9">
-                    <div class="product-description mb-0 p-0">
-                        <div class="row">
-                            <div class="col-12 d-flex flex-column flex-md-row justify-content-between">
-                                <div><h5>${item.product.product_name}</h5></div>
-                                <div class="d-flex">
-                                    <p class="mb-0">Price:</p>
-                                    <p class="mb-0 ms-2">$${item.product.product_price}</p>
+                <div class="col-11 col-md-11 d-flex align-items-center">
+                    <div style="flex-shrink: 0;">
+                        <img width="100px" src="${imagePath}" alt="${item.product_name || 'No Name'}"
+                             onerror="this.onerror=null;this.src='${dmain}/uploads/products/default.jpg';">
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-1">${item.product_name || 'No Name'}</h5>
+                        <p class="mb-1">
+                            តម្លៃ:
+                            <span style="color: red; font-size: 20px; font-weight: bold;">
+                                $${item.price || 0}
+                            </span>
+                            ${item.original_price && item.original_price != item.price ? `
+                                <span style="text-decoration: line-through; color: gray; font-size: 16px;">
+                                    $${item.original_price}
+                                </span>
+                            ` : ''}
+                        </p>
+
+
+                        <p class="mb-0">ទំហំ: ${item.size || 'N/A'}</p>
+                        <p class="text-primary g-0 p-0 m-0">${item.stock_quantity <= 0 ? 'អស់ស្តុក' : 'មានស្តុកចំនួន: ' + item.stock_quantity}</p>
+                        <div class="quantity-container mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">ចំនួន</span>
+                                <div class="d-flex align-items-center mx-2">
+                                    <button class="btn btn-secondary btn-sm minus-btn" data-index="${index}">-</button>
+                                    <input type="number" class="form-control mx-2 quantity-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 60px;">
+                                    <button class="btn btn-secondary btn-sm plus-btn" data-index="${index}">+</button>
                                 </div>
                             </div>
-                        </div>
-                        <p>${item.product.des_1}</p>
-                    </div>
-                    <p class="text-primary g-0 p-0 m-0">${item.product.quantity === 0 ? 'Out Stock' : 'In Stock'}</p>
-                    <div class="quantity-container mb-2">
-                        <div class="d-flex align-items-center">
-                            <h7>Quantity</h7>
-                            <div class="d-flex align-items-center mx-2">
-                                <button class="btn btn-secondary btn-sm minus-btn" data-index="${index}">-</button>
-                                <input type="number" class="form-control mx-2 quantity-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 60px;">
-                                <button class="btn btn-secondary btn-sm plus-btn" data-index="${index}">+</button>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <h7>Subtotal:</h7>
-                            <span class="text-success subtotal" id="subtotal${index}">$${(item.product.product_price * item.quantity).toFixed(2)}</span>
                         </div>
                     </div>
                 </div>
             </div>
         `;
     }
-
+    
     // Function to render all cart items
     function renderCartItems(items) {
         const cartItemsContainer = document.getElementById('cartItemsContainer');
-        cartItemsContainer.innerHTML = items.map((item, index) => createCartItem(item, index)).join('');
-
+        if (!items || items.length === 0) {
+            cartItemsContainer.innerHTML = '<p>គ្មានទំនិញក្នុងកន្រ្តកស្តុករបស់អ្នក</p>';
+            return;
+        }
+    
+        cartItemsContainer.innerHTML = items.map((item, index) => {
+            return createCartItem(item, index);
+        }).join('');
+    
         // Add event listeners for the quantity buttons and checkboxes
         document.querySelectorAll('.minus-btn').forEach(btn => btn.addEventListener('click', handleQuantityChange));
         document.querySelectorAll('.plus-btn').forEach(btn => btn.addEventListener('click', handleQuantityChange));
+        
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('change', function (e) {
+                const index = e.target.dataset.index;
+                let newQty = parseInt(e.target.value);
+                if (isNaN(newQty) || newQty < 1) newQty = 1;
+
+                const item = cartsItemsGL[index];
+                if (newQty > item.stock_quantity) newQty = item.stock_quantity;
+
+                e.target.value = newQty;
+                item.quantity = newQty; 
+                updateTotalPrice();
+            });
+        });
         document.querySelectorAll('.item-checkbox').forEach(checkbox => checkbox.addEventListener('change', updateTotalPrice));
         document.querySelectorAll('.delete-icon').forEach(icon => icon.addEventListener('click', deleteSingleItem));
-
+    
         updateTotalPrice(); // Initialize total price
     }
-
     // Handle quantity change
     function handleQuantityChange(e) {
         const index = e.target.dataset.index;
@@ -117,36 +141,56 @@ $(document).ready(function () {
 
     // Function to update the quantity and subtotal
     function updateQuantity(index, change) {
-        const quantityInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
-        let quantity = parseInt(quantityInput.value) + change;
-        if (quantity < 1) quantity = 1; // Ensure at least 1 item
-        quantityInput.value = quantity;
+    const item = cartsItemsGL[index];
+    const quantityInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
+    if (!quantityInput) return; 
 
-        const price = parseFloat(cartsItemsGL[index].product.product_price);
-        const subtotal = document.getElementById(`subtotal${index}`);
+    let quantity = parseInt(quantityInput.value) + change;
+    if (quantity < 1) quantity = 1;
+
+    
+    if (item.stock_quantity !== undefined && quantity > item.stock_quantity) {
+        quantity = item.stock_quantity;
+    }
+
+    quantityInput.value = quantity;
+    item.quantity = quantity;
+
+    const price = parseFloat(item.price || 0); 
+
+    
+    const subtotal = document.getElementById(`subtotal${index}`);
+    if (subtotal) {
         subtotal.textContent = `$${(quantity * price).toFixed(2)}`;
+    }
 
-        updateTotalPrice();
+    updateTotalPrice();
     }
 
     // Function to update the total price of selected items
     function updateTotalPrice() {
         let totalPrice = 0;
-
+    
         cartsItemsGL.forEach((item, index) => {
             const checkbox = document.getElementById(`item${index}`);
-            if (checkbox.checked) {
-                const quantity = parseInt(document.querySelector(`.quantity-input[data-index="${index}"]`).value);
-                const price = parseFloat(item.product.product_price);
+            if (checkbox && checkbox.checked) {
+                const quantity = parseInt(document.querySelector(`.quantity-input[data-index="${index}"]`)?.value || 1);
+                const price = parseFloat(
+                    item?.variant?.product?.product_price ??
+                    item?.product?.product_price ??
+                    item?.price ??
+                    0
+                );
                 totalPrice += quantity * price;
             }
         });
-
+    
         document.getElementById('totalPriceContainer').innerHTML = `
-            <h5>Total Price: <span class="text-primary">$${totalPrice.toFixed(2)}</span></h5>
+            <h5 class="fw-bold" style="font-size: 24px; color:blue;">
+                សរុបតម្លៃ: <span class="text-primary">$${totalPrice.toFixed(2)}</span>
+            </h5>
         `;
     }
-
     // Handle "Select All" functionality
     document.getElementById('selectAll').addEventListener('change', function () {
         const isChecked = this.checked;
@@ -158,79 +202,70 @@ $(document).ready(function () {
     function deleteSingleItem(e) {
         const index = e.currentTarget.dataset.index;
 
-        // Assuming each cart item has an ID
-        const itemId = cartsItemsGL[index].id;
+        if (!cartsItemsGL[index]) {
+            console.error(`Cart item at index ${index} does not exist`);
+            return;
+        }
 
-        $.ajax({
-            url: `/remove-from-cart`,
-            method: 'DELETE',
-            data: {
-                'id': itemId
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (res) {
-                if (res.status === 200) {
-                    showSuccess('deleted cart successfully🎉');
+        const itemId = cartsItemsGL[index].cart_id;
+        const productName = cartsItemsGL[index].product_name || 'this product';
 
-                    // call from other js
-                    getAllCartItems();
+        
+        Swal.fire({
+            title: 'លុបទំនិញ',
+            html: `តើអ្នកពិតជាចង់លុប <strong>${productName}</strong> ចេញពីកន្ត្រករបស់អ្នកមែនទេ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'លុប',
+            cancelButtonText: 'បោះបង់',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                
+                $.ajax({
+                    url: `/remove-from-cart`,
+                    method: 'POST',
+                    data: {
+                        _method: 'DELETE',
+                        id: itemId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
+                        if (res.status === 200) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '✅ លុបទំនិញជោគជ័យ!',
+                                text: 'ទំនិញត្រូវបានដកចេញពីកន្ត្រករបស់អ្នក។',
+                                confirmButtonText: 'យល់ព្រម'  
+                            });
 
-                    // Remove the item from the global array and re-render the cart
-                    cartsItemsGL.splice(index, 1);
-
-                    renderCartItems(cartsItemsGL);
-                    updateTotalPrice();
-                } else {
-                    showError('Failed to delete item.');
-                }
-            },
-            error: function () {
-                showError('Error deleting the item.');
+                            cartsItemsGL.splice(index, 1);
+                            renderCartItems(cartsItemsGL);
+                            updateTotalPrice();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '❌ មិនអាចលុបបាន!',
+                                text: 'មានបញ្ហាកើតឡើង។'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error deleting the item:', xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: '❌ បរាជ័យ!',
+                            text: 'មិនអាចលុបទំនិញបានទេ។'
+                        });
+                    }
+                });
             }
         });
     }
-
-
-    // Function to delete selected items (bulk delete)
-    document.getElementById('deleteSelectedAllItems').addEventListener('click', function () {
-        const selectedItems = cartsItemsGL.filter((item, index) => document.getElementById(`item${index}`).checked);
-        const selectedItemIds = selectedItems.map(item => item.id);
-
-        if (selectedItemIds.length > 0) {
-            $.ajax({
-                url: '/delete-multiple-from-cart',
-                method: 'DELETE',
-                data: {
-                    'ids': selectedItemIds,
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (res) {
-                    if (res.status === 200) {
-                        // Remove selected items from the global array based on selected IDs
-                        cartsItemsGL = cartsItemsGL.filter(item => !selectedItemIds.includes(item.id));
-
-                        // Re-render the cart and update the total price
-                        renderCartItems(cartsItemsGL);
-                        updateTotalPrice();
-
-                        // call from other js
-                        getAllCartItems();
-
-                        showSuccess('deleted cart successfully🎉');
-                    } else {
-                        showError('Failed to delete selected items.');
-                    }
-                },
-                error: function () {
-                    showError('Error deleting the selected items.');
-                }
-            });
-        }
-    });
 
     function MyJConfirmDialog(options) {
         let config = {
@@ -285,67 +320,71 @@ $(document).ready(function () {
         $.confirm(config);
     }
 
-    function btnCheckOut() {
-        $('#id-btn-checkout').on('click', function () {
-            // Filter the checked items
-            const FilterOnlyCartItemsSelected = cartsItemsGL.filter((item, index) => {
-                const checkbox = document.getElementById(`item${index}`);
-                return checkbox && checkbox.checked;
+function btnCheckOut() {
+    $('#id-btn-checkout').on('click', function () {
+        // Filter the checked items
+        const FilterOnlyCartItemsSelected = cartsItemsGL.filter((item, index) => {
+            const checkbox = document.getElementById(`item${index}`);
+            return checkbox && checkbox.checked;
+        });
+
+        const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => {
+            return cartItem.variant?.quantity === 0;
+        });
+
+        if (outOfStockItems.length > 0) {
+            const dmain = window.location.origin;
+
+            const contentDialog = outOfStockItems.map(item => {
+                const productName = item.variant?.product?.product_name;
+                const imagePath = item.variant?.product?.product_images?.[0]?.image_path
+                    ? `${dmain}/uploads/products/${item.variant.product.product_images[0].image_path}`
+                    : 'https://via.placeholder.com/100?text=No+Image';
+
+                return `
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <img width="100px" style="border-radius: 8px; margin-right: 10px;" src="${imagePath}" alt="${productName}">
+                        <span style="font-size: 16px; font-weight: bold;">${productName}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Hiển thị SweetAlert2 thay cho MyJConfirmDialog
+            Swal.fire({
+                title: '<strong>ទំនិញខ្លះអស់ស្តុក</strong>', // "These Products Are Out of Stock" bằng tiếng Khmer
+                html: `
+                    <div style="font-size: 14px; color: #555; margin-bottom: 10px;">
+                        សូមកុំជ្រើសរើសទំនិញដែលអស់ស្តុក៖
+                    </div>
+                    ${contentDialog}
+                `,
+                icon: 'warning',
+                confirmButtonText: 'យល់ព្រម',
+                cancelButtonText: 'បោះបង់',
+                showCancelButton: true,
+                reverseButtons: true,
+                allowOutsideClick: false
             });
 
-            // Check for out-of-stock items in the selected list
-            const outOfStockItems = FilterOnlyCartItemsSelected.filter(cartItem => cartItem.product.quantity === 0);
+            return;
+        }
 
-            if (outOfStockItems.length > 0) {
-                const dmain = window.location.origin;
+        // Nếu không có sản phẩm hết hàng
+        if (FilterOnlyCartItemsSelected.length > 0) {
+            const encodedItems = encodeURIComponent(JSON.stringify(FilterOnlyCartItemsSelected));
+            window.location.href = `/buy-now-page?items=${encodedItems}`;
+        } else {
+            // Thay showError bằng SweetAlert2
+            Swal.fire({
+                icon: 'error',
+                title: 'កំហុស',
+                text: 'មិនមានទំនិញណាមួយត្រូវបានជ្រើសសម្រាប់បញ្ជាទិញ។',
+                confirmButtonText: 'យល់ព្រម'
+            });
+        }
+    });
+}
 
-                const titleDialog = '<strong>These Products Are Out of Stock</strong>';
-
-                const contentDialog = outOfStockItems.map(item => {
-                    const productName = item.product.product_name;
-
-                    const imagePath = item.product.product_image.length > 0
-                        ? `${dmain}/uploads/products/${item.product.product_image[0].image_path}`
-                        : 'https://via.placeholder.com/100?text=No+Image';
-
-                    return `
-                         <div style="font-size: 14px; color: #555; margin-bottom: 10px;">
-                            Please deselect products that are out of stock:
-                        </div>
-
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <img width="100px" style="border-radius: 8px; margin-right: 10px;" src="${imagePath}" alt="${productName}">
-                            <span style="font-size: 16px; font-weight: bold;">${productName}</span>
-                        </div>
-                    `;
-                }).join('');
-
-                // Show dialog for out-of-stock items
-                MyJConfirmDialog({
-                    title: titleDialog,
-                    content: contentDialog,
-                    autoClose: 'Cancel|30000',
-                    type: 'red',
-                    onConfirm: function () {
-
-                    },
-                    cancelText: 'Cancel',
-                    onCancel: function () {
-
-                    }
-                });
-
-                return;
-            }
-
-            // If no out-of-stock items are selected
-            if (FilterOnlyCartItemsSelected.length > 0) {
-                window.location.href = `/buy-now-page?items=${JSON.stringify(FilterOnlyCartItemsSelected)}`;
-            } else {
-                showError('No items selected for checkout.');
-            }
-        });
-    }
 
     btnCheckOut();
 

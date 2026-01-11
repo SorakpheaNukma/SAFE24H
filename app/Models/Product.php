@@ -35,23 +35,28 @@ class Product extends Model
      */
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
-
-
-    /**
-     * Define a relationship between Product and Product images.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function product_image()
-    {
-        return $this->hasMany(ProductImages::class, 'product_id');
-    }
-
-    // Define relationship with OrderItem
+        return $this->belongsTo(Category::class, 'category_id','category_id');
+    }    
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'product_id', 'product_id');
     }
+    public function product_variants()
+    {
+        return $this->hasMany(ProductVariants::class, 'product_id', 'product_id');
+    }
+    public function product_images()
+    {
+        return $this->hasMany(ProductImages::class, 'product_id', 'product_id');
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'product_id', 'product_id');
+    }
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_product', 'product_id', 'event_id');
+    }
+
+
 }

@@ -85,6 +85,8 @@ $(document).ready(function () {
                 localStorage.setItem("user_id", res.user_id);
                 localStorage.removeItem("username");
                 localStorage.setItem("username", res.username);
+                localStorage.removeItem("is_logged_in");
+                localStorage.setItem('is_logged_in', 'true');
 
                 if (res.token) {
                     window.location.href = res.redirect_url;

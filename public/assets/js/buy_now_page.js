@@ -1,139 +1,194 @@
 $(document).ready(function () {
     let totalPrice = 0;
     let itemCount = 0;
-    const shippingFee = 2.00;
+    let shippingFee = 0;
+    let totalPayment = 0;
     var ProductsLsGL = [];
-
     const user_idGL = document.querySelector('meta[name="user_id"]').content;
-
     var UserDataGL = [];
 
     $('#id-change-address').on('click', function () {
         window.location.href = '/address-page';
     });
 
-    $('#shipping-total').text(shippingFee.toFixed(2) + "$");
+    // $('#shipping-total').text(shippingFee.toFixed(2) + "$");
 
     function getItemDataFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        const itemData = params.get('items');
-        const detailParam = params.get('detail');
-        const images = params.get('images');
+    const params = new URLSearchParams(window.location.search);
+    const itemData = params.get('items');
+    const detailParam = params.get('detail');
+    const images = params.get('images');
 
-        const productData = JSON.parse(itemData);
-        return { productData, detailParam, images };
+    let productData = {};
+    try {
+        productData = JSON.parse(decodeURIComponent(itemData)); // 👈 Decode đúng
+    } catch (err) {
+        console.error("Lỗi parse JSON:", err);
     }
+
+    return { productData, detailParam, images };
+    }   
 
     var { productData, detailParam, images } = getItemDataFromUrl();
 
     if (detailParam === 'true') {
-        ProductsLsGL.push({
-            product_id: productData.product_id,
-            product_name: productData.product_name,
-            product_price: productData.product_price,
-            image_path: images,
-            quantity: productData.quantity
-        });
+        if (Array.isArray(productData)) {
+            productData.forEach(product => {
+                ProductsLsGL.push({
+                    product_id: product.product_id,
+                    product_name: product.product_name,
+                    product_price: product.price,
+                    discount_price: productData.discounted_price ?? productData.discount_price ?? null,
+                    image_path: product.images,
+                    quantity: product.quantity,
+                    size: product.size,
+                    variant_id: product.variant_id
+                });
+            });
+        } else {
+            // Trường hợp chỉ có 1 sản phẩm, là object
+            ProductsLsGL.push({
+                product_id: productData.product_id,
+                product_name: productData.product_name,
+                price: productData.price,
+                discount_price: productData.discounted_price ?? productData.discount_price ?? null,
+                image_path: productData.images || images,
+                quantity: productData.quantity,
+                size: productData.size,
+                variant_id: productData.variant_id
+            });
+        }
+        
     } else {
-        ProductsLsGL = productData;
+        ProductsLsGL = Array.isArray(productData) ? productData : [productData];
     }
-
     // Function to dynamically add a single product when detailParam is true
     function addSingleProductItem(product) {
+        if (!product || !product.product_name || !product.quantity || (!product.price && !product.discount_price)) {
+            console.error('Thiếu thông tin sản phẩm:', product);
+            return;
+        }
+
         const productName = product.product_name;
         const quantity = product.quantity;
-        const price = product.product_price;
+        const price = parseFloat(product.discount_price !== null ? product.discount_price : product.price) || 0;
+        const size = product.size || 'N/A';
         const dmain = window.location.origin;
         const imagePath = product.image_path ? product.image_path : 'default.jpg';
 
         totalPrice += price * quantity;
         itemCount++;
 
-        const productHTML = `
-    <div class="container m-2 product-item">
-        <div class="row d-flex align-items-center flex-column flex-md-row">
-            <div class="col-12 col-md-2 mb-3 mb-md-0">
-                <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
-            </div>
-            <div class="col-12 col-md-8 d-flex flex-column">
-                <h6 class="fw-semibold">Product Name: ${productName}</h6>
-                <p class="mb-0">Quantity: ${quantity}</p>
-            </div>
-           
-        </div>
-        <div class="row mt-2">
-            <div class="col-6">
-                <h6>Price</h6>
-            </div>
-            <div class="col-6 text-end">
-                <h6 class="fw-bold">$${price}</h6>
-            </div>
-        </div>
-    </div>`;
+        const productId = `product-${product.variant_id ? product.variant_id : Date.now()}`;
 
-        // Insert the new product item before the "Order Total" section
+        const productHTML = `
+            <div id="${productId}" class="product-item" style="border: 1px solid #ccc; padding: 12px; margin: 12px 0; border-radius: 8px;">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+                    <div style="flex: 0 0 100px;">
+                        <img src="${dmain}/uploads/products/${imagePath}" alt="Product Image" style="width: 100px; height: auto; object-fit: cover; border-radius: 4px;" />
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h6 style="margin: 0; font-weight: 600;">${productName}</h6>
+                                <p style="margin: 2px 0;">ចំនួន: ${quantity}</p>
+                                <p style="margin: 2px 0;">Size: ${size}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h6 style="margin: 0;">តម្លៃរាយ</h6>
+                            <h6 style="margin: 0; font-weight: bold;">$${price.toFixed(2)}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
         const productList = document.getElementById('product-list');
         productList.insertAdjacentHTML('beforeend', productHTML);
 
-        // Update the order total display
         updateOrderTotal();
     }
 
-    // Function to dynamically add product items
-    function addProductItem(product) {
-        const productName = product.product.product_name;
-        const quantity = product.quantity;
-        const price = product.product.product_price;
-        const dmain = window.location.origin;
-        const imagePath = product.product.product_image.length > 0 ? product.product.product_image[0].image_path : 'default.jpg';
 
+    // Function to dynamically add product items bookmarrk
+    function addProductItem(product) {
+         console.log('🛒 [addProductItem] Product Info:', product); // <-- thêm dòng này
+        if (!product || !product.product_name || !product.price) {
+            console.warn('Product data invalid or incomplete:', product);
+            return;
+        }
+    
+        const productName = product.product_name;
+        const quantity = product.quantity;
+        let price = 0;
+            if (typeof product.discount_price === 'number' && !isNaN(product.discount_price)) {
+                price = product.discount_price;
+            } else if (typeof product.price === 'number' && !isNaN(product.price)) {
+                price = product.price;
+            }
+        const size = product.size;
+        const imagePath = product.images || 'default.jpg';
+        const dmain = window.location.origin;
+    
         totalPrice += price * quantity;
         itemCount++;
-
-        const productId = `product-${product.product.product_id}`;
-
+    
+        const productId = `product-${product.variant_id || Date.now()}`;
+    
         const productHTML = `
-    <div id="${productId}" class="container m-2 product-item">
-        <div class="row d-flex align-items-center flex-column flex-md-row">
-            <div class="col-12 col-md-2 mb-3 mb-md-0">
-                <img width="100%" height="auto" src="${dmain}/uploads/products/${imagePath}" alt="Product Image" />
+            <div id="${productId}" class="product-item" style="border: 1px solid #ccc; padding: 12px; margin: 12px 0; border-radius: 8px;">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
+                    <div style="flex: 0 0 100px;">
+                        <img src="${imagePath}" alt="Product Image" style="width: 100px; height: auto; object-fit: cover; border-radius: 4px;" />
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h6 style="margin: 0; font-weight: 600;">${productName}</h6>
+                                <p style="margin: 2px 0;">ចំនួន: ${quantity}</p>
+                                <p style="margin: 2px 0;">Size: ${size}</p>
+                            </div>
+                            <div>
+                                <h6 class="remove-item" data-product-id="${productId}" data-price="${price * quantity}" data-quantity="${quantity}" 
+                                    style="color: #007bff; cursor: pointer; margin: 0;">
+                                    លុប
+                                </h6>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h6 style="margin: 0;">តម្លៃ</h6>
+                            <h6 style="margin: 0; font-weight: bold;">$${price.toFixed(2)}</h6>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 col-md-8 d-flex flex-column">
-                <h6 class="fw-semibold">Product Name: ${productName}</h6>
-                <p class="mb-0">Quantity: ${quantity}</p>
-            </div>
-            <div class="col-12 col-md-2 text-md-end mt-3 mt-md-0">
-                <h6 class="text-primary remove-item" data-product-id="${productId}" data-price="${price * quantity}" data-quantity="${quantity}">Remove</h6>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-6">
-                <h6>Price</h6>
-            </div>
-            <div class="col-6 text-end">
-                <h6 class="fw-bold">$${price.toFixed(2)}</h6>
-            </div>
-        </div>
-    </div>`;
-
+        `;
         const productList = document.getElementById('product-list');
         productList.insertAdjacentHTML('beforeend', productHTML);
-
+    
         updateOrderTotal();
     }
-
-    // Function to update the order total display
+    // Function to update the order total display ErrorError
     function updateOrderTotal() {
-        const orderTotalElement = document.getElementById('order-total');
+        
         const merchandiseTotal = totalPrice;
-        const totalPayment = merchandiseTotal + shippingFee;
+        const FREE_SHIPPING_THRESHOLD = 50;
+            if (merchandiseTotal >= FREE_SHIPPING_THRESHOLD) {
+        shippingFee = 0;
+    }
+        totalPayment = merchandiseTotal + shippingFee;
 
         document.getElementById('merchandise-total').textContent = `$${merchandiseTotal.toFixed(2)}`;
+        document.getElementById('final-total').textContent = `$${totalPayment.toFixed(2)}`;        
         document.getElementById('total-payment').textContent = `$${totalPayment.toFixed(2)}`;
-        document.getElementById('final-total').textContent = `$${totalPayment.toFixed(2)}`;
-
+         // ✅ Nếu muốn hiển thị chữ "Free" thay vì $0.00
+    document.getElementById('shipping-total').textContent =
+        shippingFee === 0 ? 'Free' : `$${shippingFee.toFixed(2)}`;
+        
+        const orderTotalElement = document.getElementById('order-total');
         orderTotalElement.innerHTML = `
-    <h6 class="fw-bold mb-2 mb-md-0">Order Total (${itemCount} Item${itemCount > 1 ? 's' : ''}):</h6>
+    <h6 class="fw-bold mb-2 mb-md-0 fs-5">សរុបទំនិញ (${itemCount} ទំនិញ):</h6>
     <h6 class="fw-bold text-md-end">$${merchandiseTotal.toFixed(2)}</h6>`;
     }
 
@@ -143,16 +198,39 @@ $(document).ready(function () {
         const productPrice = parseFloat($(this).data('price'));
         const productQuantity = parseInt($(this).data('quantity'));
 
-        // Remove the item from the DOM
-        $(`#${productId}`).remove();
+        Swal.fire({
+            title: 'លុបទំនិញ',
+            html: 'តើអ្នកពិតជាចង់លុបទំនិញនេះចេញពីបញ្ជីបញ្ជាទិញមែនទេ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'លុប',
+            cancelButtonText: 'បោះបង់',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Remove the item from the DOM
+                $(`#${productId}`).remove();
 
-        // Update the total price and item count
-        totalPrice -= productPrice;
-        itemCount -= productQuantity;
+                // Update the total price and item count
+                totalPrice -= productPrice;
+                itemCount -= productQuantity;
 
-        // Update the order total display
-        updateOrderTotal();
+                // Update the order total display
+                updateOrderTotal();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'បានលុបទំនិញ!',
+                    text: 'ទំនិញត្រូវបានដកចេញដោយជោគជ័យ។',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
     });
+
 
     function initializeData() {
         ProductsLsGL.forEach(product => {
@@ -167,23 +245,33 @@ $(document).ready(function () {
     initializeData();
 
     function showSpinner() {
-        const spinner = document.getElementById('spinner');
+    const spinner = document.getElementById('spinner');
+    if (spinner) {
         spinner.style.visibility = 'visible';
         spinner.style.opacity = '1';
         spinner.style.backgroundColor = 'white';
+    }
 
-        const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
         mainContent.style.display = 'none';
     }
+}
+
 
     function hideSpinner() {
-        const spinner = document.getElementById('spinner');
+    const spinner = document.getElementById('spinner');
+    if (spinner) {
         spinner.style.opacity = '0';
         spinner.style.visibility = 'hidden';
+    }
 
-        const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
         mainContent.style.display = 'block';
     }
+}
+
 
     function getCurrentDateTime() {
         const now = new Date();
@@ -197,15 +285,17 @@ $(document).ready(function () {
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
-
     function saveOrder(callback) {
         const orderDate = getCurrentDateTime();
-
+        const paymentMethod = $('input[name="payment_method"]:checked').val();
+        
         const orderData = {
             user_id: user_idGL,
-            total_amount: totalPrice.toFixed(2),
+            total_amount: parseFloat(totalPrice.toFixed(2)),
             status: 'processing',
             order_date: orderDate,
+            shipping_fee: parseFloat(shippingFee.toFixed(2)),
+            payment_method: paymentMethod
         };
 
         $.ajax({
@@ -226,8 +316,8 @@ $(document).ready(function () {
             },
             error: function (res) {
                 if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
+                    let errors = res.responseJSON.errors;
+                    let firstError = Object.values(errors)[0][0];
                     showError(firstError);
                 } else if (res.status === 500) {
                     showError('An error occurred. Please try again later.');
@@ -261,26 +351,17 @@ $(document).ready(function () {
         });
     }
 
-
-    function saveOrderItems(orderId) {
+    function saveOrderItems(orderId, callback) {
         var orderItems = [];
-
-        if (detailParam === 'true') {
-            orderItems = ProductsLsGL.map(item => ({
-                order_id: orderId,
-                product_id: item.product_id,
-                quantity: item.quantity,
-                price: item.product_price
-            }));
-        } else {
-            orderItems = ProductsLsGL.map(item => ({
-                order_id: orderId,
-                product_id: item.product.product_id,
-                quantity: item.quantity,
-                price: item.product.product_price
-            }));
-        }
-
+    
+        orderItems = ProductsLsGL.map(item => ({
+            order_id: orderId,
+            product_id: item.product_id || null, // 👈 nếu không có thì backend phải xử lý null
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+            price: item.price // 👈 sửa lại cho đúng key
+        }));
+    
         $.ajax({
             url: '/save-order-items',
             method: 'POST',
@@ -290,68 +371,204 @@ $(document).ready(function () {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (res) {
-                if (res.status === 200) {
+                console.log('Response:', res);
+                if (res.status === 200 || res.status === 201) {
                     const dmain = window.location.origin;
-
-                    var title = "🛒 New Order Received!";
-                    var url = `${dmain}/home-dashboard`;
-                    var body = `👤 Client: `;
-
+    
+                    let title = "🛒 New Order Received!";
+                    let url = `${dmain}/home-dashboard`;
+                    let body = `👤 Client: `;
+    
                     UserDataGL.forEach(u => {
                         body += `${u.username}\n`;
                     });
-
+    
                     body += "🛍️ Ordered Items:\n";
-
-                    res.data.forEach(item => {
-                        // console.log('item: ' + JSON.stringify(item.order_item.quantity));
-                        body += `• ${item.product_name} -- Quantity:${item.order_item.quantity}\n`;
-                    });
-
-                    sendNotification(title, body, url);
-
-                    window.location.href = `/order-success?Total_Price=${totalPrice.toFixed(2)}&Order_Id=${orderId}`;
+    
+                    if (Array.isArray(res.data)) {
+                        res.data.forEach(item => {
+                            body += `• ${item.product_name} -- Quantity: ${item.order_item.quantity}\n`;
+                        });
+                    } else {
+                        body += `• Order ID: ${res.data.order_id} -- Amount: ${res.data.total_amount}\n`;
+                    }
+    
+                    try {
+                        sendNotification(title, body, url);
+                    } catch (e) {
+                        console.error('Notification error:', e);
+                    }
+    
+                    // Gọi callback sau khi hoàn tất logic
+                    if (typeof callback === 'function') callback();
+                    hideSpinner();
+                    setTimeout(function() {
+                        // Điều hướng sang trang thành công
+                        window.location.href = `/order-success?Total_Price=${totalPayment.toFixed(2)}&Order_Id=${orderId}`;
+                    }, 300); // 300ms delay
                 } else {
-                    alert('Failed to place the order items.');
+                    showError('Failed to save order items.');
+                    hideSpinner();
                 }
             },
             error: function (res) {
                 if (res.status === 422) {
-                    let error = res.responseJSON.error;
-                    let firstError = Object.values(error)[0][0];
+                    let errors = res.responseJSON.errors;
+                    let firstError = Object.values(errors)[0][0];
                     showError(firstError);
                 } else if (res.status === 500) {
                     showError('An error occurred. Please try again later.');
                 } else {
                     showError('Something went wrong!');
                 }
+                hideSpinner(); // hide trong mọi trường hợp lỗi
+
+            }
+        });
+    }    
+
+    $('#id-btn-order').on('click', function (e) {
+    e.preventDefault();
+    showSpinner();
+
+    if (!$('input[name="payment_method"]:checked').length) {
+        hideSpinner();
+        Swal.fire({
+            icon: 'warning',
+            title: 'កំហុស',
+            text: 'សូមជ្រើសរើសវិធីទូទាត់។',
+            confirmButtonText: 'យល់ព្រម'
+        });
+        return false;
+    }
+
+    if (totalPrice === 0) {
+        hideSpinner();
+        Swal.fire({
+            icon: 'info',
+            title: 'ព័ត៌មាន',
+            text: 'ពុំមានការបញ្ជាទិញទេ តម្លៃសរុបគឺសូន្យ។',
+            confirmButtonText: 'យល់ព្រម'
+        });
+        return false;
+    }
+
+    let paymentMethod = $('input[name="payment_method"]:checked').val();
+    console.log("Selected payment method:", paymentMethod);
+
+    saveOrder(function (orderId) {
+        if (paymentMethod === 'cod') {
+            saveOrderItems(orderId, function () {
+                hideSpinner();
+                Swal.fire({
+                icon: 'success',
+                title: 'ការបញ្ជាទិញបានរក្សាទុក!',
+                text: 'ការបញ្ជាទិញរបស់អ្នកបានរក្សាទុកដោយជោគជ័យ។',
+                confirmButtonText: 'យល់ព្រម'
+            });
+            });
+        } else {
+            // សម្រាប់ការទូទាត់តាមអនឡាញ ចាប់ផ្តើមដំណើរការទូទាត់ជាមួយ ABA Payway
+            initiateOnlinePayment(orderId, paymentMethod, totalPrice); // បញ្ជូន orderId និងចំនួនទឹកប្រាក់
+        }
+    });
+});
+    function initiateOnlinePayment(orderId, paymentMethod, amount) {
+        $.ajax({
+            url: '/initiate-payway-payment', // Endpoint Laravel ថ្មី
+            method: 'POST',
+            data: {
+                order_id: orderId,
+                payment_method_type: paymentMethod,
+                amount: amount
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
+                hideSpinner();
+                if (res.status === 200) {
+                    // ដោះស្រាយការឆ្លើយតបពី Payway: ប្តូរទិសដៅ បង្ហាញ QR ឬ deep link
+                    if (res.redirect_url) {
+                        window.location.href = res.redirect_url; // ប្តូរទិសដៅទៅទំព័រទូទាត់របស់ Payway
+                    } else if (res.qr_image_url) {
+                        // បង្ហាញ QR code ដល់អ្នកប្រើប្រាស់
+                        Swal.fire({
+                            title: 'ស្កេន QR ដើម្បីទូទាត់',
+                            imageUrl: res.qr_image_url,
+                            imageWidth: 200,
+                            imageHeight: 200,
+                            imageAlt: 'KHQR Code',
+                            html: '<p>សូមប្រើកម្មវិធី ABA Mobile ឬកម្មវិធីធនាគារផ្សេងទៀតដើម្បីស្កេន និងទូទាត់។</p>',
+                            showConfirmButton: false,
+                            allowOutsideClick: false
+                        });
+                    } else if (res.deeplink_url) {
+                        window.location.href = res.deeplink_url; // ព្យាយាមបើកកម្មវិធីទូរស័ព្ទ
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: res.message || 'បរាជ័យក្នុងការចាប់ផ្តើមការទូទាត់។', confirmButtonText: 'យល់ព្រម' });
+                }
+            },
+            error: function (res) {
+                hideSpinner();
+                if (res.status === 422) {
+                    let errors = res.responseJSON.errors;
+                    let firstError = Object.values(errors);
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: firstError, confirmButtonText: 'យល់ព្រម' });
+                } else if (res.status === 500) {
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាក្នុងការភ្ជាប់ទៅប្រព័ន្ធទូទាត់។', confirmButtonText: 'យល់ព្រម' });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'កំហុស', text: 'មានបញ្ហាមួយចំនួនបានកើតឡើង!', confirmButtonText: 'យល់ព្រម' });
+                }
             }
         });
     }
 
+const shippingFeesByProvince = {
+    "ភ្នំពេញ": 1.00,
+    "កណ្ដាល": 1.50,
+    "តាកែវ": 2.00,
+    "កំពត": 2.50,
+    "កែប": 2.50,
+    "ព្រះសីហនុ": 3.00,
+    "កោះកុង": 3.50,
+    "កំពុងស្ពឺ": 2.00,
+    "កំពង់ឆ្នាំង": 2.50,
+    "កំពង់ធំ": 2.50,
+    "កំពង់ចាម": 2.50,
+    "ត្បូងឃ្មុំ": 2.50,
+    "ព្រៃវែង": 2.00,
+    "ស្វាយរៀង": 2.00,
+    "បាត់ដំបង": 3.00,
+    "បន្ទាយមានជ័យ": 3.00,
+    "ប៉ៃលិន": 3.00,
+    "សៀមរាប": 3.00,
+    "ឧត្តរមានជ័យ": 3.50,
+    "ព្រះវិហារ": 3.50,
+    "ស្ទឹងត្រែង": 3.50,
+    "ក្រចេះ": 3.00,
+    "មណ្ឌលគីរី": 4.00,
+    "រតនគីរី": 4.00,
+    "ពោធិ៍សាត់": 3.00
+};
 
-    $('#id-btn-order').on('click', function (e) {
-        e.preventDefault();
-        showSpinner();
-
-        // Check if the payment method checkbox is checked
-        if (!$('#id-payment-method').is(':checked')) {
-            hideSpinner();
-            alert('Please select a payment method.');
-            return false;
+$(document).ready(function () {
+    const savedProvince = localStorage.getItem('selectedProvince');
+    if (savedProvince) {
+        const baseFee = shippingFeesByProvince[savedProvince] || 0;
+        shippingFee = baseFee;
+        updateOrderTotal();  // hàm này sẽ điều chỉnh lại shippingFee nếu free
+    
+        if (shippingFee === 0) {
+            $('#shipping-total').text('ឥតគិតថ្លៃដឹកជញ្ជូន');
+            $('#shippingCost').text('ថ្លៃដឹកជញ្ជូន៖ Free');
+        } else {
+            $('#shipping-total').text(`$${shippingFee.toFixed(2)}`);
+            $('#shippingCost').text(`ថ្លៃដឹកជញ្ជូន៖ $${shippingFee.toFixed(2)}`);
         }
+    }
+});
 
-        if (totalPrice === 0) {
-            hideSpinner();
-            alert('We don\'t have an order now. Total Price is zero.');
-            return false;
-        }
-
-        // Save the order and then save order items using the callback
-        saveOrder(function (orderId) {
-            saveOrderItems(orderId);
-            hideSpinner();
-        });
-    });
 
 });

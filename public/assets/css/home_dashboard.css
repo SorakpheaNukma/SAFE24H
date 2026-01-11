@@ -233,3 +233,139 @@ body {
         margin-left: 15px;
     }
 }
+@font-face {
+    font-family: 'Khmer OS';
+    src: url('/assets/fonts/KhmerOS.ttf') format('truetype'); /* Đường dẫn tới file font */
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Áp dụng font Khmer OS cho toàn bộ website */
+body {
+    font-family: 'Khmer OS', Arial, sans-serif;
+}
+/* ----- Bảng sản phẩm đã bán ----- */
+#table-sold-products {
+    font-size: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background-color: #fff;
+}
+
+#table-sold-products thead {
+    background-color: #f17e81; /* Màu chủ đạo */
+    color: #ffffff;
+}
+
+#table-sold-products th,
+#table-sold-products td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+#table-sold-products tbody tr:hover {
+    background-color: #fff3f3; /* Hover nhẹ */
+    transition: background-color 0.2s ease-in-out;
+}
+
+#table-sold-products img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Tiêu đề */
+.container h4 {
+    color: #f17e81;
+    font-weight: 600;
+}
+
+  /* Chắc chắn áp dụng được bằng cách dùng !important */
+  #table-show-order-dashboard thead tr th,
+  #table-sold-products thead tr th {
+    background-color: #f17e81 !important;
+    color: white !important;
+    font-weight: bold !important;
+    font-size: 15px !important;
+    text-align: center !important;
+    padding: 12px !important;
+    border: 1px solid #ddd !important;
+  }
+  .swal2-input-group {
+    margin-bottom: 15px;
+}
+.swal2-rounded {
+    border-radius: 1rem !important;
+}
+.swal2-shadow {
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+.table thead th {
+    background-color: #f17e81 !important;  /* màu chủ đạo bạn thích */
+    color: white;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #fff3f3; /* màu hover nhẹ nhàng */
+    transition: background-color 0.2s ease-in-out;
+}
+
+.table-bordered td, .table-bordered th {
+    border-color: #f1c5c7;
+}
+
+#event-product-table {
+    font-size: 15px;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.btn-success {
+    background-color: #51d88a;
+    border-color: #51d88a;
+}
+
+ .product-checkbox {
+        border: 2px solid #999;        /* Màu viền xám nhạt */
+        border-radius: 4px;
+        width: 18px;
+        height: 18px;
+        appearance: none;              /* Ẩn style mặc định */
+        -webkit-appearance: none;
+        outline: none;
+        cursor: pointer;
+        position: relative;
+    }
+
+    /* Khi được hover */
+    .product-checkbox:hover {
+        border-color: #007bff;         /* Xanh dương khi rê chuột vào */
+    }
+
+    /* Khi được chọn */
+    .product-checkbox:checked {
+        background-color: #0d6efd;     /* Màu nền khi chọn */
+        border-color: #0d6efd;
+    }
+
+    /* Tạo dấu check */
+    .product-checkbox:checked::after {
+        content: '';
+        color: white;
+        font-size: 14px;
+        position: absolute;
+        top: 0;
+        left: 3px;
+    }
+
+
+

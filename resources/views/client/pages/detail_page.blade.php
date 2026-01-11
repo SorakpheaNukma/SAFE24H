@@ -1,124 +1,133 @@
 @extends('client.layouts.app')
 
-<meta name="user_id" content="{{ Auth::user()->user_id }}">
+<meta name="user_id" content="{{ Auth::check() ? Auth::user()->user_id : '' }}">
+<meta name="is_logged_in" content="{{ Auth::check() ? 'true' : 'false' }}">
 
 @section('content')
 @include('client.layouts.nav_bar')
 
-<main class="mx-3 mb-3">
-    <!-- Back Icon and Text Home -->
-    <div class="container d-flex align-items-center mb-3">
+<!-- MAIN CONTENT START -->
+<main class="container mb-5"> <!-- Dùng container chuẩn Bootstrap -->
+
+    <!-- Back Icon -->
+    <div class="d-flex align-items-center mb-3" style="gap: 8px;">
         <div class="d-flex justify-content-center align-items-center rounded-circle"
             style="width: 40px; height: 40px; background-color: #F3F3F3;">
-            <a onclick="goBackHome()" style="cursor: pointer" class="text-blue text-decoration-none">
+            <a onclick="goBackHome()" style="cursor: pointer"
+                class="text-blue text-decoration-none d-flex align-items-center justify-content-center">
                 <i class="fa-solid fa-arrow-left fa-lg"></i>
             </a>
         </div>
-
-        <span class="fs-4 ms-2">Home</span>
+        <span class="text" style="font-size: 16px">ត្រឡប់ក្រោយ</span>
     </div>
 
-    <div class="container">
-        <div class="row">
-            <!-- -->
-            <div class="col-12 col-md-4 d-flex flex-column justify-content-center align-items-center mb-3 mb-md-0">
-                <!-- Product Images Carousel -->
-                <div id="carouselProductImages" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner" id="id-product-images">
-                        <!-- Images will be inserted here via JavaScript -->
-                    </div>
-                    <!-- Controls -->
-                    <a class="carousel-control-prev" href="#carouselProductImages" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselProductImages" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </div>
+    <!-- Detail Section -->
+    <div id="container_detail_page" class="row g-4">
+        <!-- Product Images -->
+        <div class="col-12 col-md-3 d-flex flex-column align-items-center mb-3">
+            <div class="swiper mySwiper" style="max-width: 300px; max-height: 450px; margin: 0 auto;">
+                <div class="swiper-wrapper" id="id-product-images"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
 
-                <!-- Quantity Selector -->
-                <div class="quantity-container mt-3">
-                    <h7 class="d-md-block">Quantity</h7>
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-secondary" id="minusBtn">-</button>
-                        <input type="number" class="form-control mx-2" id="id-quantityInput" value="0" min="0"
-                            style="width: 60px;">
-                        <button class="btn btn-secondary" id="plusBtn">+</button>
-                    </div>
-                </div>
+        <!-- Product Details -->
+        <div class="col-12 col-md-6 d-flex flex-column justify-content-start align-items-start">
+            <div id="id-product-name" class="product-line fw-bold fs-2 mb-2 text-break"></div>
+
+            <div class="product-line">
+                <span id="id-price" class="custom-price"></span>
             </div>
 
-            <!-- -->
-            <div class="col-12 col-md-8 d-flex flex-column justify-content-start align-items-start">
-                <h1 id="id-product-name" class="product-title" style="padding-left: 0; "></h1>
-                <p>Free 2 Days Shipping | 1 Year Warranty</p>
+            <div class="product-line price-info">
+                <span class="icon-check p-1 rounded-pill" style="background-color: #F3F3F3;">
+                    <i class="fa-solid fa-check"></i>
+                </span>
+                <span class="text">អាចដូរវិញបាន ឥតគិតថ្លៃ</span>
+            </div>
 
-                <!-- Reviews and Rating -->
-                <div class="d-flex gap-4">
-                    <p>4.5 <i class="fa-solid fa-star"></i></p>
-                    {{-- <p>392 Reviews</p> --}}
-                </div>
+            <div class="product-line d-flex gap-4">
+                <p class="rating-stars text-warning fs-2 mb-0"></p>
+                <p class="avg-rating-text text-muted mb-0"></p>
+            </div>
 
-                <!--price-->
-                <div>
-                    <span id="id-price" class="fs-4 fw-bold"></span>
-                </div>
-                <!---->
-                <div class="price-info mb-3">
-                    <span class="icon-check p-1 rounded-pill" style="background-color: #F3F3F3;"><i
-                            class="fa-solid fa-check"></i></span>
-                    <span class="text">Free return</span>
-                </div>
-
+            <div class="mb-2 d-flex gap-3">
                 <p id="id-sold"></p>
+                <p id="id-stock"></p>
+            </div>
+            <!-- Size -->
+            <div class="product-line d-flex align-items-center">
+                <label for="id-sizeSelect" class="fw-medium mb-0 me-2">ទំហំ:</label>
+                <select id="id-sizeSelect" class="form-select" style="width: 150px;">
+                    <option value="" disabled selected hidden>ជ្រើសរើសទំហំ</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                    <option value="2XL">2XL</option>
+                </select>
+            </div>
 
-                <div class="d-flex w-100 justify-content-start gap-4">
-                    <!-- Buttons -->
-                    <button id="id-btn-buy-now" class="btn btn-primary ">Buy It Now</button>
-                    <button id="id-btn-add-to-cart" class="btn btn-secondary">Add to Cart</button>
+            <!-- Quantity -->
+            <div class="quantity-container mb-3 mt-2">
+                <span class="fw-medium">ចំនួន:</span>
+                <div class="quantity_count d-flex align-items-center gap-2">
+                    <button class="btn btn-secondary" id="minusBtn">-</button>
+                    <input type="number" class="form-control text-center" id="id-quantityInput" value="0" min="0"
+                        style="width: 60px;">
+                    <button class="btn btn-secondary" id="plusBtn">+</button>
                 </div>
             </div>
 
-        </div>
 
-        <!--about product-->
-        <div>
-            <p class="mb-0 mt-2 fw-semibold fs-4">About</p>
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 col-md-3">
-                        <div id="id-img-about"></div>
-                    </div>
-
-                    <div class="col-12 col-md-9">
-                        <!-- Product Details -->
-                        <div id="product-detail-id"></div>
-                    </div>
+            <!-- Buttons -->
+                <div class="product-line d-flex w-100 justify-content-start gap-4">
+                    <button id="id-btn-buy-now" class="btn-add btn btn-primary" style="width: 226px; height: 49px;">ទិញឥឡូវនេះ</button> 
+                    <button id="id-btn-add-to-cart" class="btn-add btn btn-secondary" style="width: 226px; height: 49px;">បន្ថែមទុកក្នុងកន្ត្រក</button>
                 </div>
             </div>
+
+        <!-- Product Description -->
+        <div class="col-12 col-md-3 d-flex flex-column mb-3">
+            <div class="fw-bold text-start" style="font-size: 32px;">អំពីទំនិញ</div>
+            <div id="product-detail-id" class="w-100"></div>
         </div>
-
-        <!-- Recommend Items -->
-        <div style="padding: 15px;">
-            <div class="row">
-                <div>
-                    <p class="fw-semibold fs-4 p-0 m-0">Recommend items</p>
-                    <div class="d-flex flex-wrap justify-content-start" id="recommend-items-grid">
-                    </div>
-
-                    <div class="text-center mt-3" id="view-more-container" style="display: none;">
-                        <button class="btn btn-dark" onclick="addMoreItems()">View More</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
+
+    <!-- Comment Section -->
+    <div class="container_comment mt-4">
+        <div class="mb-2">
+            <p class="fw-bold" style="font-size: 25px;">មតិ និងការវាយតម្លៃ</p>
+        </div>
+        <div class="comments-list">
+            <!-- AJAX comment rendering -->
+        </div>
+    </div>
+
+    <!-- Recommend Items -->
+    <div class="mt-4">
+        <p class="fw-semibold fs-3">ទំនិញស្រដៀងៗគ្នា</p>
+        <div class="d-flex flex-wrap justify-content-start mt-2" id="recommend-items-grid"></div>
+        <div class="text-center mt-3" id="view-more-container" style="display: none;">
+            <button class="btn btn-dark" onclick="addMoreItems()">បន្ថែមទៀត</button>
+        </div>
+    </div>
+
 </main>
 
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+
+<!-- Script JS -->
 <script src="{{ asset('assets/js/nav_bar_global.js') }}"></script>
 <script src="{{ asset('assets/js/detail_page.js') }}"></script>
 
+<!-- SweetAlert -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection

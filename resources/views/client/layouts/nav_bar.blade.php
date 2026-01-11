@@ -1,8 +1,13 @@
-<!--  -->
 <nav class="navbar navbar-expand-lg navbar-light my-Bg">
+    
     <div class="container">
         <!-- Logo -->
-        <a class="navbar-brand fs-2 fw-bold" href="/home-page">Japan Care</a>
+        <div class="logo_container">
+            <a href="/home-page">
+                <img src="assets/images/Ellipse_3.png" alt="">
+            </a>
+        </div>
+        <a class="navbar-brand fs-2 fw-bold" href="/home-page">SAFE 24H</a>
 
         <!--  Button for Sidebar -->
         <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="offcanvas"
@@ -23,14 +28,15 @@
             <div class="offcanvas-body sidebar-content p-0 p-lg-0">
                 <!-- Box with text and search bar -->
                 <div class="search-container d-flex align-items-center">
-                    <div id="id_location" class="mx-2"
-                        style="width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 10px; border-radius: 10px; background-color: #F3F3F3;">
-                        Delivery to Cambodia ...
-                    </div>
-                    <div class="input-group"">
+                <button id="id_location" class="mx-2"
+                        style="width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 10px; border-radius: 10px; background-color: #F3F3F3; border: none; cursor: pointer;">
+                    ដឹកជញ្ជូនទៅដល់ ..............
+                </button>
+
+                    <div class="input-group">
                             <select class=" form-select" id="categoryDropdown">
                         </select>
-                        <input type="text" class="form-control" placeholder="Search...">
+                        <input type="text" class="form-control" placeholder="ស្វែងរក...">
                         <button id="id-btn-search" class="btn btn-primary" type="button">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -49,26 +55,33 @@
                                 class="d-none custom-badge position-absolute top-0 start-100 translate-middle badge rounded-pill"
                                 style="background-color: blue; color: white;"></span>
                         </a>
-                        {{-- <div class="cart-info d-flex flex-column ms-2 fw-bold">
-                            <p class="text-nowrap mb-0">My Cart</p>
-                            <p class="mb-0 total">$0</p>
-                        </div> --}}
                     </div>
 
 
                     <!-- Profile Section -->
-                    <div class="ms-2 nav-item dropdown">
+                    <div id="profile" class="ms-2 nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img class="rounded-circle me-lg-2" src="assets/images/profile.png" alt="Profile Picture"
-                                style="width: 40px; height: 40px;">
+                        <img id="profile_nav_bar" class="rounded-circle me-lg-2" 
+                            src="{{ Auth::check() && Auth::user()->user_profile 
+                                ? asset(Auth::user()->user_profile) 
+                                : asset('assets/images/profile.png') }}" 
+                            alt="Profile Picture" style="width: 40px; height: 40px;">
+
                             <span id="id-username" class="d-none d-lg-inline-flex"></span>
                             <i id="dropdown-icon" class="fas fa-chevron-down ms-2"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom">
-                            <a id="id-profile" class="dropdown-item">My Profile</a>
-                            <a id="id-logout" id="id-logout" class="dropdown-item">Log Out</a>
+                            <a id="id-profile" class="dropdown-item">ព័ត៌មានរបស់អ្នក</a>
+                            <a id="id-logout" id="id-logout" class="dropdown-item">ចាកចេញ</a>
                         </div>
                     </div>
+
+                    <!-- Login/Sign Up Section -->
+                    <div id="auth-buttons" class="ms-2 d-flex d-none">
+                        <a href="/login" class="btn btn-outline-primary me-2">ចូលគណនី</a>
+                        <a href="/sign-up" class="btn btn-outline-secondary">បង្កើតគណនី</a>
+                    </div>
+
 
                 </div>
             </div>
@@ -78,12 +91,3 @@
     </div>
 </nav>
 <!-- -->
-
-<script>
-    $(document).ready(function () {
-    let username = "{{ Auth::user()->username }}";  
-    if (username) {
-        $('#id-username').text(username);
-    }
-});
-</script>

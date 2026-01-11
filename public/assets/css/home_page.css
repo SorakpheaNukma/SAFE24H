@@ -1,51 +1,62 @@
-/* here for grid footer */
-/* Flexbox Layout for Sticky Footer */
+/*--------------------------------------------------
+1. Global Styles (Body, Font, Spinner, Hidden, etc.)
+--------------------------------------------------*/
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    /* Full viewport height */
     font-family: Arial, sans-serif;
     background-color: #ffffff;
     margin: 0;
-    /* Remove default margin */
 }
 
 main {
     flex: 1;
-    /* Flexible main content area */
 }
 
-/* .grid-item {
-    background-color: #ffffff;
-    border: 1px solid #e6e6e6;
-    border-radius: 10px;
-    padding: 8px;
-    text-align: center;
-    margin-bottom: 15px;
-    height: auto;
-} */
+#spinner {
+    opacity: 0;
+    visibility: hidden;
+}
 
+.hidden {
+    display: none;
+}
+
+/* Khmer Font Import */
+@font-face {
+    font-family: 'Khmer OS';
+    src: url('/assets/fonts/KhmerOS.ttf') format('truetype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Khmer OS', Arial, sans-serif;
+}
+
+
+/*--------------------------------------------------
+2. Grid & Product Card Styles
+--------------------------------------------------*/
 .grid-item {
     background-color: #ffffff;
     border: 1px solid #e6e6e6;
-    border-radius: 10px;
-    padding: 8px;
+    border-radius: 20px;
+    padding: 18px;
     text-align: center;
     margin-bottom: 15px;
+    width: 100%;
     height: auto;
+    min-height: 320px;
+    box-shadow: 4px 8px 10px 2px #34343449;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* Smooth transition for scaling and shadow */
     position: relative;
     cursor: pointer;
 }
 
 .grid-item:hover {
-    /* Scale up the grid item */
-    /* transform: scale(1.05); */
     background-color: #F3F3F3;
-    /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
-    /* Optional: add shadow effect */
 }
 
 .icon-overlay {
@@ -53,49 +64,43 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    /* Center the icon */
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
-/* .grid-item:hover .icon-overlay {
-    opacity: 1;
-} */
-
-/* .hover-icon {
-    width: 40px;
-    height: 40px;
-    display: block;
-} */
-
-
 .image-container {
-    width: calc(100% - 20px);
-    height: 150px;
-    border-radius: 15px;
-    margin: 0 auto;
+    width: 100%;
+    height: 215px;
+    margin: auto;
+    border-radius: 20px;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.25rem;
     background-color: #E4EEF9;
     margin-bottom: 10px;
 }
 
 .image-container img {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 0.25rem;
+}
+
+.item-description {
+    display: flex;
+    flex-direction: column;
 }
 
 .product-title {
-    padding-left: 8px;
-    padding-right: 8px;
     font-weight: bold;
-    margin-bottom: 5px;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
 }
 
 .product-description {
@@ -103,50 +108,45 @@ main {
     padding-right: 8px;
     font-size: 0.9em;
     color: #555;
-    margin-bottom: 10px;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    -webkit-line-clamp: 1;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-}
-
-.product-price-rating {
-    padding-right: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1em;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .product-price {
-    padding-left: 8px;
+    margin: 0;
+    font-size: 22px;
     color: #28a745;
     font-weight: bold;
 }
 
-.product-rating img {
-    width: 20px;
-    height: 20px;
-    object-fit: cover;
+.product-original-price {
+    font-size: 0.95em;
+    color: gray;
+    text-decoration: line-through;
+}
+
+.product-discount {
+    font-size: 0.9em;
+    color: green;
+    font-weight: bold;
 }
 
 @media (min-width: 992px) {
-    .col-lg-5-custom {
-        flex: 0 0 20%;
-        max-width: 20%;
+    .col-lg-3-per-row {
+        flex: 0 0 33.3333%;
+        max-width: 33.3333%;
     }
 }
 
-@media (max-width: 580px) {
-    .col-lg-5-custom {
-        flex: 0 0 50%;
-        max-width: 50%;
-    }
-}
 
-/* Footer */
+/*--------------------------------------------------
+3. Footer Styles
+--------------------------------------------------*/
 .footer {
     background-color: #333;
     color: #fff;
@@ -188,21 +188,10 @@ main {
     text-decoration: underline;
 }
 
-/* Spinner */
-#spinner {
-    opacity: 0;
-    visibility: hidden;
-}
 
-/*hidden */
-.hidden {
-    display: none;
-}
-
-/* end of grid footer*/
-/*//////////////////////////////////////////////////////////////////*/
-
-/* here for navbar ...*/
+/*--------------------------------------------------
+4. Navbar & Header Styles
+--------------------------------------------------*/
 .my-Bg {
     background-color: white;
 }
@@ -221,16 +210,44 @@ main {
     background-color: blue;
 }
 
-
 #categoryDropdown {
     background-color: #F3F3F3;
+    cursor: pointer;
 }
 
 .input-group .form-control {
     background-color: #F3F3F3;
+    border-left: none;
 }
 
-/* Styles for screens > 992px */
+
+/*--------------------------------------------------
+5. Card Hover Effects
+--------------------------------------------------*/
+.card {
+    transition: all 0.3s ease-in-out;
+    overflow: visible !important;
+    position: relative;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    transition: all 0.4s ease;
+    display: block;
+}
+
+/* .card:hover .card-img-top {
+    object-fit: contain;
+    height: 300px;
+    background-color: #fff;
+} */
+
+
+/*--------------------------------------------------
+6. Responsive Design (Media Queries)
+--------------------------------------------------*/
 @media (min-width: 992px) {
     .search-container {
         display: flex;
@@ -247,7 +264,6 @@ main {
         flex: 2;
     }
 
-    /* Style for the search input */
     .input-group .form-control {
         min-width: 500px;
     }
@@ -258,12 +274,9 @@ main {
         flex: 1;
     }
 
-    /* Adjust the search input width */
     .input-group .form-control {
         width: 300px !important;
-        /* Set desired width */
         min-width: 0 !important;
-        /* Override any minimum width restrictions */
     }
 
     .search-container {
@@ -279,12 +292,9 @@ main {
         flex: 1;
     }
 
-    /* Adjust the search input width */
     .input-group .form-control {
         width: 250px !important;
-        /* Set desired width */
         min-width: 0 !important;
-        /* Override any minimum width restrictions */
     }
 
     .search-container {
@@ -294,7 +304,6 @@ main {
         margin-top: 5px;
     }
 }
-
 
 @media (max-width: 991px) {
     .sidebar {
@@ -320,12 +329,9 @@ main {
         flex: 1;
     }
 
-    /* Adjust the search input width */
     .input-group .form-control {
         width: 100px !important;
-        /* Set desired width */
         min-width: 0 !important;
-        /* Override any minimum width restrictions */
     }
 
     .search-container {
@@ -346,7 +352,6 @@ main {
         width: 100% !important;
     }
 
-    /* Sidebar */
     .sidebar {
         background-color: white !important;
         backdrop-filter: blur(10px);
@@ -354,7 +359,6 @@ main {
         height: 100%;
     }
 
-    /* Make the search container and other elements stack vertically */
     .search-container {
         flex-direction: column;
         align-items: flex-start;
@@ -367,7 +371,6 @@ main {
         margin-bottom: 10px;
     }
 
-    /* Style the input group to keep the search icon inside the input */
     .input-group {
         display: flex;
         flex-wrap: nowrap;
@@ -386,8 +389,6 @@ main {
         border-bottom-left-radius: 0;
     }
 
-
-
     .cart-info {
         margin-top: 10px;
     }
@@ -402,8 +403,86 @@ main {
     }
 }
 
-/*//////////////////////////////////////////////////////////////////*/
+
+/*--------------------------------------------------
+7. Gallery Styles
+--------------------------------------------------*/
+.gallery-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.gallery-container img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .gallery-container img {
+        width: 100%;
+        height: auto;
+    }
+}
+
+
+/*--------------------------------------------------
+8. Miscellaneous
+--------------------------------------------------*/
+#container_detail_page {
+    width: 100% !important;
+}
 
 .dropdown-toggle::after {
     content: none;
+}
+/*--------------------------------------------------
+9. Miscellaneous
+--------------------------------------------------*/
+.img-hover-wrapper {
+    position: relative;
+    width: 100%;
+    height: 520px; /* hoặc cùng chiều cao bạn đang dùng */
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.img-hover-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* height: 100%;
+    width: 100%; */
+    object-fit: cover;
+    transition: opacity 0.3s ease-in-out;
+    display: block;
+    width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.img-hover-wrapper .hover-img {
+    opacity: 0;
+    z-index: 2;
+}
+
+.img-hover-wrapper .main-img {
+    z-index: 1;
+}
+
+.img-hover-wrapper:hover .hover-img {
+    opacity: 1;
+}
+
+.img-hover-wrapper:hover .main-img {
+    opacity: 0;
+}
+.product-title {
+    font-family: 'Khmer OS', Arial, sans-serif;
 }

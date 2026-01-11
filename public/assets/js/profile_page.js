@@ -1,4 +1,9 @@
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     const usernameGL = document.querySelector('meta[name="username"]').content;
     const phoneNumberGL = document.querySelector('meta[name="phone_number"]').content;
     const emailGL = document.querySelector('meta[name="email"]').content;
@@ -7,93 +12,150 @@ $(document).ready(function () {
     let processCountGL = 0;
     let toShipCountGL = 0;
 
+    $.ajax({
+        url: '/user-info',
+        method: 'GET',
+        success: function (data) {
+            $('#username').text(data.username);
+            $('#phone').text(data.phone);
+            $('#email').text(data.email);
+    
+            // Cập nhật ảnh nếu có, ngược lại dùng ảnh mặc định
+            let profilePath = data.user_profile 
+                ? '/' + data.user_profile.replace(/\\/g, '/') 
+                : '/assets/images/profile.png';
+            $('#avatar').attr('src', profilePath);
+        },
+        error: function () {
+            console.log("Lỗi khi lấy thông tin người dùng.");
+            showGuestUI();
+        }
+    });
+    
+    
 
     $('#id-edit-info').on('click', function () {
-        $.confirm({
-            title: '<strong>Edit Information</strong>',
-            content: `
-                <form id="editInfoForm" class="formName">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" placeholder="Enter your name" class="form-control" required />
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" id="phone" placeholder="Enter your phone number" class="form-control" required />
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="Enter your email" class="form-control" required />
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="profile-image">Profile Image</label>
-                        <input type="file" id="profile-image" class="form-control" accept="image/*" />
-                    </div>
-                </form>
-            `,
-            draggable: true,
-            columnClass: 'm',
-            typeAnimated: true,
-            type: 'blue',
-            buttons: {
-                yes: {
-                    text: 'Submit',
-                    action: function () {
-                        alert('we\'re in development !!');
-                        var name = this.$content.find('#name').val();
-                        var phone = this.$content.find('#phone').val();
-                        var email = this.$content.find('#email').val();
-                        var profileImage = this.$content.find('#profile-image')[0].files[0];
+    $.confirm({
+        title: '<strong>ព័ត៌មានរបស់អ្នក</strong>',
+        content: `
+            <form id="editInfoForm" class="formName">
+                <div class="form-group">
+                    <label for="name">ឈ្មោះ</label>
+                    <input type="text" id="name" placeholder="សូមបំពេញឈ្មោះ" class="form-control" required />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="phone">លេខទូរស័ព្ទ</label>
+                    <input type="text" id="phone" placeholder="សូមបំពេញលេខទូរស័ព្ទ" class="form-control" required />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="email">អ៊ីម៉ែល</label>
+                    <input type="email" id="email" placeholder="សូមបំពេញអ៊ីម៉ែល" class="form-control" required />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="profile-image">រូបភាព</label>
+                    <input type="file" id="profile-image" class="form-control" accept="image/*" />
+                </div>
+            </form>
+        `,
+        draggable: true,
+        columnClass: 'm',
+        typeAnimated: true,
+        type: 'blue',
+        buttons: {
+            yes: {
+                text: 'យល់ព្រម',
+                btnClass: 'btn-blue',
+                action: function () {
+                    const name = this.$content.find('#name').val();
+                    const phone = this.$content.find('#phone').val();
+                    const email = this.$content.find('#email').val();
+                    const profileImage = this.$content.find('#profile-image')[0].files[0];
 
-                        if (!name || !phone || !email) {
-                            $.alert('Please fill all the fields.');
-                            return false;
-                        }
-
-                        // Handle submission logic here
-                        console.log("Name:", name);
-                        console.log("Phone:", phone);
-                        console.log("Email:", email);
-
-                        // Handle profile image upload if necessary
-                        if (profileImage) {
-                            console.log("Profile Image:", profileImage.name);
-                            // Optionally, create a FormData object for AJAX submission
-                            const formData = new FormData();
-                            formData.append('name', name);
-                            formData.append('phone', phone);
-                            formData.append('email', email);
-                            formData.append('profile-image', profileImage);
-
-                            // Example AJAX submission
-                            /*
-                            $.ajax({
-                                url: '/update-info',
-                                type: 'POST',
-                                data: formData,
-                                contentType: false,
-                                processData: false,
-                                success: function(response) {
-                                    // Handle response
-                                }
-                            });
-                            */
-                        }
+                    if (!name || !phone || !email) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'សូមបំពេញព័ត៌មាន!',
+                            text: 'សូមបំពេញឈ្មោះ, លេខទូរស័ព្ទ និងអ៊ីម៉ែល',
+                            confirmButtonText: 'យល់ព្រម'
+                        });
+                        return false;
                     }
-                },
-                no: {
-                    text: 'Cancel',
-                    action: function () { }
-                },
-            },
-            onOpenBefore: function () {
-                this.$content.find('#name').val(usernameGL);
-                this.$content.find('#phone').val(phoneNumberGL);
-                this.$content.find('#email').val(emailGL);
-            },
-        });
-    });
 
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('phone', phone);
+                    formData.append('email', email);
+                    if (profileImage) {
+                        formData.append('user_profile', profileImage);
+                    }
+
+                    Swal.fire({
+                        title: 'កំពុងរក្សាទុក...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    $.ajax({
+                        url: '/update-info',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        success: (response) => {
+                            Swal.close();
+                            $('#profile_name').text(response.username);
+                            $('#profile_phone').text(response.phone_number);
+                            $('#profile_email').text(response.email);
+
+                            localStorage.setItem("username", response.username);
+                            localStorage.setItem("profileImage", response.profile_image);
+
+                            if (profileImage) {
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    $('img[src*="profile.png"], img[src*="uploads/profile"]').attr('src', e.target.result);
+                                    $('#profile_nav_bar').attr('src', e.target.result);
+                                };
+                                reader.readAsDataURL(profileImage);
+                            }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ជោគជ័យ!',
+                                text: 'បានរក្សាទុកព័ត៌មានដោយជោគជ័យ!',
+                                confirmButtonText: 'យល់ព្រម'
+                            });
+                        },
+                        error: () => {
+                            Swal.close();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'បរាជ័យ!',
+                                text: 'មានបញ្ហា ខណៈពេលកំពុងរក្សាទុកព័ត៌មាន!',
+                                confirmButtonText: 'បិទ'
+                            });
+                        }
+                    });
+                }
+            },
+            no: {
+                text: 'បោះបង់',
+                action: function () { /* nothing */ }
+            },
+        },
+        onOpenBefore: function () {
+            this.$content.find('#name').val(usernameGL);
+            this.$content.find('#phone').val(phoneNumberGL);
+            this.$content.find('#email').val(emailGL);
+        },
+    });
+    });
 
     function getOrdersCurrentLogin(callback) {
         $.ajax({
@@ -178,6 +240,7 @@ $(document).ready(function () {
             },
             success: function (res) {
                 if (res.status === 200) {
+
                     const filteredItems = res.data.filter(item => orderIds.includes(item.order_id));
 
                     callback(filteredItems);

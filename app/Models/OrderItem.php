@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProductVariants;
 
 class OrderItem extends Model
 {
@@ -14,6 +15,7 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'product_id',
+        'variant_id',
         'quantity',
         'price',
     ];
@@ -28,4 +30,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Product::class, 'product_id', 'product_id');
     }
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariants::class, 'variant_id');
+    }
+    
 }
